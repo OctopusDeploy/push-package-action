@@ -1,0 +1,73 @@
+{
+  "author": "Octopus Deploy",
+  "bugs": {
+    "url": "https://github.com/OctopusDeploy/push-package-action/issues"
+  },
+  "dependencies": {
+    "@actions/core": "^1.2.6",
+    "@actions/exec": "^1.0.4"
+  },
+  "description": "GitHub Action to Push a Package to Octopus Deploy",
+  "devDependencies": {
+    "@types/jest": "^26.0.22",
+    "@types/node": "^14.14.37",
+    "@types/tmp": "^0.2.0",
+    "@types/urijs": "^1.19.15",
+    "@typescript-eslint/parser": "^4.20.0",
+    "@vercel/ncc": "^0.27.0",
+    "eslint": "^7.23.0",
+    "eslint-plugin-jest": "^24.3.2",
+    "jest": "^26.6.3",
+    "jest-circus": "^26.6.3",
+    "js-yaml": "^4.0.0",
+    "prettier": "2.2.1",
+    "tmp": "^0.2.1",
+    "ts-jest": "^26.5.4",
+    "typescript": "^4.2.3"
+  },
+  "homepage": "https://github.com/OctopusDeploy/push-package-action#readme",
+  "jest": {
+    "clearMocks": true,
+    "collectCoverage": true,
+    "moduleFileExtensions": [
+      "js",
+      "ts"
+    ],
+    "setupFiles": [
+      "<rootDir>/src/test-setup.ts"
+    ],
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/*.test.ts"
+    ],
+    "testRunner": "jest-circus/runner",
+    "testTimeout": 10000,
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "verbose": true
+  },
+  "keywords": [
+    "cli",
+    "deployment",
+    "octopus-deploy",
+    "github-actions"
+  ],
+  "license": "Apache-2.0",
+  "main": "dist/main.js",
+  "name": "push-package-action",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OctopusDeploy/push-package-action.git"
+  },
+  "scripts": {
+    "all": "npm run build && npm run format && npm run lint && npm run package && npm test",
+    "build": "tsc && ncc build",
+    "format": "prettier --write **/*.ts",
+    "format-check": "prettier --check **/*.ts",
+    "lint": "eslint src/**/*.ts",
+    "package": "ncc build --source-map --license licenses.txt",
+    "test": "jest"
+  },
+  "version": "1.0.0"
+}
