@@ -32,8 +32,8 @@ steps:
     uses: OctopusDeploy/install-octopus-cli-action@v1.1.1
     with:
       version: latest
-  - name: Create a release in Octopus Deploy 🐙
-    uses: OctopusDeploy/create-release-action@v1.0.0
+  - name: Push a package to Octopus Deploy 🐙
+    uses: OctopusDeploy/push-package-action@v1.0.0
     with:
       password: ${{ secrets.PASSWORD }}
       packages: "package1,package2"
