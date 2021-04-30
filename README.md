@@ -16,7 +16,7 @@ steps:
     with:
       version: latest
   - name: Push a package to Octopus Deploy 🐙
-    uses: OctopusDeploy/push-package-action@v1.0.0
+    uses: OctopusDeploy/push-package-action@v1.0.1
     with:
       api_key: ${{ secrets.API_KEY }}
       packages: "package1,package2"
@@ -33,7 +33,7 @@ steps:
     with:
       version: latest
   - name: Push a package to Octopus Deploy 🐙
-    uses: OctopusDeploy/push-package-action@v1.0.0
+    uses: OctopusDeploy/push-package-action@v1.0.1
     with:
       password: ${{ secrets.PASSWORD }}
       packages: "package1,package2"
