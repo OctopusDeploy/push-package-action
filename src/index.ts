@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as octopus from './push-package'
-import * as inputs from '../src/input-parameters'
+import * as inputs from './input-parameters'
 
 async function run(): Promise<void> {
   try {
