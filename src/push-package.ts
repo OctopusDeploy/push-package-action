@@ -1,9 +1,9 @@
 import {InputParameters} from './input-parameters'
-import * as core from '@actions/core'
-import * as exec from '@actions/exec'
+import {info, setFailed} from '@actions/core'
+import {exec, ExecOptions} from '@actions/exec'
 
 function getArgs(parameters: InputParameters): string[] {
-  core.info('🔣 Parsing inputs...')
+  info('🔣 Parsing inputs...')
 
   const args = ['push']
 
@@ -23,7 +23,7 @@ function getArgs(parameters: InputParameters): string[] {
       parameters.overwriteMode !== 'OverwriteExisting' &&
       parameters.overwriteMode !== 'IgnoreIfExists'
     ) {
-      core.setFailed(
+      setFailed(
         'The input value, overwrite_mode is invalid; accept values are "FailIfExists", "OverwriteExisting", and "IgnoreIfExists".'
       )
     }
@@ -62,41 +62,41 @@ function getArgs(parameters: InputParameters): string[] {
 export async function pushPackage(parameters: InputParameters): Promise<void> {
   const args = getArgs(parameters)
 
-  const options: exec.ExecOptions = {
-    ignoreReturnCode: true,
+  const options: ExecOptions = {
     listeners: {
-      errline: (line: string) => {
-        core.error(line)
-      },
       stdline: (line: string) => {
         if (line.length <= 0) return
 
         if (line.includes('Octopus Deploy Command Line Tool')) {
           const version = line.split('version ')[1]
-          core.info(`🐙 Using Octopus Deploy CLI ${version}...`)
+          info(`🐙 Using Octopus Deploy CLI ${version}...`)
           return
         }
 
         if (line.includes('Handshaking with Octopus Server')) {
-          core.info(`🤝 Handshaking with Octopus Deploy`)
+          info(`🤝 Handshaking with Octopus Deploy`)
           return
         }
 
         if (line.includes('Authenticated as:')) {
-          core.info(`✅ Authenticated`)
+          info(`✅ Authenticated`)
           return
         }
 
         if (line === 'Push successful') {
-          core.info(`🎉 Push successful!`)
+          info(`🎉 Push successful!`)
           return
         }
 
-        core.info(line)
+        info(line)
       }
     },
     silent: true
   }
 
-  await exec.exec('octo', args, options)
+  try {
+    await exec('octo', args, options)
+  } catch (err) {
+    setFailed(err)
+  }
 }
