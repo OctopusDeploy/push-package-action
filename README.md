@@ -12,11 +12,11 @@ Incorporate the following actions in your workflow to push a package to Octopus 
 steps:
   - uses: actions/checkout@v2
   - name: Install Octopus CLI 🐙
-    uses: OctopusDeploy/install-octopus-cli-action@v1.1.1
+    uses: OctopusDeploy/install-octopus-cli-action@v1.1.6
     with:
       version: latest
   - name: Push a package to Octopus Deploy 🐙
-    uses: OctopusDeploy/push-package-action@v1.0.1
+    uses: OctopusDeploy/push-package-action@v1.0.2
     with:
       api_key: ${{ secrets.API_KEY }}
       packages: "package1,package2"
@@ -29,11 +29,11 @@ Here's an example that provides a `username` and `password` to authenticate to O
 steps:
   - uses: actions/checkout@v2
   - name: Install Octopus CLI 🐙
-    uses: OctopusDeploy/install-octopus-cli-action@v1.1.1
+    uses: OctopusDeploy/install-octopus-cli-action@v1.1.6
     with:
       version: latest
   - name: Push a package to Octopus Deploy 🐙
-    uses: OctopusDeploy/push-package-action@v1.0.1
+    uses: OctopusDeploy/push-package-action@v1.0.2
     with:
       password: ${{ secrets.PASSWORD }}
       packages: "package1,package2"
