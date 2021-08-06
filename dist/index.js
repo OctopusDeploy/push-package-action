@@ -1704,59 +1704,6 @@ function copyFile(srcFile, destFile, force) {
 
 /***/ }),
 
-/***/ 361:
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getBooleanInput = void 0;
-/**
- * Gets the input value of the boolean type in the YAML specification.
- * The return value is also in boolean type.
- * ref: https://yaml.org/type/bool.html
- *
- * @param     name     name of the input to get
- * @returns   boolean
- */
-function getBooleanInput(name) {
-    const trueValue = [
-        'true',
-        'True',
-        'TRUE',
-        'yes',
-        'Yes',
-        'YES',
-        'y',
-        'Y',
-        'on',
-        'On',
-        'ON'
-    ];
-    const falseValue = [
-        'false',
-        'False',
-        'FALSE',
-        'no',
-        'No',
-        'NO',
-        'n',
-        'N',
-        'off',
-        'Off',
-        'OFF'
-    ];
-    const val = (process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '').trim();
-    if (trueValue.includes(val))
-        return true;
-    if (falseValue.includes(val))
-        return false;
-    return false;
-}
-exports.getBooleanInput = getBooleanInput;
-
-
-/***/ }),
-
 /***/ 148:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1810,51 +1757,31 @@ run();
 /***/ }),
 
 /***/ 519:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.get = void 0;
-const core = __importStar(__nccwpck_require__(186));
-const get_boolean_input_1 = __nccwpck_require__(361);
+const core_1 = __nccwpck_require__(186);
 function get() {
     return {
-        apiKey: core.getInput('api_key'),
-        configFile: core.getInput('config_file'),
-        debug: get_boolean_input_1.getBooleanInput('debug'),
-        ignoreSslErrors: get_boolean_input_1.getBooleanInput('ignore_ssl_errors'),
-        logLevel: core.getInput('log_level'),
-        overwriteMode: core.getInput('overwrite_mode'),
-        packages: core.getInput('packages'),
-        password: core.getInput('password'),
-        proxy: core.getInput('proxy'),
-        proxyPassword: core.getInput('proxy_password'),
-        proxyUsername: core.getInput('proxy_username'),
-        releaseExisting: core.getInput('release_existing'),
-        server: core.getInput('server'),
-        space: core.getInput('space'),
-        timeout: core.getInput('timeout'),
-        useDeltaCompression: get_boolean_input_1.getBooleanInput('use_delta_compression'),
-        username: core.getInput('user')
+        apiKey: core_1.getInput('api_key'),
+        configFile: core_1.getInput('config_file'),
+        debug: core_1.getBooleanInput('debug'),
+        ignoreSslErrors: core_1.getBooleanInput('ignore_ssl_errors'),
+        logLevel: core_1.getInput('log_level'),
+        overwriteMode: core_1.getInput('overwrite_mode'),
+        packages: core_1.getInput('packages'),
+        password: core_1.getInput('password'),
+        proxy: core_1.getInput('proxy'),
+        proxyPassword: core_1.getInput('proxy_password'),
+        proxyUsername: core_1.getInput('proxy_username'),
+        releaseExisting: core_1.getInput('release_existing'),
+        server: core_1.getInput('server'),
+        space: core_1.getInput('space'),
+        timeout: core_1.getInput('timeout'),
+        useDeltaCompression: core_1.getBooleanInput('use_delta_compression'),
+        username: core_1.getInput('user')
     };
 }
 exports.get = get;

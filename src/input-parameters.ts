@@ -1,5 +1,4 @@
-import * as core from '@actions/core'
-import {getBooleanInput} from './get-boolean-input'
+import {getBooleanInput, getInput} from '@actions/core'
 
 export interface InputParameters {
   apiKey: string
@@ -23,22 +22,22 @@ export interface InputParameters {
 
 export function get(): InputParameters {
   return {
-    apiKey: core.getInput('api_key'),
-    configFile: core.getInput('config_file'),
+    apiKey: getInput('api_key'),
+    configFile: getInput('config_file'),
     debug: getBooleanInput('debug'),
     ignoreSslErrors: getBooleanInput('ignore_ssl_errors'),
-    logLevel: core.getInput('log_level'),
-    overwriteMode: core.getInput('overwrite_mode'),
-    packages: core.getInput('packages'),
-    password: core.getInput('password'),
-    proxy: core.getInput('proxy'),
-    proxyPassword: core.getInput('proxy_password'),
-    proxyUsername: core.getInput('proxy_username'),
-    releaseExisting: core.getInput('release_existing'),
-    server: core.getInput('server'),
-    space: core.getInput('space'),
-    timeout: core.getInput('timeout'),
+    logLevel: getInput('log_level'),
+    overwriteMode: getInput('overwrite_mode'),
+    packages: getInput('packages'),
+    password: getInput('password'),
+    proxy: getInput('proxy'),
+    proxyPassword: getInput('proxy_password'),
+    proxyUsername: getInput('proxy_username'),
+    releaseExisting: getInput('release_existing'),
+    server: getInput('server'),
+    space: getInput('space'),
+    timeout: getInput('timeout'),
     useDeltaCompression: getBooleanInput('use_delta_compression'),
-    username: core.getInput('user')
+    username: getInput('user')
   }
 }
