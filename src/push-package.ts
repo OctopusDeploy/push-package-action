@@ -96,7 +96,9 @@ export async function pushPackage(parameters: InputParameters): Promise<void> {
 
   try {
     await exec('octo', args, options)
-  } catch (err) {
-    setFailed(err)
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      setFailed(e)
+    }
   }
 }
