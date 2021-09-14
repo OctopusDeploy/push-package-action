@@ -133,7 +133,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
+exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.notice = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
 const command_1 = __nccwpck_require__(351);
 const file_command_1 = __nccwpck_require__(717);
 const utils_1 = __nccwpck_require__(278);
@@ -311,19 +311,30 @@ exports.debug = debug;
 /**
  * Adds an error issue
  * @param message error issue message. Errors will be converted to string via toString()
+ * @param properties optional properties to add to the annotation.
  */
-function error(message) {
-    command_1.issue('error', message instanceof Error ? message.toString() : message);
+function error(message, properties = {}) {
+    command_1.issueCommand('error', utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
 }
 exports.error = error;
 /**
- * Adds an warning issue
+ * Adds a warning issue
  * @param message warning issue message. Errors will be converted to string via toString()
+ * @param properties optional properties to add to the annotation.
  */
-function warning(message) {
-    command_1.issue('warning', message instanceof Error ? message.toString() : message);
+function warning(message, properties = {}) {
+    command_1.issueCommand('warning', utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
 }
 exports.warning = warning;
+/**
+ * Adds a notice issue
+ * @param message notice issue message. Errors will be converted to string via toString()
+ * @param properties optional properties to add to the annotation.
+ */
+function notice(message, properties = {}) {
+    command_1.issueCommand('notice', utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+}
+exports.notice = notice;
 /**
  * Writes info to log with console.log.
  * @param message info message
@@ -455,7 +466,7 @@ exports.issueCommand = issueCommand;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.toCommandValue = void 0;
+exports.toCommandProperties = exports.toCommandValue = void 0;
 /**
  * Sanitizes an input into a string so it can be passed into issueCommand safely
  * @param input input to sanitize into a string
@@ -470,6 +481,25 @@ function toCommandValue(input) {
     return JSON.stringify(input);
 }
 exports.toCommandValue = toCommandValue;
+/**
+ *
+ * @param annotationProperties
+ * @returns The command properties to send with the actual annotation command
+ * See IssueCommandProperties: https://github.com/actions/runner/blob/main/src/Runner.Worker/ActionCommandManager.cs#L646
+ */
+function toCommandProperties(annotationProperties) {
+    if (!Object.keys(annotationProperties).length) {
+        return {};
+    }
+    return {
+        title: annotationProperties.title,
+        line: annotationProperties.startLine,
+        endLine: annotationProperties.endLine,
+        col: annotationProperties.startColumn,
+        endColumn: annotationProperties.endColumn
+    };
+}
+exports.toCommandProperties = toCommandProperties;
 //# sourceMappingURL=utils.js.map
 
 /***/ }),
@@ -1737,7 +1767,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(186));
+const core_1 = __nccwpck_require__(186);
 const octopus = __importStar(__nccwpck_require__(20));
 const inputs = __importStar(__nccwpck_require__(519));
 function run() {
@@ -1746,8 +1776,10 @@ function run() {
             const inputParameters = inputs.get();
             yield octopus.pushPackage(inputParameters);
         }
-        catch (error) {
-            core.setFailed(error.message);
+        catch (e) {
+            if (e instanceof Error) {
+                (0, core_1.setFailed)(e);
+            }
         }
     });
 }
@@ -1765,23 +1797,23 @@ exports.get = void 0;
 const core_1 = __nccwpck_require__(186);
 function get() {
     return {
-        apiKey: core_1.getInput('api_key'),
-        configFile: core_1.getInput('config_file'),
-        debug: core_1.getBooleanInput('debug'),
-        ignoreSslErrors: core_1.getBooleanInput('ignore_ssl_errors'),
-        logLevel: core_1.getInput('log_level'),
-        overwriteMode: core_1.getInput('overwrite_mode'),
-        packages: core_1.getInput('packages'),
-        password: core_1.getInput('password'),
-        proxy: core_1.getInput('proxy'),
-        proxyPassword: core_1.getInput('proxy_password'),
-        proxyUsername: core_1.getInput('proxy_username'),
-        releaseExisting: core_1.getInput('release_existing'),
-        server: core_1.getInput('server'),
-        space: core_1.getInput('space'),
-        timeout: core_1.getInput('timeout'),
-        useDeltaCompression: core_1.getBooleanInput('use_delta_compression'),
-        username: core_1.getInput('user')
+        apiKey: (0, core_1.getInput)('api_key'),
+        configFile: (0, core_1.getInput)('config_file'),
+        debug: (0, core_1.getBooleanInput)('debug'),
+        ignoreSslErrors: (0, core_1.getBooleanInput)('ignore_ssl_errors'),
+        logLevel: (0, core_1.getInput)('log_level'),
+        overwriteMode: (0, core_1.getInput)('overwrite_mode'),
+        packages: (0, core_1.getInput)('packages'),
+        password: (0, core_1.getInput)('password'),
+        proxy: (0, core_1.getInput)('proxy'),
+        proxyPassword: (0, core_1.getInput)('proxy_password'),
+        proxyUsername: (0, core_1.getInput)('proxy_username'),
+        releaseExisting: (0, core_1.getInput)('release_existing'),
+        server: (0, core_1.getInput)('server'),
+        space: (0, core_1.getInput)('space'),
+        timeout: (0, core_1.getInput)('timeout'),
+        useDeltaCompression: (0, core_1.getBooleanInput)('use_delta_compression'),
+        username: (0, core_1.getInput)('user')
     };
 }
 exports.get = get;
@@ -1807,7 +1839,7 @@ exports.pushPackage = void 0;
 const core_1 = __nccwpck_require__(186);
 const exec_1 = __nccwpck_require__(514);
 function getArgs(parameters) {
-    core_1.info('🔣 Parsing inputs...');
+    (0, core_1.info)('🔣 Parsing inputs...');
     const args = ['push'];
     if (parameters.apiKey.length > 0)
         args.push(`--apiKey=${parameters.apiKey}`);
@@ -1823,7 +1855,7 @@ function getArgs(parameters) {
         parameters.overwriteMode !== 'FailIfExists') {
         if (parameters.overwriteMode !== 'OverwriteExisting' &&
             parameters.overwriteMode !== 'IgnoreIfExists') {
-            core_1.setFailed('The input value, overwrite_mode is invalid; accept values are "FailIfExists", "OverwriteExisting", and "IgnoreIfExists".');
+            (0, core_1.setFailed)('The input value, overwrite_mode is invalid; accept values are "FailIfExists", "OverwriteExisting", and "IgnoreIfExists".');
         }
         args.push(`--overwrite-mode=${parameters.overwriteMode}`);
     }
@@ -1868,31 +1900,33 @@ function pushPackage(parameters) {
                         return;
                     if (line.includes('Octopus Deploy Command Line Tool')) {
                         const version = line.split('version ')[1];
-                        core_1.info(`🐙 Using Octopus Deploy CLI ${version}...`);
+                        (0, core_1.info)(`🐙 Using Octopus Deploy CLI ${version}...`);
                         return;
                     }
                     if (line.includes('Handshaking with Octopus Server')) {
-                        core_1.info(`🤝 Handshaking with Octopus Deploy`);
+                        (0, core_1.info)(`🤝 Handshaking with Octopus Deploy`);
                         return;
                     }
                     if (line.includes('Authenticated as:')) {
-                        core_1.info(`✅ Authenticated`);
+                        (0, core_1.info)(`✅ Authenticated`);
                         return;
                     }
                     if (line === 'Push successful') {
-                        core_1.info(`🎉 Push successful!`);
+                        (0, core_1.info)(`🎉 Push successful!`);
                         return;
                     }
-                    core_1.info(line);
+                    (0, core_1.info)(line);
                 }
             },
             silent: true
         };
         try {
-            yield exec_1.exec('octo', args, options);
+            yield (0, exec_1.exec)('octo', args, options);
         }
-        catch (err) {
-            core_1.setFailed(err);
+        catch (e) {
+            if (e instanceof Error) {
+                (0, core_1.setFailed)(e);
+            }
         }
     });
 }
