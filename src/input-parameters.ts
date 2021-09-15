@@ -1,4 +1,4 @@
-import { getBooleanInput, getMultilineInput, getInput } from '@actions/core'
+import {getBooleanInput, getMultilineInput, getInput} from '@actions/core'
 
 export interface InputParameters {
   apiKey: string
