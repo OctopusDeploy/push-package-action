@@ -1803,7 +1803,7 @@ function get() {
         ignoreSslErrors: (0, core_1.getBooleanInput)('ignore_ssl_errors'),
         logLevel: (0, core_1.getInput)('log_level'),
         overwriteMode: (0, core_1.getInput)('overwrite_mode'),
-        packages: (0, core_1.getInput)('packages'),
+        packages: (0, core_1.getMultilineInput)('packages'),
         password: (0, core_1.getInput)('password'),
         proxy: (0, core_1.getInput)('proxy'),
         proxyPassword: (0, core_1.getInput)('proxy_password'),
@@ -1859,12 +1859,8 @@ function getArgs(parameters) {
         }
         args.push(`--overwrite-mode=${parameters.overwriteMode}`);
     }
-    if (parameters.packages.length > 0) {
-        for (const iterator of parameters.packages.split(',')) {
-            if (iterator.length > 0) {
-                args.push(`--package=${iterator}`);
-            }
-        }
+    for (const pkg of parameters.packages) {
+        pkg.split(',').map(p => args.push(`--package=${p}`));
     }
     if (parameters.password.length > 0)
         args.push(`--pass=${parameters.password}`);
