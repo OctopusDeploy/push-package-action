@@ -1,6 +1,6 @@
-import {InputParameters} from './input-parameters'
-import {info, setFailed} from '@actions/core'
-import {exec, ExecOptions} from '@actions/exec'
+import { InputParameters } from './input-parameters'
+import { info, setFailed } from '@actions/core'
+import { exec, ExecOptions } from '@actions/exec'
 
 function getArgs(parameters: InputParameters): string[] {
   info('🔣 Parsing inputs...')
@@ -30,13 +30,7 @@ function getArgs(parameters: InputParameters): string[] {
     args.push(`--overwrite-mode=${parameters.overwriteMode}`)
   }
 
-  if (parameters.packages.length > 0) {
-    for (const iterator of parameters.packages.split(',')) {
-      if (iterator.length > 0) {
-        args.push(`--package=${iterator}`)
-      }
-    }
-  }
+  parameters.packages.forEach(p => p.split(',').map(p => args.push(`--package=${p}`)))
 
   if (parameters.password.length > 0) args.push(`--pass=${parameters.password}`)
   if (parameters.proxy.length > 0) args.push(`--proxy=${parameters.proxy}`)

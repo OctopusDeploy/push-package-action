@@ -1,4 +1,4 @@
-import {getBooleanInput, getInput} from '@actions/core'
+import { getBooleanInput, getMultilineInput, getInput } from '@actions/core'
 
 export interface InputParameters {
   apiKey: string
@@ -7,7 +7,7 @@ export interface InputParameters {
   ignoreSslErrors: boolean
   logLevel: string
   overwriteMode: string
-  packages: string
+  packages: string[]
   password: string
   proxy: string
   proxyPassword: string
@@ -28,7 +28,7 @@ export function get(): InputParameters {
     ignoreSslErrors: getBooleanInput('ignore_ssl_errors'),
     logLevel: getInput('log_level'),
     overwriteMode: getInput('overwrite_mode'),
-    packages: getInput('packages'),
+    packages: getMultilineInput('packages'),
     password: getInput('password'),
     proxy: getInput('proxy'),
     proxyPassword: getInput('proxy_password'),
