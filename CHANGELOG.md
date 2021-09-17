@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.1.1](https://www.github.com/OctopusDeploy/push-package-action/compare/v1.1.0...v1.1.1) (2021-09-17)
+
+
+### Bug Fixes
+
+* updated action YAML configuration ([ac96b74](https://www.github.com/OctopusDeploy/push-package-action/commit/ac96b7434354b159fe078b2d85333e1e6fb8e5cd))
+
 ## [1.1.0](https://www.github.com/OctopusDeploy/push-package-action/compare/v1.0.2...v1.1.0) (2021-09-15)
 
 
