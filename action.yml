@@ -39,7 +39,7 @@ inputs:
   space:
     description: 'The name or ID of a space within which this command will be executed. If omitted, the default space will be used.'
   timeout:
-    default: '600'
+    default: 600
     description: 'A timeout value in seconds for network operations.'
   use_delta_compression:
     default: true
