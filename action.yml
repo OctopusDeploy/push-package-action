@@ -1,7 +1,7 @@
 name: 'Push Package to Octopus Deploy'
 description: 'GitHub Action to push a package to Octopus Deploy'
 author: 'Octopus Deploy'
-branding: 
+branding:
   color: 'blue'
   icon: 'package'
 
@@ -11,10 +11,10 @@ inputs:
   config_file:
     description: 'The path to a configuration file of default values with one "key=value" per line.'
   debug:
-    default: 'false'
+    default: false
     description: 'Enable debug logging.'
   ignore_ssl_errors:
-    default: 'false'
+    default: false
     description: 'Ignore certificate errors when communicating with Octopus Deploy. Warning: enabling this option creates a security vulnerability.'
   log_level:
     default: 'debug'
@@ -42,7 +42,7 @@ inputs:
     default: '600'
     description: 'A timeout value in seconds for network operations.'
   use_delta_compression:
-    default: true,
+    default: true
     description: 'Use delta compression when uploading packages to Octopus Deploy.'
   username:
     description: 'The username used to authenticate with Octopus Deploy. You must provide an apiKey or username and password. It is strongly recommended to retrieve this value from a GitHub secret.'
