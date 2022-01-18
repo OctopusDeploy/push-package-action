@@ -4,7 +4,7 @@
     "url": "https://github.com/OctopusDeploy/push-package-action/issues"
   },
   "dependencies": {
-    "@actions/core": "^1.5.0",
+    "@actions/core": "^1.6.0",
     "@actions/exec": "^1.1.0"
   },
   "description": "GitHub Action to Push a Package to Octopus Deploy",
