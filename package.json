@@ -14,7 +14,7 @@
     "@types/tmp": "^0.2.3",
     "@typescript-eslint/parser": "^4.33.0",
     "@vercel/ncc": "^0.33.1",
-    "eslint": "^7.32.0",
+    "eslint": "^8.7.0",
     "eslint-plugin-jest": "^25.7.0",
     "jest": "^27.4.7",
     "jest-circus": "^27.2.0",
