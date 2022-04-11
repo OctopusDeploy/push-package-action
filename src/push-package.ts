@@ -48,8 +48,8 @@ function getArgs(parameters: InputParameters): string[] {
     args.push(`--timeout=${parameters.timeout}`)
   if (parameters.timeout.length > 0 && parameters.timeout !== `600`)
     args.push(`--timeout=${parameters.timeout}`)
-  if (parameters.useDeltaCompression)
-    args.push(`--use-delta-compression=${parameters.useDeltaCompression}`)
+  if (!parameters.useDeltaCompression)
+    args.push(`--use-delta-compression=false`)
   if (parameters.username.length > 0) args.push(`--user=${parameters.username}`)
 
   return args
