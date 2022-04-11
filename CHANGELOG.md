@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.1.2](https://www.github.com/OctopusDeploy/push-package-action/compare/v1.1.1...v1.1.2) (2022-04-11)
+
+
+### Bug Fixes
+
+* updated logic to fix use_delta_compression bug ([b40ba56](https://www.github.com/OctopusDeploy/push-package-action/commit/b40ba56f58a70b8a2aea302ab6c2aebb793cfb3a))
+
 ### [1.1.1](https://www.github.com/OctopusDeploy/push-package-action/compare/v1.1.0...v1.1.1) (2021-09-17)
 
 
