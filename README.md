@@ -12,7 +12,7 @@ Incorporate the following actions in your workflow to push a package to Octopus 
 steps:
   - uses: actions/checkout@v2
   - name: Install Octopus CLI 🐙
-    uses: OctopusDeploy/install-octopus-cli-action@<version>
+    uses: OctopusDeploy/install-octopus-cli-action@v1
     with:
       version: latest
   - name: Push a package to Octopus Deploy 🐙
@@ -29,7 +29,7 @@ Here's an example that provides a `username` and `password` to authenticate to O
 steps:
   - uses: actions/checkout@v2
   - name: Install Octopus CLI 🐙
-    uses: OctopusDeploy/install-octopus-cli-action@<version>
+    uses: OctopusDeploy/install-octopus-cli-action@v1
     with:
       version: latest
   - name: Push a package to Octopus Deploy 🐙
