@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/OctopusDeploy/push-package-action/compare/v1.2.0...v1.2.1) (2022-06-27)
+
+
+### Bug Fixes
+
+* updated README ([8026f99](https://github.com/OctopusDeploy/push-package-action/commit/8026f99cf977bd6c24395d27ab245dbdac24781f))
+
 ## [1.2.0](https://github.com/OctopusDeploy/push-package-action/compare/v1.1.2...v1.2.0) (2022-06-27)
 
 
