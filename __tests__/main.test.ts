@@ -11,6 +11,6 @@ describe('inputs', () => {
 describe('releases', () => {
   it('successfully pushes a package', async () => {
     const inputParameters = inputs.get()
-    octopus.pushPackage(inputParameters)
+    await octopus.pushPackage(inputParameters)
   }, 100000)
 })

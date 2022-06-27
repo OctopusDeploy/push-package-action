@@ -9,20 +9,22 @@
   },
   "description": "GitHub Action to Push a Package to Octopus Deploy",
   "devDependencies": {
-    "@types/jest": "^27.4.1",
-    "@types/node": "^17.0.38",
+    "@types/jest": "^28.1.2",
+    "@types/node": "^18.0.0",
     "@types/tmp": "^0.2.3",
     "@typescript-eslint/parser": "^5.27.0",
     "@vercel/ncc": "^0.33.4",
     "eslint": "^8.16.0",
     "eslint-plugin-github": "^4.3.6",
     "eslint-plugin-jest": "^26.1.5",
-    "jest": "^28.0.2",
-    "jest-circus": "^28.0.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^28.1.1",
+    "jest-circus": "^28.0.3",
+    "jest-junit": "^13.2.0",
     "js-yaml": "^4.1.0",
     "prettier": "2.6.2",
     "tmp": "^0.2.1",
-    "ts-jest": "^27.1.4",
+    "ts-jest": "^28.0.4",
     "typescript": "^4.7.2"
   },
   "homepage": "https://github.com/OctopusDeploy/push-package-action#readme",
@@ -47,6 +49,15 @@
     },
     "verbose": true
   },
+  "jest-junit": {
+    "outputDirectory": "reports",
+    "outputName": "jest-junit.xml",
+    "ancestorSeperator": " > ",
+    "uniqueOutputName": "false",
+    "suiteNameTemplate": "{filepath}",
+    "classNameTemplate": "{classname}",
+    "titleTemplate": "{title}"
+  },
   "keywords": [
     "cli",
     "deployment",
@@ -54,7 +65,7 @@
     "github-actions"
   ],
   "license": "Apache-2.0",
-  "main": "out/index.js",
+  "main": "src/index.ts",
   "name": "push-package-action",
   "repository": {
     "type": "git",
@@ -66,8 +77,8 @@
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "prebuild": "eslint src/**/*.ts",
-    "postbuild": "ncc build -o dist",
-    "test": "jest"
+    "postbuild": "ncc build out/index.js -o dist",
+    "test": "jest --ci --reporters=default --reporters=jest-junit"
   },
   "version": "1.1.2"
 }
