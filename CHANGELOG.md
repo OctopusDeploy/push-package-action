@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/OctopusDeploy/push-package-action/compare/v1.1.2...v1.2.0) (2022-06-27)
+
+
+### Features
+
+* Updated build pipeline and process ([0423898](https://github.com/OctopusDeploy/push-package-action/commit/0423898b33e11eed09eea039292e7189cd133105))
+
 ### [1.1.2](https://www.github.com/OctopusDeploy/push-package-action/compare/v1.1.1...v1.1.2) (2022-04-11)
 
 
