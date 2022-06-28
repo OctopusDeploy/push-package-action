@@ -34,6 +34,9 @@ jobs:
           OCTOPUS_SERVER_BASE64_LICENSE: ${{ secrets.OCTOPUS_SERVER_BASE64_LICENSE }}
         ports:
           - 8080:8080
+    permissions:
+      statuses: write
+      checks: write
     steps:
       - uses: actions/checkout@v3
       
@@ -51,9 +54,10 @@ jobs:
           OCTOPUS_TEST_APIKEY: ${{ env.ADMIN_API_KEY }}
         run: npm run all
 
-      - name: Upload test report
-        uses: actions/upload-artifact@v3
+      - name: Test Report
+        uses: dorny/test-reporter@v1
         if: success() || failure()
         with:
-          name: test-results
-          path: reports/jest-*.xml
+          name: JEST Tests
+          path: 'reports/jest-*.xml'
+          reporter: jest-junit
