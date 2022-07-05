@@ -64,3 +64,7 @@ The following inputs are optional:
 | `timeout`               | A timeout value for network operations (in seconds).                                                                                                                                                                                                                                                             |     `600`      |
 | `use_delta_compression` | Use delta compression when uploading packages to Octopus Deploy.                                                                                                                                                                                                                                                 |     `true`     |
 | `username`              | The username used to authenticate with Octopus Deploy. You must provide `api_key` or `username` and `password`. It is strongly recommended to retrieve this value from a GitHub secret.                                                                                                                          |                |
+
+## 🤝 Contributions
+
+Contributions are welcome! :heart: Please read our [Contributing Guide](CONTRIBUTING.md) for information about how to get involved in this project.
