@@ -22,9 +22,9 @@ afterEach(() => {
 })
 
 test('standard commandline processing', () => {
-    w.stdLine('Octopus Deploy Command Line Tool version 123')
-    w.stdLine('Handshaking with Octopus Server')
-    w.stdLine('Authenticated as: magic user that should not be revealed')
+    w.stdline('Octopus Deploy Command Line Tool version 123')
+    w.stdline('Handshaking with Octopus Server')
+    w.stdline('Authenticated as: magic user that should not be revealed')
   
     expect(infoMessages).toEqual([
         '🐙 Using Octopus Deploy CLI 123...',
@@ -34,24 +34,24 @@ test('standard commandline processing', () => {
 })
 
 test('thing pushed successfully', () => {
-    w.stdLine('Push successful')
+    w.stdline('Push successful')
 
     expect(infoMessages).toEqual(['🎉 Push successful!'])
 })
 
 test('other lines just get passed through', () => {
-    w.stdLine('Push successful!') // note trailing ! means the earlier thing doesn't matc
-    w.stdLine('foo')
-    w.stdLine('bar')
-    w.stdLine('baz')
+    w.stdline('Push successful!') // note trailing ! means the earlier thing doesn't matc
+    w.stdline('foo')
+    w.stdline('bar')
+    w.stdline('baz')
   
     expect(infoMessages).toEqual(['Push successful!', 'foo', 'bar', 'baz'])
   })
   
   test('filters blank lines', () => {
-    w.stdLine('')
-    w.stdLine('foo')
-    w.stdLine('')
+    w.stdline('')
+    w.stdline('foo')
+    w.stdline('')
   
     expect(infoMessages).toEqual(['foo'])
   })

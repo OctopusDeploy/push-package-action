@@ -23,7 +23,7 @@ export class OctopusCliWrapper {
     this.logWarn = logWarn
   }
 
-  stdLine(line: string): void {
+  stdline(line: string): void {
     if (line.length <= 0) return
 
     if (line.includes('Octopus Deploy Command Line Tool')) {
@@ -158,7 +158,7 @@ export class OctopusCliWrapper {
 
     const options: ExecOptions = {
       listeners: {
-        stdline: input => this.stdLine(input)
+        stdline: input => this.stdline(input)
       },
       env: cliLaunchConfiguration.env,
       silent: true
