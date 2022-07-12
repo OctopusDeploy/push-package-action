@@ -1,11 +1,16 @@
-import {setFailed} from '@actions/core'
-import * as octopus from './push-package'
-import * as inputs from './input-parameters'
+import { getInputParameters } from './input-parameters'
+import { info, warning, setFailed } from '@actions/core'
+import { OctopusCliWrapper } from './octopus-cli-wrapper'
 
 async function run(): Promise<void> {
   try {
-    const inputParameters = inputs.get()
-    await octopus.pushPackage(inputParameters)
+    const wrapper = new OctopusCliWrapper(
+      getInputParameters(),
+      process.env,
+      msg => info(msg),
+      msg => warning(msg)
+    )
+    await wrapper.pushPackage()
   } catch (e: unknown) {
     if (e instanceof Error) {
       setFailed(e)

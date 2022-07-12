@@ -8,5 +8,7 @@
     "noImplicitAny": true,
     "esModuleInterop": true
   },
-  "exclude": ["node_modules", "**/*.test.ts"]
+  "include": [
+    "src"
+  ]
 }

@@ -10,14 +10,14 @@
   "description": "GitHub Action to Push a Package to Octopus Deploy",
   "devDependencies": {
     "@types/jest": "^28.1.4",
-    "@types/node": "^18.0.0",
+    "@types/node": "^18.0.3",
     "@types/tmp": "^0.2.3",
-    "@typescript-eslint/parser": "^5.29.0",
+    "@typescript-eslint/parser": "^5.30.6",
     "@vercel/ncc": "^0.34.0",
-    "eslint": "^8.18.0",
+    "eslint": "^8.19.0",
     "eslint-plugin-github": "^4.3.6",
     "eslint-plugin-jest": "^26.5.3",
-    "eslint-plugin-prettier": "^4.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "jest": "^28.1.2",
     "jest-circus": "^28.1.1",
     "jest-junit": "^14.0.0",
@@ -78,7 +78,9 @@
     "format-check": "prettier --check **/*.ts",
     "prebuild": "eslint src/**/*.ts",
     "postbuild": "ncc build out/index.js -o dist",
-    "test": "jest --ci --reporters=default --reporters=jest-junit"
+    "test": "jest --ci --reporters=default --reporters=jest-junit",
+    "test:unit": "jest --ci --reporters=default --reporters=jest-junit --testPathPattern=__tests__/unit",
+    "test:integration": "jest --ci --reporters=default --reporters=jest-junit --testPathPattern=__tests__/integration"
   },
   "version": "1.2.1"
 }
