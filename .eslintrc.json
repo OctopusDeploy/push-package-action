@@ -51,5 +51,9 @@
       "node": true,
       "es6": true,
       "jest/globals": true
+    },
+    // eslint doesn't know about the global NodeJS variable
+    "globals": {
+      "NodeJS": true
     }
   }
