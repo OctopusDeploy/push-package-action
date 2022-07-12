@@ -8,7 +8,7 @@ process.env = Object.assign(process.env, {
   INPUT_SERVER: process.env['OCTOPUS_TEST_URL'],
   INPUT_PACKAGES: 'test.nupkg',
   INPUT_OVERWRITE_MODE: 'OverwriteExisting',
-  INPUT_USE_DELTA_COMPRESSION: false,
+  INPUT_USE_DELTA_COMPRESSION: true,
   RUNNER_TEMP: tmpdir.name,
   RUNNER_TOOL_CACHE: tmpdir.name,
   GITHUB_ACTION: '1'

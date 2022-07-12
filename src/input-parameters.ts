@@ -35,3 +35,27 @@ export function getInputParameters(): InputParameters {
     useDeltaCompression: getBooleanInput('use_delta_compression')
   }
 }
+
+export function makeInputParameters(override: Partial<InputParameters> | undefined = undefined): InputParameters {
+  const template = {
+    // required parameters
+    packages: [],
+    apiKey: '',
+    server: '',
+    space: '',
+    // optional parameters
+    debug: false,
+    logLevel: '',
+    overwriteMode: '',
+    proxy: '',
+    proxyPassword: '',
+    proxyUsername: '',
+    timeout: '',
+    useDeltaCompression: true
+  }
+
+  if (override) {
+    Object.assign(template, override)
+  }
+  return template
+}

@@ -78,7 +78,8 @@
     "format-check": "prettier --check **/*.ts",
     "prebuild": "eslint src/**/*.ts",
     "postbuild": "ncc build out/index.js -o dist",
-    "test": "jest --ci --reporters=default --reporters=jest-junit"
+    "test": "jest --ci --reporters=default --reporters=jest-junit",
+    "test:unit": "jest --ci --reporters=default --reporters=jest-junit --testPathPattern=__tests__/unit"
   },
   "version": "1.2.1"
 }
