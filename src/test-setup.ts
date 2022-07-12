@@ -1,7 +1,7 @@
-import * as tmp from 'tmp'
+import { setGracefulCleanup, dirSync } from 'tmp'
 
-tmp.setGracefulCleanup()
-const tmpdir = tmp.dirSync({ template: 'push-package-XXXXXX' })
+setGracefulCleanup()
+const tmpdir = dirSync({ template: 'push-package-XXXXXX' })
 process.env = Object.assign(process.env, {
   INPUT_API_KEY: process.env['OCTOPUS_TEST_APIKEY'],
   INPUT_DEBUG: false,
