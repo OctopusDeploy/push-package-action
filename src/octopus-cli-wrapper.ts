@@ -1,6 +1,6 @@
-import {InputParameters} from './input-parameters'
-import {info, setFailed} from '@actions/core'
-import {exec, ExecOptions} from '@actions/exec'
+import { InputParameters } from './input-parameters'
+import { info, setFailed } from '@actions/core'
+import { exec, ExecOptions } from '@actions/exec'
 
 // environment variables can either be a NodeJS.ProcessEnv or a plain old object with string keys/values for testing
 type EnvVars = { [key: string]: string } | NodeJS.ProcessEnv
@@ -26,30 +26,30 @@ export class OctopusCliWrapper {
   stdLine(line: string): void {
     if (line.length <= 0) return
 
-        if (line.includes('Octopus Deploy Command Line Tool')) {
-          const version = line.split('version ')[1]
-          this.logInfo(`🐙 Using Octopus Deploy CLI ${version}...`)
-          return
-        }
+    if (line.includes('Octopus Deploy Command Line Tool')) {
+      const version = line.split('version ')[1]
+      this.logInfo(`🐙 Using Octopus Deploy CLI ${version}...`)
+      return
+    }
 
-        if (line.includes('Handshaking with Octopus Server')) {
-          this.logInfo(`🤝 Handshaking with Octopus Deploy`)
-          return
-        }
+    if (line.includes('Handshaking with Octopus Server')) {
+      this.logInfo(`🤝 Handshaking with Octopus Deploy`)
+      return
+    }
 
-        if (line.includes('Authenticated as:')) {
-          this.logInfo(`✅ Authenticated`)
-          return
-        }
+    if (line.includes('Authenticated as:')) {
+      this.logInfo(`✅ Authenticated`)
+      return
+    }
 
-        switch (line) {
-          case 'Push successful':
-            this.logInfo(`🎉 Push successful!`)
-            break
-          default:
-            this.logInfo(line)
-            break
-        }
+    switch (line) {
+      case 'Push successful':
+        this.logInfo(`🎉 Push successful!`)
+        break
+      default:
+        this.logInfo(line)
+        break
+    }
   }
 
   // Picks up a config value from GHA Input or environment, supports mapping
@@ -99,7 +99,6 @@ export class OctopusCliWrapper {
 
   // Converts incoming environment and inputParameters into a set of commandline args + env vars to run the Octopus CLI
   generateLaunchConfig(): CliLaunchConfiguration {
-
     const launchArgs: string[] = ['push']
     const launchEnv: { [key: string]: string } = {}
 
@@ -131,14 +130,8 @@ export class OctopusCliWrapper {
 
     if (parameters.debug) launchArgs.push(`--debug`)
 
-    if (
-      parameters.overwriteMode.length > 0 &&
-      parameters.overwriteMode !== 'FailIfExists'
-    ) {
-      if (
-        parameters.overwriteMode !== 'OverwriteExisting' &&
-        parameters.overwriteMode !== 'IgnoreIfExists'
-      ) {
+    if (parameters.overwriteMode.length > 0 && parameters.overwriteMode !== 'FailIfExists') {
+      if (parameters.overwriteMode !== 'OverwriteExisting' && parameters.overwriteMode !== 'IgnoreIfExists') {
         setFailed(
           'The input value, overwrite_mode is invalid; accept values are "FailIfExists", "OverwriteExisting", and "IgnoreIfExists".'
         )
@@ -151,11 +144,10 @@ export class OctopusCliWrapper {
     }
 
     if (parameters.logLevel.length > 0 && parameters.logLevel !== `600`)
-    launchArgs.push(`--timeout=${parameters.timeout}`)
+      launchArgs.push(`--timeout=${parameters.timeout}`)
     if (parameters.timeout.length > 0 && parameters.timeout !== `600`)
       launchArgs.push(`--timeout=${parameters.timeout}`)
-    if (!parameters.useDeltaCompression)
-      launchArgs.push(`--use-delta-compression=false`)
+    if (!parameters.useDeltaCompression) launchArgs.push(`--use-delta-compression=false`)
 
     return { args: launchArgs, env: launchEnv }
   }
@@ -183,6 +175,6 @@ export class OctopusCliWrapper {
 }
 
 export interface CliLaunchConfiguration {
-  args: string[],
+  args: string[]
   env: { [key: string]: string }
 }

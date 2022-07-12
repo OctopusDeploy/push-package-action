@@ -1,4 +1,4 @@
-import {getBooleanInput, getMultilineInput, getInput} from '@actions/core'
+import { getBooleanInput, getMultilineInput, getInput } from '@actions/core'
 
 export interface InputParameters {
   // required parameters
@@ -32,6 +32,6 @@ export function getInputParameters(): InputParameters {
     proxyPassword: getInput('proxy_password'),
     proxyUsername: getInput('proxy_username'),
     timeout: getInput('timeout'),
-    useDeltaCompression: getBooleanInput('use_delta_compression'),
+    useDeltaCompression: getBooleanInput('use_delta_compression')
   }
 }
