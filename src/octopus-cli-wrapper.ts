@@ -143,8 +143,8 @@ export class OctopusCliWrapper {
       pkg.split(',').map(p => launchArgs.push(`--package=${p}`))
     }
 
-    if (parameters.logLevel.length > 0 && parameters.logLevel !== `600`)
-      launchArgs.push(`--timeout=${parameters.timeout}`)
+    if (parameters.logLevel.length > 0 && parameters.logLevel !== `debug`)
+      launchArgs.push(`--logLevel=${parameters.logLevel}`)
     if (parameters.timeout.length > 0 && parameters.timeout !== `600`)
       launchArgs.push(`--timeout=${parameters.timeout}`)
     if (!parameters.useDeltaCompression) launchArgs.push(`--use-delta-compression=false`)
