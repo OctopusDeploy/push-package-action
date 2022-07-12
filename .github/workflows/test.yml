@@ -61,3 +61,17 @@ jobs:
           name: JEST Tests
           path: 'reports/jest-*.xml'
           reporter: jest-junit
+
+      - name: Package test report
+        run: |
+          zip -rj TestReport.1.0.0.zip ./reports
+      
+      - name: Push Package to Octopus
+        uses: ./
+        env:
+          OCTOPUS_HOST: ${{ env.SERVER_URL }}
+          OCTOPUS_API_KEY: ${{ env.ADMIN_API_KEY }}
+          OCTOPUS_SPACE: 'Spaces-1'
+        with:
+          packages: |
+            TestReport.1.0.0.zip
