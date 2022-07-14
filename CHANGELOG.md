@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.0.0](https://github.com/OctopusDeploy/push-package-action/compare/v1.2.1...v2.0.0) (2022-07-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove unused inputs
+
+### Features
+
+* Added build summary with list of packages that were pushed ([#253](https://github.com/OctopusDeploy/push-package-action/issues/253)) ([5409834](https://github.com/OctopusDeploy/push-package-action/commit/54098349935277c044f57f16750bd2fa3fb7e395))
+* release 2.0.0 ([#248](https://github.com/OctopusDeploy/push-package-action/issues/248)) ([ba24ea6](https://github.com/OctopusDeploy/push-package-action/commit/ba24ea6be13e5e89c2e0faa4f3d29f7fade95ed1))
+
+
+### Bug Fixes
+
+* fix bug where we'd add the wrong parameter when a log level has been specified ([68b5334](https://github.com/OctopusDeploy/push-package-action/commit/68b5334348cdc49750f5f0bc6ce6a41df04b61ab))
+
+
+### Code Refactoring
+
+* remove unused inputs ([68b5334](https://github.com/OctopusDeploy/push-package-action/commit/68b5334348cdc49750f5f0bc6ce6a41df04b61ab))
+
 ## [1.2.1](https://github.com/OctopusDeploy/push-package-action/compare/v1.2.0...v1.2.1) (2022-06-27)
 
 
