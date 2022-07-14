@@ -3291,29 +3291,6 @@ exports.debug = debug; // for test
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -3324,14 +3301,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const input_parameters_1 = __nccwpck_require__(519);
 const core_1 = __nccwpck_require__(186);
-const octopus = __importStar(__nccwpck_require__(20));
-const inputs = __importStar(__nccwpck_require__(519));
+const octopus_cli_wrapper_1 = __nccwpck_require__(856);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const inputParameters = inputs.get();
-            yield octopus.pushPackage(inputParameters);
+            const wrapper = new octopus_cli_wrapper_1.OctopusCliWrapper((0, input_parameters_1.getInputParameters)(), process.env, msg => (0, core_1.info)(msg), msg => (0, core_1.warning)(msg));
+            yield wrapper.pushPackage();
         }
         catch (e) {
             if (e instanceof Error) {
@@ -3351,35 +3328,55 @@ run();
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.get = void 0;
+exports.makeInputParameters = exports.getInputParameters = void 0;
 const core_1 = __nccwpck_require__(186);
-function get() {
+function getInputParameters() {
     return {
+        // required parameters
+        packages: (0, core_1.getMultilineInput)('packages'),
         apiKey: (0, core_1.getInput)('api_key'),
-        configFile: (0, core_1.getInput)('config_file'),
+        server: (0, core_1.getInput)('server'),
+        space: (0, core_1.getInput)('space'),
+        // optional parameters
         debug: (0, core_1.getBooleanInput)('debug'),
-        ignoreSslErrors: (0, core_1.getBooleanInput)('ignore_ssl_errors'),
         logLevel: (0, core_1.getInput)('log_level'),
         overwriteMode: (0, core_1.getInput)('overwrite_mode'),
-        packages: (0, core_1.getMultilineInput)('packages'),
-        password: (0, core_1.getInput)('password'),
         proxy: (0, core_1.getInput)('proxy'),
         proxyPassword: (0, core_1.getInput)('proxy_password'),
         proxyUsername: (0, core_1.getInput)('proxy_username'),
-        releaseExisting: (0, core_1.getInput)('release_existing'),
-        server: (0, core_1.getInput)('server'),
-        space: (0, core_1.getInput)('space'),
         timeout: (0, core_1.getInput)('timeout'),
-        useDeltaCompression: (0, core_1.getBooleanInput)('use_delta_compression'),
-        username: (0, core_1.getInput)('user')
+        useDeltaCompression: (0, core_1.getBooleanInput)('use_delta_compression')
     };
 }
-exports.get = get;
+exports.getInputParameters = getInputParameters;
+function makeInputParameters(override = undefined) {
+    const template = {
+        // required parameters
+        packages: [],
+        apiKey: '',
+        server: '',
+        space: '',
+        // optional parameters
+        debug: false,
+        logLevel: '',
+        overwriteMode: '',
+        proxy: '',
+        proxyPassword: '',
+        proxyUsername: '',
+        timeout: '',
+        useDeltaCompression: true
+    };
+    if (override) {
+        Object.assign(template, override);
+    }
+    return template;
+}
+exports.makeInputParameters = makeInputParameters;
 
 
 /***/ }),
 
-/***/ 20:
+/***/ 856:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -3394,98 +3391,148 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.pushPackage = void 0;
+exports.OctopusCliWrapper = void 0;
 const core_1 = __nccwpck_require__(186);
 const exec_1 = __nccwpck_require__(514);
-function getArgs(parameters) {
-    (0, core_1.info)('🔣 Parsing inputs...');
-    const args = ['push'];
-    if (parameters.apiKey.length > 0)
-        args.push(`--apiKey=${parameters.apiKey}`);
-    if (parameters.configFile.length > 0)
-        args.push(`--configFile=${parameters.configFile}`);
-    if (parameters.debug)
-        args.push(`--debug`);
-    if (parameters.ignoreSslErrors)
-        args.push(`--ignoreSslErrors`);
-    if (parameters.logLevel.length > 0 && parameters.logLevel !== `debug`)
-        args.push(`--logLevel=${parameters.logLevel}`);
-    if (parameters.overwriteMode.length > 0 &&
-        parameters.overwriteMode !== 'FailIfExists') {
-        if (parameters.overwriteMode !== 'OverwriteExisting' &&
-            parameters.overwriteMode !== 'IgnoreIfExists') {
-            (0, core_1.setFailed)('The input value, overwrite_mode is invalid; accept values are "FailIfExists", "OverwriteExisting", and "IgnoreIfExists".');
-        }
-        args.push(`--overwrite-mode=${parameters.overwriteMode}`);
+class OctopusCliWrapper {
+    constructor(parameters, env, logInfo, logWarn) {
+        this.pushedPackages = [];
+        this.inputParameters = parameters;
+        this.env = env;
+        this.logInfo = logInfo;
+        this.logWarn = logWarn;
     }
-    for (const pkg of parameters.packages) {
-        pkg.split(',').map(p => args.push(`--package=${p}`));
+    stdline(line) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (line.length <= 0)
+                return;
+            if (line.includes('Octopus Deploy Command Line Tool')) {
+                const version = line.split('version ')[1];
+                this.logInfo(`🐙 Using Octopus Deploy CLI ${version}...`);
+                return;
+            }
+            if (line.includes('Handshaking with Octopus Server')) {
+                this.logInfo(`🤝 Handshaking with Octopus Deploy`);
+                return;
+            }
+            if (line.includes('Authenticated as:')) {
+                this.logInfo(`✅ Authenticated`);
+                return;
+            }
+            if (line.includes('Pushing package:')) {
+                const pkg = line.replace('Pushing package: ', '').replace('...', '');
+                this.pushedPackages.push(pkg);
+                this.logInfo(`📦 Pushing ${pkg}`);
+                return;
+            }
+            switch (line) {
+                case 'Push successful':
+                    this.logInfo(`🎉 Push successful!`);
+                    yield this.createBuildSummary();
+                    break;
+                default:
+                    this.logInfo(line);
+                    break;
+            }
+        });
     }
-    if (parameters.password.length > 0)
-        args.push(`--pass=${parameters.password}`);
-    if (parameters.proxy.length > 0)
-        args.push(`--proxy=${parameters.proxy}`);
-    if (parameters.proxyPassword.length > 0)
-        args.push(`--proxyPass=${parameters.proxyPassword}`);
-    if (parameters.proxyUsername.length > 0)
-        args.push(`--proxyUser=${parameters.proxyUsername}`);
-    if (parameters.releaseExisting.length > 0)
-        args.push(`--releaseExisting=${parameters.releaseExisting}`);
-    if (parameters.server.length > 0)
-        args.push(`--server=${parameters.server}`);
-    if (parameters.space.length > 0)
-        args.push(`--space=${parameters.space}`);
-    if (parameters.logLevel.length > 0 && parameters.logLevel !== `600`)
-        args.push(`--timeout=${parameters.timeout}`);
-    if (parameters.timeout.length > 0 && parameters.timeout !== `600`)
-        args.push(`--timeout=${parameters.timeout}`);
-    if (!parameters.useDeltaCompression)
-        args.push(`--use-delta-compression=false`);
-    if (parameters.username.length > 0)
-        args.push(`--user=${parameters.username}`);
-    return args;
-}
-function pushPackage(parameters) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const args = getArgs(parameters);
-        const options = {
-            listeners: {
-                stdline: (line) => {
-                    if (line.length <= 0)
-                        return;
-                    if (line.includes('Octopus Deploy Command Line Tool')) {
-                        const version = line.split('version ')[1];
-                        (0, core_1.info)(`🐙 Using Octopus Deploy CLI ${version}...`);
-                        return;
-                    }
-                    if (line.includes('Handshaking with Octopus Server')) {
-                        (0, core_1.info)(`🤝 Handshaking with Octopus Deploy`);
-                        return;
-                    }
-                    if (line.includes('Authenticated as:')) {
-                        (0, core_1.info)(`✅ Authenticated`);
-                        return;
-                    }
-                    if (line === 'Push successful') {
-                        (0, core_1.info)(`🎉 Push successful!`);
-                        return;
-                    }
-                    (0, core_1.info)(line);
-                }
-            },
-            silent: true
-        };
-        try {
-            yield (0, exec_1.exec)('octo', args, options);
+    // Picks up a config value from GHA Input or environment, supports mapping
+    // of an obsolete env var to a newer one (e.g. OCTOPUS_CLI_SERVER vs OCTOPUS_HOST)
+    pickupConfigurationValueExtended(inputParameter, inputObsoleteEnvKey, inputNewEnvKey, valueHandler) {
+        // we always want to log the warning for a deprecated environment variable, even if the parameter comes in via inputParameter
+        let result;
+        const deprecatedValue = this.env[inputObsoleteEnvKey];
+        if (deprecatedValue && deprecatedValue.length > 0) {
+            this.logWarn(`Detected Deprecated ${inputObsoleteEnvKey} environment variable. Prefer ${inputNewEnvKey}`);
+            result = deprecatedValue;
         }
-        catch (e) {
-            if (e instanceof Error) {
-                (0, core_1.setFailed)(e);
+        const value = this.env[inputNewEnvKey];
+        // deliberately not 'else if' because if both OCTOPUS_CLI_API_KEY and OCTOPUS_API_KEY are set we want the latter to win
+        if (value && value.length > 0) {
+            result = value;
+        }
+        if (inputParameter.length > 0) {
+            result = inputParameter;
+        }
+        if (result) {
+            valueHandler(result);
+        }
+    }
+    // Picks up a config value from GHA Input or environment
+    pickupConfigurationValue(inputParameter, inputNewEnvKey, valueHandler) {
+        if (inputParameter.length > 0) {
+            valueHandler(inputParameter);
+        }
+        else {
+            const value = this.env[inputNewEnvKey];
+            if (value && value.length > 0) {
+                valueHandler(value);
             }
         }
-    });
+    }
+    // Converts incoming environment and inputParameters into a set of commandline args + env vars to run the Octopus CLI
+    generateLaunchConfig() {
+        const launchArgs = ['push'];
+        const launchEnv = {};
+        const parameters = this.inputParameters;
+        this.pickupConfigurationValueExtended(parameters.apiKey, 'OCTOPUS_CLI_API_KEY', 'OCTOPUS_API_KEY', value => (launchEnv['OCTOPUS_CLI_API_KEY'] = value));
+        this.pickupConfigurationValueExtended(parameters.server, 'OCTOPUS_CLI_SERVER', 'OCTOPUS_HOST', value => (launchEnv['OCTOPUS_CLI_SERVER'] = value));
+        this.pickupConfigurationValue(parameters.space, 'OCTOPUS_SPACE', value => launchArgs.push(`--space=${value}`));
+        this.pickupConfigurationValue(parameters.proxy, 'OCTOPUS_PROXY', value => launchArgs.push(`--proxy=${value}`));
+        this.pickupConfigurationValue(parameters.proxyUsername, 'OCTOPUS_PROXY_USERNAME', value => launchArgs.push(`--proxyUser=${value}`));
+        this.pickupConfigurationValue(parameters.proxyPassword, 'OCTOPUS_PROXY_PASSWORD', value => launchArgs.push(`--proxyPass=${value}`));
+        if (parameters.debug)
+            launchArgs.push(`--debug`);
+        if (parameters.overwriteMode.length > 0 && parameters.overwriteMode !== 'FailIfExists') {
+            if (parameters.overwriteMode !== 'OverwriteExisting' && parameters.overwriteMode !== 'IgnoreIfExists') {
+                (0, core_1.setFailed)('The input value, overwrite_mode is invalid; accept values are "FailIfExists", "OverwriteExisting", and "IgnoreIfExists".');
+            }
+            launchArgs.push(`--overwrite-mode=${parameters.overwriteMode}`);
+        }
+        for (const pkg of parameters.packages) {
+            pkg.split(',').map(p => launchArgs.push(`--package=${p}`));
+        }
+        if (parameters.logLevel.length > 0 && parameters.logLevel !== `debug`)
+            launchArgs.push(`--logLevel=${parameters.logLevel}`);
+        if (parameters.timeout.length > 0 && parameters.timeout !== `600`)
+            launchArgs.push(`--timeout=${parameters.timeout}`);
+        if (!parameters.useDeltaCompression)
+            launchArgs.push(`--use-delta-compression=false`);
+        return { args: launchArgs, env: launchEnv };
+    }
+    createBuildSummary() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.pushedPackages.length > 0) {
+                yield core_1.summary
+                    .addHeading(`🎉 Package${this.pushedPackages.length > 1 ? 's' : ''} successfully pushed to Octopus Deploy`, 3)
+                    .addCodeBlock(this.pushedPackages.map(pkg => `📦 ${pkg}`).join('\n'))
+                    .write();
+            }
+        });
+    }
+    pushPackage() {
+        return __awaiter(this, void 0, void 0, function* () {
+            (0, core_1.info)('🔣 Parsing inputs...');
+            const cliLaunchConfiguration = this.generateLaunchConfig();
+            const options = {
+                listeners: {
+                    stdline: (input) => __awaiter(this, void 0, void 0, function* () { return yield this.stdline(input); })
+                },
+                env: cliLaunchConfiguration.env,
+                silent: true
+            };
+            try {
+                yield (0, exec_1.exec)('octo', cliLaunchConfiguration.args, options);
+            }
+            catch (e) {
+                if (e instanceof Error) {
+                    (0, core_1.setFailed)(e);
+                }
+            }
+        });
+    }
 }
-exports.pushPackage = pushPackage;
+exports.OctopusCliWrapper = OctopusCliWrapper;
 
 
 /***/ }),

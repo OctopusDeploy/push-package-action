@@ -16,7 +16,7 @@ steps:
     with:
       version: latest
   - name: Push a package to Octopus Deploy 🐙
-    uses: OctopusDeploy/push-package-action@v1
+    uses: OctopusDeploy/push-package-action@v2
     env:
       OCTOPUS_API_KEY: ${{ secrets.API_KEY }}
       OCTOPUS_HOST: ${{ secrects.SERVER }}
