@@ -33,10 +33,46 @@ test('standard commandline processing', () => {
     ])
 })
 
-test('thing pushed successfully', () => {
-    w.stdline('Push successful')
+describe('pushing a single package', () => {
+  test('using only filename', () => {
+    w.stdline('Pushing package: MyPackage.1.0.0.zip...')
 
-    expect(infoMessages).toEqual(['🎉 Push successful!'])
+    expect(infoMessages).toEqual(['📦 Pushing MyPackage.1.0.0.zip'])
+  })
+
+  test('using full path', () => {
+    w.stdline('Pushing package: /path/to/package/MyPackage.1.0.0.tar.gz...')
+
+    expect(infoMessages).toEqual(['📦 Pushing /path/to/package/MyPackage.1.0.0.tar.gz'])
+  })
+
+  test('successfully', () => {
+      w.stdline('Push successful')
+
+      expect(infoMessages).toEqual(['🎉 Push successful!'])
+  })
+})
+
+describe('pushing multiple packages', () => {
+  test('using only filename', () => {
+    w.stdline('Pushing package: MyPackage.1.0.0.zip...')
+    w.stdline('Pushing package: MyOtherPackage.1.1.0.tar.gz...')
+
+    expect(infoMessages).toEqual([
+      '📦 Pushing MyPackage.1.0.0.zip',
+      '📦 Pushing MyOtherPackage.1.1.0.tar.gz'
+    ])
+  })
+
+  test('using full path', () => {
+    w.stdline('Pushing package: /path/to/package/MyPackage.1.0.0.tar.gz...')
+    w.stdline('Pushing package: /path/to/package/MyOtherPackage.1.1.0.zip...')
+
+    expect(infoMessages).toEqual([
+      '📦 Pushing /path/to/package/MyPackage.1.0.0.tar.gz',
+      '📦 Pushing /path/to/package/MyOtherPackage.1.1.0.zip'
+    ])
+  })
 })
 
 test('other lines just get passed through', () => {

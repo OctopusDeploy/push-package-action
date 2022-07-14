@@ -1,6 +1,7 @@
 import { InputParameters } from './input-parameters'
 import { info, setFailed } from '@actions/core'
 import { exec, ExecOptions } from '@actions/exec'
+import path from 'path'
 
 // environment variables can either be a NodeJS.ProcessEnv or a plain old object with string keys/values for testing
 type EnvVars = { [key: string]: string } | NodeJS.ProcessEnv
@@ -39,6 +40,13 @@ export class OctopusCliWrapper {
 
     if (line.includes('Authenticated as:')) {
       this.logInfo(`✅ Authenticated`)
+      return
+    }
+
+    if (line.includes('Pushing package:')) {
+      const pkg  = line.replace('Pushing package: ', '').replace('...', '')
+
+      this.logInfo(`📦 Pushing ${pkg}`)
       return
     }
 
