@@ -166,7 +166,7 @@ export class OctopusCliWrapper {
     if (this.pushedPackages.length > 0) {
       await summary
         .addHeading(`🎉 Package${this.pushedPackages.length > 1 ? 's' : ''} successfully pushed to Octopus Deploy`, 3)
-        .addCodeBlock(this.pushedPackages.map(pkg => `- 📦 ${pkg}`).join('\n'))
+        .addCodeBlock(this.pushedPackages.map(pkg => `📦 ${pkg}`).join('\n'))
         .write()
     }
   }
