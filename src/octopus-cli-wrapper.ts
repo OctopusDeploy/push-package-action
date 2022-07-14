@@ -1,5 +1,5 @@
 import { InputParameters } from './input-parameters'
-import { info, setFailed } from '@actions/core'
+import { info, setFailed, summary } from '@actions/core'
 import { exec, ExecOptions } from '@actions/exec'
 
 // environment variables can either be a NodeJS.ProcessEnv or a plain old object with string keys/values for testing
@@ -10,6 +10,7 @@ export class OctopusCliWrapper {
   env: EnvVars
   logInfo: (message: string) => void
   logWarn: (message: string) => void
+  pushedPackages: string[] = []
 
   constructor(
     parameters: InputParameters,
@@ -23,7 +24,7 @@ export class OctopusCliWrapper {
     this.logWarn = logWarn
   }
 
-  stdline(line: string): void {
+  async stdline(line: string): Promise<void> {
     if (line.length <= 0) return
 
     if (line.includes('Octopus Deploy Command Line Tool')) {
@@ -42,9 +43,18 @@ export class OctopusCliWrapper {
       return
     }
 
+    if (line.includes('Pushing package:')) {
+      const pkg = line.replace('Pushing package: ', '').replace('...', '')
+      this.pushedPackages.push(pkg)
+
+      this.logInfo(`📦 Pushing ${pkg}`)
+      return
+    }
+
     switch (line) {
       case 'Push successful':
         this.logInfo(`🎉 Push successful!`)
+        await this.createBuildSummary()
         break
       default:
         this.logInfo(line)
@@ -152,13 +162,22 @@ export class OctopusCliWrapper {
     return { args: launchArgs, env: launchEnv }
   }
 
+  async createBuildSummary(): Promise<void> {
+    if (this.pushedPackages.length > 0) {
+      await summary
+        .addHeading(`🎉 Package${this.pushedPackages.length > 1 ? 's' : ''} successfully pushed to Octopus Deploy`, 3)
+        .addCodeBlock(this.pushedPackages.map(pkg => `📦 ${pkg}`).join('\n'))
+        .write()
+    }
+  }
+
   async pushPackage(): Promise<void> {
     info('🔣 Parsing inputs...')
     const cliLaunchConfiguration = this.generateLaunchConfig()
 
     const options: ExecOptions = {
       listeners: {
-        stdline: input => this.stdline(input)
+        stdline: async input => await this.stdline(input)
       },
       env: cliLaunchConfiguration.env,
       silent: true
