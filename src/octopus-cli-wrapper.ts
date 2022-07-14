@@ -1,7 +1,6 @@
 import { InputParameters } from './input-parameters'
 import { info, setFailed, summary } from '@actions/core'
 import { exec, ExecOptions } from '@actions/exec'
-import path from 'path'
 
 // environment variables can either be a NodeJS.ProcessEnv or a plain old object with string keys/values for testing
 type EnvVars = { [key: string]: string } | NodeJS.ProcessEnv
@@ -11,7 +10,7 @@ export class OctopusCliWrapper {
   env: EnvVars
   logInfo: (message: string) => void
   logWarn: (message: string) => void
-  pushedPackages: string[] = [];
+  pushedPackages: string[] = []
 
   constructor(
     parameters: InputParameters,
@@ -45,7 +44,7 @@ export class OctopusCliWrapper {
     }
 
     if (line.includes('Pushing package:')) {
-      const pkg  = line.replace('Pushing package: ', '').replace('...', '')
+      const pkg = line.replace('Pushing package: ', '').replace('...', '')
       this.pushedPackages.push(pkg)
 
       this.logInfo(`📦 Pushing ${pkg}`)
@@ -178,7 +177,7 @@ export class OctopusCliWrapper {
 
     const options: ExecOptions = {
       listeners: {
-        stdline: input => this.stdline(input)
+        stdline: async input => await this.stdline(input)
       },
       env: cliLaunchConfiguration.env,
       silent: true
