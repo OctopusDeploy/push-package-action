@@ -11,6 +11,7 @@ export class OctopusCliWrapper {
   logInfo: (message: string) => void
   logWarn: (message: string) => void
   pushedPackages: string[] = []
+  success = false
 
   constructor(
     parameters: InputParameters,
@@ -24,7 +25,7 @@ export class OctopusCliWrapper {
     this.logWarn = logWarn
   }
 
-  async stdline(line: string): Promise<void> {
+  stdline(line: string): void {
     if (line.length <= 0) return
 
     if (line.includes('Octopus Deploy Command Line Tool')) {
@@ -54,7 +55,7 @@ export class OctopusCliWrapper {
     switch (line) {
       case 'Push successful':
         this.logInfo(`🎉 Push successful!`)
-        await this.createBuildSummary()
+        this.success = true
         break
       default:
         this.logInfo(line)
@@ -177,7 +178,7 @@ export class OctopusCliWrapper {
 
     const options: ExecOptions = {
       listeners: {
-        stdline: async input => await this.stdline(input)
+        stdline: input => this.stdline(input)
       },
       env: cliLaunchConfiguration.env,
       silent: true
@@ -185,6 +186,9 @@ export class OctopusCliWrapper {
 
     try {
       await exec('octo', cliLaunchConfiguration.args, options)
+      if (this.success) {
+        await this.createBuildSummary()
+      }
     } catch (e: unknown) {
       if (e instanceof Error) {
         setFailed(e)
