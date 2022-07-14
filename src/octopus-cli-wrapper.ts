@@ -1,5 +1,5 @@
 import { InputParameters } from './input-parameters'
-import { info, setFailed } from '@actions/core'
+import { info, setFailed, summary } from '@actions/core'
 import { exec, ExecOptions } from '@actions/exec'
 import path from 'path'
 
@@ -11,6 +11,7 @@ export class OctopusCliWrapper {
   env: EnvVars
   logInfo: (message: string) => void
   logWarn: (message: string) => void
+  pushedPackages: string[] = [];
 
   constructor(
     parameters: InputParameters,
@@ -24,7 +25,7 @@ export class OctopusCliWrapper {
     this.logWarn = logWarn
   }
 
-  stdline(line: string): void {
+  async stdline(line: string): Promise<void> {
     if (line.length <= 0) return
 
     if (line.includes('Octopus Deploy Command Line Tool')) {
@@ -45,6 +46,7 @@ export class OctopusCliWrapper {
 
     if (line.includes('Pushing package:')) {
       const pkg  = line.replace('Pushing package: ', '').replace('...', '')
+      this.pushedPackages.push(pkg)
 
       this.logInfo(`📦 Pushing ${pkg}`)
       return
@@ -53,6 +55,7 @@ export class OctopusCliWrapper {
     switch (line) {
       case 'Push successful':
         this.logInfo(`🎉 Push successful!`)
+        await this.createBuildSummary()
         break
       default:
         this.logInfo(line)
@@ -158,6 +161,15 @@ export class OctopusCliWrapper {
     if (!parameters.useDeltaCompression) launchArgs.push(`--use-delta-compression=false`)
 
     return { args: launchArgs, env: launchEnv }
+  }
+
+  async createBuildSummary(): Promise<void> {
+    if (this.pushedPackages.length > 0) {
+      await summary
+        .addHeading(`🎉 Package${this.pushedPackages.length > 1 ? 's' : ''} successfully pushed to Octopus Deploy`)
+        .addList(this.pushedPackages.map(pkg => `📦 ${pkg}`))
+        .write()
+    }
   }
 
   async pushPackage(): Promise<void> {
