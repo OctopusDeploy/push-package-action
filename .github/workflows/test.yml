@@ -64,7 +64,8 @@ jobs:
 
       - name: Package test report
         run: |
-          zip -rj TestReport.1.0.0.zip ./reports
+          zip -rj MyPackage.1.0.0.zip ./reports
+          zip -rj MyOtherPackage.1.0.0.zip ./reports
       
       - name: Push Package to Octopus
         uses: ./
@@ -74,4 +75,5 @@ jobs:
           OCTOPUS_SPACE: 'Spaces-1'
         with:
           packages: |
-            TestReport.1.0.0.zip
+            MyPackage.1.0.0.zip
+            MyOtherPackage.1.0.0.zip
