@@ -83,13 +83,16 @@ test('all the parameters where env has the values', () => {
   ])
 })
 
-test('', () => {
-  // if (parameters.overwriteMode.length > 0 && parameters.overwriteMode !== 'FailIfExists') {
-  //   if (parameters.overwriteMode !== 'OverwriteExisting' && parameters.overwriteMode !== 'IgnoreIfExists') {
-  //     throw new Error(
-  //       'The input value, overwrite_mode is invalid; accept values are "FailIfExists", "OverwriteExisting", and "IgnoreIfExists".'
-  //     )
-  //   }
-  //   launchArgs.push(`--overwrite-mode=${parameters.overwriteMode}`)
-  // }
+test('fails if the overwriteMode is invalid', () => {
+  const i = makeInputParameters({
+    packages: ['test.1.2.3.zip'],
+    apiKey: 'API-FOOBAR',
+    overwriteMode: 'Banana',
+    server: 'https://octopus.server',
+    space: 'Spaces-1'
+  })
+
+  expect(() => generateLaunchConfig({ parameters: i, env: {} }, console)).toThrow(
+    'The input value, overwrite_mode is invalid; accept values are "FailIfExists", "OverwriteExisting", and "IgnoreIfExists".'
+  )
 })
