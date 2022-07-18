@@ -1,4 +1,3 @@
-import { makeInputParameters } from '../../src/input-parameters'
 import { OctopusCliOutputHandler } from '../../src/octopus-cli-wrapper'
 import { CaptureOutput } from '../test-helpers'
 

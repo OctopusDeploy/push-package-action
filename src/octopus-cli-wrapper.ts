@@ -1,4 +1,4 @@
-import { setFailed, summary } from '@actions/core'
+import { summary } from '@actions/core'
 import { exec, ExecOptions } from '@actions/exec'
 import {
   CliOutput,
@@ -135,7 +135,7 @@ export class OctopusCliOutputHandler {
   }
 }
 
-async function createBuildSummary(pushedPackages: string[]): Promise<void> {
+export async function createBuildSummary(pushedPackages: string[]): Promise<void> {
   if (pushedPackages.length > 0) {
     await summary
       .addHeading(`🎉 Package${pushedPackages.length > 1 ? 's' : ''} successfully pushed to Octopus Deploy`, 3)
@@ -147,7 +147,11 @@ async function createBuildSummary(pushedPackages: string[]): Promise<void> {
 // This invokes the CLI to do the work.
 // Returns the release number assigned by the octopus server
 // This shells out to 'octo' and expects to be running in GHA, so you can't unit test it; integration tests only.
-export async function pushPackage(inputs: CliInputs, output: CliOutput, octoExecutable: string): Promise<void> {
+export async function pushPackage(
+  inputs: CliInputs,
+  output: CliOutput,
+  octoExecutable: string
+): Promise<{ success: boolean; pushedPackages: string[] }> {
   const outputHandler = new OctopusCliOutputHandler(output)
 
   const cliLaunchConfiguration = generateLaunchConfig(inputs, output)
@@ -169,9 +173,7 @@ export async function pushPackage(inputs: CliInputs, output: CliOutput, octoExec
 
   try {
     await exec(octoExecutable, cliLaunchConfiguration.args, options)
-    if (outputHandler.success) {
-      await createBuildSummary(outputHandler.pushedPackages)
-    }
+    return { success: outputHandler.success, pushedPackages: outputHandler.pushedPackages }
   } catch (e: unknown) {
     if (e instanceof Error) {
       // catch some particular messages and rethrow more convenient ones
