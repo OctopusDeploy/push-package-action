@@ -1,7 +1,6 @@
 import { getInputParameters } from './input-parameters'
-import { info, warning, setFailed, setOutput } from '@actions/core'
-import { CliInputs, createRelease } from './octopus-cli-wrapper'
-import { writeFileSync } from 'fs'
+import { info, warning, setFailed } from '@actions/core'
+import { CliInputs, createBuildSummary, pushPackage } from './octopus-cli-wrapper'
 import { CliOutput } from './cli-util'
 
 // GitHub actions entrypoint
@@ -10,18 +9,9 @@ async function run(): Promise<void> {
     const inputs: CliInputs = { parameters: getInputParameters(), env: process.env }
     const outputs: CliOutput = { info: s => info(s), warn: s => warning(s) }
 
-    const allocatedReleaseNumber = await createRelease(inputs, outputs, 'octo')
-
-    if (allocatedReleaseNumber) {
-      setOutput('release_number', allocatedReleaseNumber)
-    }
-
-    const stepSummaryFile = process.env.GITHUB_STEP_SUMMARY
-    if (stepSummaryFile && allocatedReleaseNumber) {
-      writeFileSync(
-        stepSummaryFile,
-        `🐙 Octopus Deploy Created Release **${allocatedReleaseNumber}** in Project **${inputs.parameters.project}**.`
-      )
+    const { success, pushedPackages } = await pushPackage(inputs, outputs, 'octo')
+    if (success) {
+      await createBuildSummary(pushedPackages)
     }
   } catch (e: unknown) {
     if (e instanceof Error) {
