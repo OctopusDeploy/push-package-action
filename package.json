@@ -10,11 +10,11 @@
   "description": "GitHub Action to Push a Package to Octopus Deploy",
   "devDependencies": {
     "@types/jest": "^28.1.6",
-    "@types/node": "^18.0.4",
+    "@types/node": "^18.0.6",
     "@types/tmp": "^0.2.3",
     "@typescript-eslint/parser": "^5.30.6",
     "@vercel/ncc": "^0.34.0",
-    "eslint": "^8.19.0",
+    "eslint": "^8.20.0",
     "eslint-plugin-github": "^4.3.6",
     "eslint-plugin-jest": "^26.6.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -24,7 +24,7 @@
     "js-yaml": "^4.1.0",
     "prettier": "2.7.1",
     "tmp": "^0.2.1",
-    "ts-jest": "^28.0.6",
+    "ts-jest": "^28.0.7",
     "typescript": "^4.7.4"
   },
   "homepage": "https://github.com/OctopusDeploy/push-package-action#readme",
