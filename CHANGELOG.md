@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.1](https://github.com/OctopusDeploy/push-package-action/compare/v2.0.0...v2.0.1) (2022-07-19)
+
+
+### Bug Fixes
+
+* Environment variables from the GitHub action context were not passed through to the underlying Octopus CLI ([54192af](https://github.com/OctopusDeploy/push-package-action/commit/54192af3e733e94e49e7498c37000c8b01572e52))
+* StdError and the process exit code returned by the CLI are now shown in Github Action runs ([54192af](https://github.com/OctopusDeploy/push-package-action/commit/54192af3e733e94e49e7498c37000c8b01572e52))
+
 ## [2.0.0](https://github.com/OctopusDeploy/push-package-action/compare/v1.2.1...v2.0.0) (2022-07-14)
 
 
