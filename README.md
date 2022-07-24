@@ -19,7 +19,7 @@ steps:
     uses: OctopusDeploy/push-package-action@v2
     env:
       OCTOPUS_API_KEY: ${{ secrets.API_KEY }}
-      OCTOPUS_HOST: ${{ secrects.SERVER }}
+      OCTOPUS_HOST: ${{ secrets.SERVER }}
       OCTOPUS_SPACE: 'Spaces-1'
     with:
       packages: |
