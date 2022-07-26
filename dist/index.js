@@ -6801,9 +6801,14 @@ function generateLaunchConfig(inputs, output) {
         }
         for (const pkg of parameters.packages) {
             for (const pkgName of pkg.split(',')) {
-                const pkgPaths = yield globp(pkgName);
-                for (const pkgPath of pkgPaths) {
-                    launchArgs.push(`--package=${pkgPath}`);
+                if (glob_1.default.hasMagic(pkgName)) {
+                    const pkgPaths = yield globp(pkgName);
+                    for (const pkgPath of pkgPaths) {
+                        launchArgs.push(`--package=${pkgPath}`);
+                    }
+                }
+                else {
+                    launchArgs.push(`--package=${pkgName}`);
                 }
             }
         }
