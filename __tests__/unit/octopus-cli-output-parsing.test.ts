@@ -1,8 +1,8 @@
 import { OctopusCliOutputHandler } from '../../src/octopus-cli-wrapper'
 import { CaptureOutput } from '../test-helpers'
 
-var output: CaptureOutput
-var w: OctopusCliOutputHandler
+let output: CaptureOutput
+let w: OctopusCliOutputHandler
 
 beforeEach(() => {
   output = new CaptureOutput()
