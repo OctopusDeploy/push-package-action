@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/OctopusDeploy/push-package-action/compare/v2.0.1...v2.1.0) (2022-07-26)
+
+
+### Features
+
+* Globbing support for packages ([#271](https://github.com/OctopusDeploy/push-package-action/issues/271)) ([cc89e6d](https://github.com/OctopusDeploy/push-package-action/commit/cc89e6da8eb2bf96b387642fb8197f18887f3935))
+
 ## [2.0.1](https://github.com/OctopusDeploy/push-package-action/compare/v2.0.0...v2.0.1) (2022-07-19)
 
 
