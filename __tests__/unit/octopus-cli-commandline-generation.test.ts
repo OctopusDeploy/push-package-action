@@ -121,3 +121,30 @@ test('globbing packages for matched ending with .zip', async () => {
     '--package=__tests__/testpkgs/win/test.1.0.1.zip'
   ])
 })
+
+test('globbing packages and non-glob packages', async () => {
+  const i = makeInputParameters({
+    packages: ['__tests__/testpkgs/**/*.zip', 'test.1.2.3.zip'],
+    apiKey: 'API-FOOBAR',
+    server: 'https://octopus.server'
+  })
+  const env = {
+    OCTOPUS_API_KEY: 'API FOOBAR',
+    OCTOPUS_HOST: 'http://octopusServer',
+    OCTOPUS_SPACE: 'Spaces-1'
+  }
+
+  const launchInfo = await generateLaunchConfig({ parameters: i, env }, console)
+
+  expect(launchInfo.args).toEqual([
+    'push',
+    '--space=Spaces-1',
+    '--package=__tests__/testpkgs/linux/apple.2.2.2.zip',
+    '--package=__tests__/testpkgs/linux/test.1.0.0.zip',
+    '--package=__tests__/testpkgs/linux/test.1.1.1.zip',
+    '--package=__tests__/testpkgs/main.1.1.1.zip',
+    '--package=__tests__/testpkgs/win/test.1.0.0.zip',
+    '--package=__tests__/testpkgs/win/test.1.0.1.zip',
+    '--package=test.1.2.3.zip'
+  ])
+})

@@ -25,6 +25,7 @@ steps:
       packages: |
         package1.tar.gz
         package2.zip
+        packages/**/*.zip
 ```
 
 ## 📥 Environment Variables
