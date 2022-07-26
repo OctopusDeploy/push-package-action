@@ -8,6 +8,10 @@ import {
   pickupConfigurationValueExtended
 } from './cli-util'
 import { InputParameters } from './input-parameters'
+import glob from 'glob'
+import { promisify } from 'util'
+
+const globp = promisify(glob)
 
 // Things in this file are specific to create-release-action and not shared with other actions
 
@@ -17,7 +21,7 @@ export interface CliInputs {
 }
 
 // Converts incoming environment and inputParameters into a set of commandline args + env vars to run the Octopus CLI
-export function generateLaunchConfig(inputs: CliInputs, output: CliOutput): CliLaunchConfiguration {
+export async function generateLaunchConfig(inputs: CliInputs, output: CliOutput): Promise<CliLaunchConfiguration> {
   const launchArgs: string[] = ['push']
   const launchEnv: { [key: string]: string } = {}
 
@@ -63,7 +67,16 @@ export function generateLaunchConfig(inputs: CliInputs, output: CliOutput): CliL
   }
 
   for (const pkg of parameters.packages) {
-    pkg.split(',').map(p => launchArgs.push(`--package=${p}`))
+    for (const pkgName of pkg.split(',')) {
+      if (glob.hasMagic(pkgName)) {
+        const pkgPaths = await globp(pkgName)
+        for (const pkgPath of pkgPaths) {
+          launchArgs.push(`--package=${pkgPath}`)
+        }
+      } else {
+        launchArgs.push(`--package=${pkgName}`)
+      }
+    }
   }
 
   if (parameters.logLevel.length > 0 && parameters.logLevel !== `debug`)
@@ -154,7 +167,7 @@ export async function pushPackage(
 ): Promise<{ success: boolean; pushedPackages: string[] }> {
   const outputHandler = new OctopusCliOutputHandler(output)
 
-  const cliLaunchConfiguration = generateLaunchConfig(inputs, output)
+  const cliLaunchConfiguration = await generateLaunchConfig(inputs, output)
 
   // the launch config will only have the specific few env vars that the script wants to set.
   // Need to merge with the rest of the environment variables, otherwise we will pass a

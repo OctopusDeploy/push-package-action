@@ -5,10 +5,12 @@
   },
   "dependencies": {
     "@actions/core": "^1.9.0",
-    "@actions/exec": "^1.1.1"
+    "@actions/exec": "^1.1.1",
+    "glob": "^8.0.3"
   },
   "description": "GitHub Action to Push a Package to Octopus Deploy",
   "devDependencies": {
+    "@types/glob": "^7.2.0",
     "@types/jest": "^28.1.6",
     "@types/node": "^18.0.6",
     "@types/tmp": "^0.2.3",
