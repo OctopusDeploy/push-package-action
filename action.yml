@@ -39,5 +39,5 @@ inputs:
     description: 'Use delta compression when uploading packages to Octopus Deploy.'
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
