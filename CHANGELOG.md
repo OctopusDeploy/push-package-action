@@ -13,6 +13,7 @@
 ### Features
 
 * Globbing support for packages ([#271](https://github.com/OctopusDeploy/push-package-action/issues/271)) ([cc89e6d](https://github.com/OctopusDeploy/push-package-action/commit/cc89e6da8eb2bf96b387642fb8197f18887f3935))
+* Bump to Node16 ([ee7ea64](https://github.com/OctopusDeploy/push-package-action/commit/ee7ea64100f514fa132bce04ffc9b72336599c40))
 
 ## [2.0.1](https://github.com/OctopusDeploy/push-package-action/compare/v2.0.0...v2.0.1) (2022-07-19)
 
