@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/OctopusDeploy/push-package-action/compare/v2.1.0...v2.2.0) (2022-11-04)
+
+
+### Features
+
+* bump dependencies ([5a3fd14](https://github.com/OctopusDeploy/push-package-action/commit/5a3fd14b20d3b1bc6164be57004c1b0fe14ce7b6))
+
 ## [2.1.0](https://github.com/OctopusDeploy/push-package-action/compare/v2.0.1...v2.1.0) (2022-07-26)
 
 
