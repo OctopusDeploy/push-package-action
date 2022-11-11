@@ -5,13 +5,15 @@
   },
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "@actions/exec": "^1.1.1",
+    "@octopusdeploy/api-client": "github:OctopusDeploy/api-client.ts#enh-dropenvvars",
     "glob": "^8.0.3"
   },
   "description": "GitHub Action to Push a Package to Octopus Deploy",
   "devDependencies": {
     "@types/glob": "^8.0.0",
     "@types/jest": "^29.2.1",
+    "@types/json-patch": "^0.0.30",
+    "@types/lodash": "^4.14.188",
     "@types/node": "^18.11.9",
     "@types/tmp": "^0.2.3",
     "@typescript-eslint/parser": "^5.42.0",
