@@ -1,5 +1,5 @@
 import { summary } from '@actions/core'
-import { Client, packagePush } from '@octopusdeploy/api-client'
+import { Client, PackageRepository } from '@octopusdeploy/api-client'
 import glob from 'glob'
 import { promisify } from 'util'
 import { InputParameters } from './input-parameters'
@@ -9,7 +9,8 @@ const globp = promisify(glob)
 export async function pushPackageFromInputs(client: Client, parameters: InputParameters): Promise<string[]> {
   const packages = await expandGlobs(parameters.packages)
 
-  await packagePush(client, parameters.space, packages, parameters.overwriteMode)
+  const repository = new PackageRepository(client, parameters.space)
+  await repository.push(packages, parameters.overwriteMode)
 
   return packages
 }
