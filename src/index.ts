@@ -41,6 +41,8 @@ import process from 'process'
   } catch (e: unknown) {
     if (e instanceof Error) {
       setFailed(e)
+    } else {
+      setFailed(`Unknown error: ${e}`)
     }
   }
 })()
