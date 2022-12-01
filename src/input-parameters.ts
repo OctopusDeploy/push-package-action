@@ -17,7 +17,7 @@ export interface InputParameters {
 
 export function getInputParameters(isRetry: boolean): InputParameters {
   const overwriteMode: OverwriteMode =
-    (OverwriteMode as any)[getInput('overwrite_mode')] || // eslint-disable-line @typescript-eslint/no-explicit-any
+    OverwriteMode[getInput('overwrite_mode') as keyof typeof OverwriteMode] ||
     (isRetry ? OverwriteMode.IgnoreIfExists : OverwriteMode.FailIfExists)
 
   const parameters: InputParameters = {
