@@ -1,61 +1,53 @@
-import { getBooleanInput, getMultilineInput, getInput } from '@actions/core'
+import { getMultilineInput, getInput } from '@actions/core'
+import { OverwriteMode } from '@octopusdeploy/api-client'
+
+const EnvironmentVariables = {
+  URL: 'OCTOPUS_URL',
+  ApiKey: 'OCTOPUS_API_KEY',
+  Space: 'OCTOPUS_SPACE'
+} as const
 
 export interface InputParameters {
-  // required parameters
-  packages: string[]
-  apiKey: string
   server: string
+  apiKey: string
   space: string
-  // optional parameters
-  debug?: boolean
-  logLevel: string
-  overwriteMode: string
-  proxy: string
-  proxyPassword: string
-  proxyUsername: string
-  timeout: string
-  useDeltaCompression: boolean
+  packages: string[]
+  overwriteMode: OverwriteMode
 }
 
-export function getInputParameters(): InputParameters {
-  return {
-    // required parameters
-    packages: getMultilineInput('packages'),
-    apiKey: getInput('api_key'),
-    server: getInput('server'),
-    space: getInput('space'),
-    // optional parameters
-    debug: getBooleanInput('debug'),
-    logLevel: getInput('log_level'),
-    overwriteMode: getInput('overwrite_mode'),
-    proxy: getInput('proxy'),
-    proxyPassword: getInput('proxy_password'),
-    proxyUsername: getInput('proxy_username'),
-    timeout: getInput('timeout'),
-    useDeltaCompression: getBooleanInput('use_delta_compression')
-  }
-}
+export function getInputParameters(isRetry: boolean): InputParameters {
+  const overwriteMode: OverwriteMode =
+    OverwriteMode[getInput('overwrite_mode') as keyof typeof OverwriteMode] ||
+    (isRetry ? OverwriteMode.IgnoreIfExists : OverwriteMode.FailIfExists)
 
-export function makeInputParameters(override: Partial<InputParameters> | undefined = undefined): InputParameters {
-  const template = {
-    // required parameters
-    packages: [],
-    apiKey: '',
-    server: '',
-    space: '',
-    // optional parameters
-    debug: false,
-    logLevel: '',
-    overwriteMode: '',
-    proxy: '',
-    proxyPassword: '',
-    proxyUsername: '',
-    timeout: '',
-    useDeltaCompression: true
+  const parameters: InputParameters = {
+    server: getInput('server') || process.env[EnvironmentVariables.URL] || '',
+    apiKey: getInput('api_key') || process.env[EnvironmentVariables.ApiKey] || '',
+    space: getInput('space') || process.env[EnvironmentVariables.Space] || '',
+    packages: getMultilineInput('packages', { required: true }),
+    overwriteMode
   }
 
-  if (override) {
-    Object.assign(template, override)
+  const errors: string[] = []
+  if (!parameters.server) {
+    errors.push(
+      "The Octopus instance URL is required, please specify explictly through the 'server' input or set the OCTOPUS_URL environment variable."
+    )
   }
-  return template
+  if (!parameters.apiKey) {
+    errors.push(
+      "The Octopus API Key is required, please specify explictly through the 'api_key' input or set the OCTOPUS_API_KEY environment variable."
+    )
+  }
+  if (!parameters.space) {
+    errors.push(
+      "The Octopus space name is required, please specify explictly through the 'space' input or set the OCTOPUS_SPACE environment variable."
+    )
+  }
+
+  if (errors.length > 0) {
+    throw new Error(errors.join('\n'))
+  }
+
+  return parameters
 }

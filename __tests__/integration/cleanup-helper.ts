@@ -3,7 +3,7 @@ type Callback = () => unknown
 export class CleanupHelper {
   #actions: Callback[] = []
 
-  add(callback: Callback) {
+  add(callback: Callback): void {
     this.#actions.push(callback)
   }
 

@@ -18,9 +18,9 @@ steps:
   - name: Push a package to Octopus Deploy 🐙
     uses: OctopusDeploy/push-package-action@v2
     env:
+      OCTOPUS_URL: ${{ secrets.SERVER }}
       OCTOPUS_API_KEY: ${{ secrets.API_KEY }}
-      OCTOPUS_HOST: ${{ secrets.SERVER }}
-      OCTOPUS_SPACE: 'Spaces-1'
+      OCTOPUS_SPACE: 'Default'
     with:
       packages: |
         package1.tar.gz
@@ -30,40 +30,21 @@ steps:
 
 ## 📥 Environment Variables
 
-| Name                    | Description                                                                                                                                                                                                                                                                                                      |
-| :---------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `OCTOPUS_API_KEY`               | The API key used to access Octopus Deploy. `API-GUEST` may be used if the guest account is enabled. It is strongly recommended that this value is retrieved from a GitHub secret.                                                |
-| `OCTOPUS_HOST`                | The base URL hosting Octopus Deploy (i.e. `https://octopus.example.com`). It is strongly recommended that this value is retrieved from a GitHub secret.                                                                                                                                                                |
-| `OCTOPUS_PROXY`                 | The URL of a proxy to use (i.e. `https://proxy.example.com`). If `OCTOPUS_PROXY_USERNAME` and `OCTOPUS_PROXY_PASSWORD` are omitted, the default credentials are used. It is strongly recommended that this value is retrieved from a GitHub secret.                                                                                                                                                                                                                                                           |
-| `OCTOPUS_PROXY_PASSWORD`        | The password used to connect to a proxy. It is strongly recommended to retrieve this value from a GitHub secret.                                                                        |
-| `OCTOPUS_PROXY_USERNAME`        | The username used to connect to a proxy. It is strongly recommended to retrieve this value from a GitHub secret.                                                                                                                                                                                                 |
-| `OCTOPUS_SPACE`                 | The ID of a space within which this command will be executed. If omitted, the default space will be used.                                                                                                                                                                                                |
-
+| Name              | Description                                                                                                                                          |
+| :---------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OCTOPUS_URL`     | The base URL hosting Octopus Deploy (i.e. `https://octopus.example.com`). It is strongly recommended that this value retrieved from a GitHub secret. |
+| `OCTOPUS_API_KEY` | The API key used to access Octopus Deploy. It is strongly recommended that this value retrieved from a GitHub secret.                                |
+| `OCTOPUS_SPACE`   | The Name of a space within which this command will be executed.                                                                                      |
 
 ## 📥 Inputs
 
-The following inputs are required:
-
-| Name                    | Description                                                                                                                                                                                                                                                                                                      |
-| :---------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages`              | A multi-line and/or comma-delimited list of packages to push to Octopus Deploy (i.e. package1,package2).                                                                                                                                                                                                         |
-
-The following inputs are optional:
-
-| Name                    | Description                                                                                                                                                                                                                                                                                                      |    Default     |
-| :---------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------: |
-| `api_key`               | The API key used to access Octopus Deploy. `API-GUEST` may be used if the guest account is enabled. It is recommended to specify this value in the `OCTOPUS_API_KEY` environment variable.                                                |                |
-| `debug`                 | Enable debug logging.                                                                                                                                                                                                                                                                                            |    `false`     |
-| `ignore_ssl_errors`     | Ignore certificate errors when communicating with Octopus Deploy. Warning: enabling this option creates a security vulnerability.                                                                                                                                                                                |    `false`     |
-| `log_level`             | The log level; valid options are `verbose`, `debug`, `information`, `warning`, `error`, and `fatal`.                                                                                                                                                                                                             |    `debug`     |
-| `overwrite_mode`        | Determines the action to perform with package if it already exists in the repository. Valid input values are `FailIfExists`, `OverwriteExisting`, and `IgnoreIfExists`.                                                                                                                                          | `FailIfExists` |
-| `proxy`                 | The URL of a proxy to use (i.e. `https://proxy.example.com`).  It is recommended to specify this value in the `OCTOPUS_PROXY` environment variable.                                                                                                                                                                                                                                                  |                |
-| `proxy_password`        | The password used to connect to a proxy. It is strongly recommended to retrieve this value from a GitHub secret. If `proxy_username` and `proxy_password` are omitted and `proxy` is specified, the default credentials are used. It is recommended to specify this value in the `OCTOPUS_PROXY_PASSWORD` environment variable.                                                                              |                |
-| `proxy_username`        | The username used to connect to a proxy. It is strongly recommended to retrieve this value from a GitHub secret. It is recommended to specify this value in the `OCTOPUS_PROXY_USERNAME` environment variable.                                                                                                                                                                                               |                |
-| `server`                | The base URL hosting Octopus Deploy (i.e. `https://octopus.example.com`). It is recommended to retrieve this value from an environment variable. It is recommended to specify this value in the `OCTOPUS_HOST` environment variable.                                                                                                                                                                |                |
-| `space`                 | The name or ID of a space within which this command will be executed. It is recommended to specify this value in the `OCTOPUS_SPACE` environment variable.                                                                                                                                                                                               |                |
-| `timeout`               | A timeout value for network operations (in seconds).                                                                                                                                                                                                                                                             |     `600`      |
-| `use_delta_compression` | Use delta compression when uploading packages to Octopus Deploy.                                                                                                                                                                                                                                                 |     `true`     |
+| Name             | Description                                                                                                                                                                                                  |
+| :--------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages`       | **Required.** A multi-line and/or comma-delimited list of packages to push to Octopus Deploy (i.e. package1,package2).                                                                                       |
+| `overwrite_mode` | Determines the action to perform with package if it already exists in the repository. Valid input values are `FailIfExists` (default), `OverwriteExisting`, and `IgnoreIfExists`.                            |
+| `server`         | The instance URL hosting Octopus Deploy (i.e. "https://octopus.example.com/"). The instance URL is required, but you may also use the OCTOPUS_URL environment variable.                                      |
+| `api_key`        | The API key used to access Octopus Deploy. An API key is required, but you may also use the OCTOPUS_API_KEY environment variable. It is strongly recommended that this value retrieved from a GitHub secret. |
+| `space`          | The name of a space within which this command will be executed. The space name is required, but you may also use the OCTOPUS_SPACE environment variable.                                                     |
 
 ## 🤝 Contributions
 
