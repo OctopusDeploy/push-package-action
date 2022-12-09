@@ -2,7 +2,7 @@
 
 <img alt= "" src="https://github.com/OctopusDeploy/push-package-action/raw/main/assets/github-actions-octopus.png" />
 
-This is a GitHub Action to push a package to [Octopus Deploy](https://octopus.com/). It requires the [Octopus CLI](https://octopus.com/docs/octopus-rest-api/octopus-cli); please ensure to include [install-octopus-cli-action](https://github.com/OctopusDeploy/install-octopus-cli-action) in your workflow (example below) before using this GitHub Action.
+This is a GitHub Action to push a package to [Octopus Deploy](https://octopus.com/).
 
 ## Examples
 
@@ -11,10 +11,7 @@ Incorporate the following actions in your workflow to push a package to Octopus 
 ```yml
 steps:
   - uses: actions/checkout@v3
-  - name: Install Octopus CLI 🐙
-    uses: OctopusDeploy/install-octopus-cli-action@v1
-    with:
-      version: latest
+
   - name: Push a package to Octopus Deploy 🐙
     uses: OctopusDeploy/push-package-action@v2
     env:
