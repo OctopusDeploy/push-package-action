@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.0.0](https://github.com/OctopusDeploy/push-package-action/compare/v2.2.0...v3.0.0) (2022-12-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* Update action to use the native API client
+
+### Features
+
+* Update action to use the native API client ([bfb8b66](https://github.com/OctopusDeploy/push-package-action/commit/bfb8b662f41b0ad7e03124a8537a21cc82e776ce))
+
+
+### Bug Fixes
+
+* updated dependencies ([c5ae0f8](https://github.com/OctopusDeploy/push-package-action/commit/c5ae0f881fe84461f703dec14777c4ed4ff20244))
+
 ## [2.2.0](https://github.com/OctopusDeploy/push-package-action/compare/v2.1.0...v2.2.0) (2022-11-04)
 
 
