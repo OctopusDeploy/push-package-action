@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/OctopusDeploy/push-package-action/compare/v3.0.0...v3.0.1) (2022-12-16)
+
+
+### Bug Fixes
+
+* failed package push outcome reported ([1519d62](https://github.com/OctopusDeploy/push-package-action/commit/1519d62d98c7d679d11c765e3ff2fba3c75eb69e))
+
 ## [3.0.0](https://github.com/OctopusDeploy/push-package-action/compare/v2.2.0...v3.0.0) (2022-12-13)
 
 

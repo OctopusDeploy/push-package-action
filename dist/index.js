@@ -3987,13 +3987,13 @@ var PackageRepository = /** @class */ (function () {
     PackageRepository.prototype.push = function (packages, overwriteMode) {
         if (overwriteMode === void 0) { overwriteMode = overwriteMode_1.OverwriteMode.FailIfExists; }
         return __awaiter(this, void 0, void 0, function () {
-            var spaceId, tasks, packages_1, packages_1_1, packagePath;
-            var e_1, _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var spaceId, tasks, packages_1, packages_1_1, packagePath, rejectedTasks, completedTasks, completedTasks_1, completedTasks_1_1, t, errors, rejectedTasks_1, rejectedTasks_1_1, e, error;
+            var e_1, _a, e_2, _b, e_3, _c;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
                     case 0: return [4 /*yield*/, (0, spaceResolver_1.resolveSpaceId)(this.client, this.spaceName)];
                     case 1:
-                        spaceId = _b.sent();
+                        spaceId = _d.sent();
                         tasks = [];
                         try {
                             for (packages_1 = __values(packages), packages_1_1 = packages_1.next(); !packages_1_1.done; packages_1_1 = packages_1.next()) {
@@ -4008,9 +4008,48 @@ var PackageRepository = /** @class */ (function () {
                             }
                             finally { if (e_1) throw e_1.error; }
                         }
+                        rejectedTasks = [];
                         return [4 /*yield*/, Promise.allSettled(tasks)];
                     case 2:
-                        _b.sent();
+                        completedTasks = _d.sent();
+                        try {
+                            for (completedTasks_1 = __values(completedTasks), completedTasks_1_1 = completedTasks_1.next(); !completedTasks_1_1.done; completedTasks_1_1 = completedTasks_1.next()) {
+                                t = completedTasks_1_1.value;
+                                if (t.status === "rejected") {
+                                    rejectedTasks.push(t.reason);
+                                }
+                            }
+                        }
+                        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                        finally {
+                            try {
+                                if (completedTasks_1_1 && !completedTasks_1_1.done && (_b = completedTasks_1.return)) _b.call(completedTasks_1);
+                            }
+                            finally { if (e_2) throw e_2.error; }
+                        }
+                        errors = [];
+                        try {
+                            for (rejectedTasks_1 = __values(rejectedTasks), rejectedTasks_1_1 = rejectedTasks_1.next(); !rejectedTasks_1_1.done; rejectedTasks_1_1 = rejectedTasks_1.next()) {
+                                e = rejectedTasks_1_1.value;
+                                if (e instanceof Error) {
+                                    errors.push(e);
+                                }
+                                else {
+                                    errors.push(new Error("unexpected error: ".concat(e)));
+                                }
+                            }
+                        }
+                        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                        finally {
+                            try {
+                                if (rejectedTasks_1_1 && !rejectedTasks_1_1.done && (_c = rejectedTasks_1.return)) _c.call(rejectedTasks_1);
+                            }
+                            finally { if (e_3) throw e_3.error; }
+                        }
+                        if (errors.length > 0) {
+                            error = errors.map(function (e) { return "".concat(e); });
+                            throw new Error(error.join("\n"));
+                        }
                         this.client.info("Packages uploaded");
                         return [2 /*return*/];
                 }
