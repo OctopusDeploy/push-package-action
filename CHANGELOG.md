@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.0.2](https://github.com/OctopusDeploy/push-package-action/compare/v3.0.1...v3.0.2) (2022-12-19)
+
+
+### Bug Fixes
+
+* updated dependencies ([0fda2d9](https://github.com/OctopusDeploy/push-package-action/commit/0fda2d9cd68b1b7b5ef610194f2025c043151fb3))
+
+
+### Miscellaneous Chores
+
+* release 3.0.2 ([ba02ac8](https://github.com/OctopusDeploy/push-package-action/commit/ba02ac803457d7e70aa6a7826b66ed541484c609))
+
 ## [3.0.1](https://github.com/OctopusDeploy/push-package-action/compare/v3.0.0...v3.0.1) (2022-12-16)
 
 
