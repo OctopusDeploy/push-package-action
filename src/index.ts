@@ -27,7 +27,7 @@ import process from 'process'
     const parameters = getInputParameters(parseInt(process.env['GITHUB_RUN_ATTEMPT'] || '0') > 1)
 
     const config: ClientConfiguration = {
-      userAgentApp: 'GitHubActions push-package-action',
+      userAgentApp: 'GitHubActions (package;push;v3)',
       instanceURL: parameters.server,
       apiKey: parameters.apiKey,
       logging: logger
