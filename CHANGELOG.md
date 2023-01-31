@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.3](https://github.com/OctopusDeploy/push-package-action/compare/v3.0.2...v3.0.3) (2023-01-31)
+
+
+### Bug Fixes
+
+* updated user-agent value ([70b9a85](https://github.com/OctopusDeploy/push-package-action/commit/70b9a859acfc4e4da6e246fb41f6930e061393d0))
+
 ## [3.0.2](https://github.com/OctopusDeploy/push-package-action/compare/v3.0.1...v3.0.2) (2022-12-19)
 
 
