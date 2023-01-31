@@ -3548,6 +3548,9 @@ var NuGetPackageBuilder = /** @class */ (function () {
                             fs_1.default.appendFileSync(nuspecFile, "        <version>".concat(args.version, "</version>\n"));
                             fs_1.default.appendFileSync(nuspecFile, "        <description>".concat(args.nuspecArgs.description, "</description>\n"));
                             fs_1.default.appendFileSync(nuspecFile, "        <authors>".concat(args.nuspecArgs.authors.join(","), "</authors>\n"));
+                            if (args.nuspecArgs.title) {
+                                fs_1.default.appendFileSync(nuspecFile, "        <title>".concat(args.nuspecArgs.title, "</title>\n"));
+                            }
                             if (args.nuspecArgs.releaseNotes) {
                                 fs_1.default.appendFileSync(nuspecFile, "        <releaseNotes>".concat(args.nuspecArgs.releaseNotes, "</releaseNotes>\n"));
                             }
@@ -7519,8 +7522,9 @@ module.exports = function (/**String*/ input, /** object */ options) {
          * @param zipPath optional path inside zip
          * @param filter optional RegExp or Function if files match will
          *               be included.
+         * @param {number | object} attr - number as unix file permissions, object as filesystem Stats object
          */
-        addLocalFolder: function (/**String*/ localPath, /**String=*/ zipPath, /**=RegExp|Function*/ filter) {
+        addLocalFolder: function (/**String*/ localPath, /**String=*/ zipPath, /**=RegExp|Function*/ filter, /**=number|object*/ attr) {
             // Prepare filter
             if (filter instanceof RegExp) {
                 // if filter is RegExp wrap it
@@ -7552,9 +7556,9 @@ module.exports = function (/**String*/ input, /** object */ options) {
                         if (filter(p)) {
                             var stats = filetools.fs.statSync(filepath);
                             if (stats.isFile()) {
-                                self.addFile(zipPath + p, filetools.fs.readFileSync(filepath), "", stats);
+                                self.addFile(zipPath + p, filetools.fs.readFileSync(filepath), "", attr ? attr : stats);
                             } else {
-                                self.addFile(zipPath + p + "/", Buffer.alloc(0), "", stats);
+                                self.addFile(zipPath + p + "/", Buffer.alloc(0), "", attr ? attr : stats);
                             }
                         }
                     });
@@ -7628,7 +7632,9 @@ module.exports = function (/**String*/ input, /** object */ options) {
                                     }
                                 });
                             } else {
-                                next();
+                                process.nextTick(() => {
+                                    next();
+                                });
                             }
                         } else {
                             callback(true, undefined);
@@ -7694,23 +7700,21 @@ module.exports = function (/**String*/ input, /** object */ options) {
             var fileattr = entry.isDirectory ? 0x10 : 0; // (MS-DOS directory flag)
 
             // extended attributes field for Unix
-            if (!Utils.isWin) {
-                // set file type either S_IFDIR / S_IFREG
-                let unix = entry.isDirectory ? 0x4000 : 0x8000;
+            // set file type either S_IFDIR / S_IFREG
+            let unix = entry.isDirectory ? 0x4000 : 0x8000;
 
-                if (isStat) {
-                    // File attributes from file stats
-                    unix |= 0xfff & attr.mode;
-                } else if ("number" === typeof attr) {
-                    // attr from given attr values
-                    unix |= 0xfff & attr;
-                } else {
-                    // Default values:
-                    unix |= entry.isDirectory ? 0o755 : 0o644; // permissions (drwxr-xr-x) or (-r-wr--r--)
-                }
-
-                fileattr = (fileattr | (unix << 16)) >>> 0; // add attributes
+            if (isStat) {
+                // File attributes from file stats
+                unix |= 0xfff & attr.mode;
+            } else if ("number" === typeof attr) {
+                // attr from given attr values
+                unix |= 0xfff & attr;
+            } else {
+                // Default values:
+                unix |= entry.isDirectory ? 0o755 : 0o644; // permissions (drwxr-xr-x) or (-r-wr--r--)
             }
+
+            fileattr = (fileattr | (unix << 16)) >>> 0; // add attributes
 
             entry.attr = fileattr;
 
@@ -7886,12 +7890,14 @@ module.exports = function (/**String*/ input, /** object */ options) {
          * @param callback The callback will be executed when all entries are extracted successfully or any error is thrown.
          */
         extractAllToAsync: function (/**String*/ targetPath, /**Boolean*/ overwrite, /**Boolean*/ keepOriginalPermission, /**Function*/ callback) {
-            if (!callback) {
-                callback = function () {};
-            }
             overwrite = get_Bool(overwrite, false);
             if (typeof keepOriginalPermission === "function" && !callback) callback = keepOriginalPermission;
             keepOriginalPermission = get_Bool(keepOriginalPermission, false);
+            if (!callback) {
+                callback = function (err) {
+                    throw new Error(err);
+                };
+            }
             if (!_zip) {
                 callback(new Error(Utils.Errors.NO_ZIP));
                 return;
@@ -8473,7 +8479,7 @@ module.exports = function () {
                 // total number of entries
                 _totalEntries = Utils.readBigUInt64LE(data, Constants.ZIP64TOT);
                 // central directory size in bytes
-                _size = Utils.readBigUInt64LE(data, Constants.ZIP64SIZ);
+                _size = Utils.readBigUInt64LE(data, Constants.ZIP64SIZE);
                 // offset of first CEN header
                 _offset = Utils.readBigUInt64LE(data, Constants.ZIP64OFF);
 
@@ -8524,7 +8530,7 @@ module.exports = function () {
         }
     };
 };
-
+ // Misspelled 
 
 /***/ }),
 
@@ -9106,6 +9112,7 @@ module.exports.FileAttr = __nccwpck_require__(8321);
 const fsystem = (__nccwpck_require__(2895).require)();
 const pth = __nccwpck_require__(1017);
 const Constants = __nccwpck_require__(4522);
+const Errors = __nccwpck_require__(1255);
 const isWin = typeof process === "object" && "win32" === process.platform;
 
 const is_Obj = (obj) => obj && typeof obj === "object";
@@ -13388,6 +13395,12 @@ function setopts (self, pattern, options) {
     pattern = "**/" + pattern
   }
 
+  self.windowsPathsNoEscape = !!options.windowsPathsNoEscape ||
+    options.allowWindowsEscape === false
+  if (self.windowsPathsNoEscape) {
+    pattern = pattern.replace(/\\/g, '/')
+  }
+
   self.silent = !!options.silent
   self.pattern = pattern
   self.strict = options.strict !== false
@@ -13443,8 +13456,6 @@ function setopts (self, pattern, options) {
   // Note that they are not supported in Glob itself anyway.
   options.nonegate = true
   options.nocomment = true
-  // always treat \ in patterns as escapes, not path separators
-  options.allowWindowsEscape = true
 
   self.minimatch = new Minimatch(pattern, options)
   self.options = self.minimatch.options
@@ -14753,7 +14764,9 @@ minimatch.match = (list, pattern, options = {}) => {
 
 // replace stuff like \* with *
 const globUnescape = s => s.replace(/\\(.)/g, '$1')
+const charUnescape = s => s.replace(/\\([^-\]])/g, '$1')
 const regExpEscape = s => s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
+const braExpEscape = s => s.replace(/[[\]\\]/g, '\\$&')
 
 class Minimatch {
   constructor (pattern, options) {
@@ -14839,7 +14852,7 @@ class Minimatch {
       negateOffset++
     }
 
-    if (negateOffset) this.pattern = pattern.substr(negateOffset)
+    if (negateOffset) this.pattern = pattern.slice(negateOffset)
     this.negate = negate
   }
 
@@ -15021,7 +15034,7 @@ class Minimatch {
     if (pattern === '') return ''
 
     let re = ''
-    let hasMagic = !!options.nocase
+    let hasMagic = false
     let escaping = false
     // ? => one single character
     const patternListStack = []
@@ -15034,11 +15047,23 @@ class Minimatch {
     let pl
     let sp
     // . and .. never match anything that doesn't start with .,
-    // even when options.dot is set.
-    const patternStart = pattern.charAt(0) === '.' ? '' // anything
-    // not (start or / followed by . or .. followed by / or end)
-    : options.dot ? '(?!(?:^|\\\/)\\.{1,2}(?:$|\\\/))'
-    : '(?!\\.)'
+    // even when options.dot is set.  However, if the pattern
+    // starts with ., then traversal patterns can match.
+    let dotTravAllowed = pattern.charAt(0) === '.'
+    let dotFileAllowed = options.dot || dotTravAllowed
+    const patternStart = () =>
+      dotTravAllowed
+        ? ''
+        : dotFileAllowed
+        ? '(?!(?:^|\\/)\\.{1,2}(?:$|\\/))'
+        : '(?!\\.)'
+    const subPatternStart = (p) =>
+      p.charAt(0) === '.'
+        ? ''
+        : options.dot
+        ? '(?!(?:^|\\/)\\.{1,2}(?:$|\\/))'
+        : '(?!\\.)'
+
 
     const clearStateChar = () => {
       if (stateChar) {
@@ -15088,6 +15113,11 @@ class Minimatch {
         }
 
         case '\\':
+          if (inClass && pattern.charAt(i + 1) === '-') {
+            re += c
+            continue
+          }
+
           clearStateChar()
           escaping = true
         continue
@@ -15122,7 +15152,7 @@ class Minimatch {
           if (options.noext) clearStateChar()
         continue
 
-        case '(':
+        case '(': {
           if (inClass) {
             re += '('
             continue
@@ -15133,46 +15163,64 @@ class Minimatch {
             continue
           }
 
-          patternListStack.push({
+          const plEntry = {
             type: stateChar,
             start: i - 1,
             reStart: re.length,
             open: plTypes[stateChar].open,
-            close: plTypes[stateChar].close
-          })
-          // negation is (?:(?!js)[^/]*)
-          re += stateChar === '!' ? '(?:(?!(?:' : '(?:'
+            close: plTypes[stateChar].close,
+          }
+          this.debug(this.pattern, '\t', plEntry)
+          patternListStack.push(plEntry)
+          // negation is (?:(?!(?:js)(?:<rest>))[^/]*)
+          re += plEntry.open
+          // next entry starts with a dot maybe?
+          if (plEntry.start === 0 && plEntry.type !== '!') {
+            dotTravAllowed = true
+            re += subPatternStart(pattern.slice(i + 1))
+          }
           this.debug('plType %j %j', stateChar, re)
           stateChar = false
-        continue
+          continue
+        }
 
-        case ')':
-          if (inClass || !patternListStack.length) {
+        case ')': {
+          const plEntry = patternListStack[patternListStack.length - 1]
+          if (inClass || !plEntry) {
             re += '\\)'
             continue
           }
+          patternListStack.pop()
 
+          // closing an extglob
           clearStateChar()
           hasMagic = true
-          pl = patternListStack.pop()
+          pl = plEntry
           // negation is (?:(?!js)[^/]*)
           // The others are (?:<pattern>)<type>
           re += pl.close
           if (pl.type === '!') {
-            negativeLists.push(pl)
+            negativeLists.push(Object.assign(pl, { reEnd: re.length }))
           }
-          pl.reEnd = re.length
-        continue
+          continue
+        }
 
-        case '|':
-          if (inClass || !patternListStack.length) {
+        case '|': {
+          const plEntry = patternListStack[patternListStack.length - 1]
+          if (inClass || !plEntry) {
             re += '\\|'
             continue
           }
 
           clearStateChar()
           re += '|'
-        continue
+          // next subpattern can start with a dot?
+          if (plEntry.start === 0 && plEntry.type !== '!') {
+            dotTravAllowed = true
+            re += subPatternStart(pattern.slice(i + 1))
+          }
+          continue
+        }
 
         // these are mostly the same in regexp and glob
         case '[':
@@ -15200,8 +15248,6 @@ class Minimatch {
             continue
           }
 
-          // handle the case where we left a class open.
-          // "[z-a]" is valid, equivalent to "\[z-a\]"
           // split where the last [ was, make sure we don't have
           // an invalid re. if so, re-walk the contents of the
           // would-be class to re-translate any characters that
@@ -15211,20 +15257,16 @@ class Minimatch {
           // to do safely.  For now, this is safe and works.
           cs = pattern.substring(classStart + 1, i)
           try {
-            RegExp('[' + cs + ']')
+            RegExp('[' + braExpEscape(charUnescape(cs)) + ']')
+            // looks good, finish up the class.
+            re += c
           } catch (er) {
-            // not a valid class!
-            sp = this.parse(cs, SUBPARSE)
-            re = re.substr(0, reClassStart) + '\\[' + sp[0] + '\\]'
-            hasMagic = hasMagic || sp[1]
-            inClass = false
-            continue
+            // out of order ranges in JS are errors, but in glob syntax,
+            // they're just a range that matches nothing.
+            re = re.substring(0, reClassStart) + '(?:$.)' // match nothing ever
           }
-
-          // finish up the class.
           hasMagic = true
           inClass = false
-          re += c
         continue
 
         default:
@@ -15248,9 +15290,9 @@ class Minimatch {
       // this is a huge pita.  We now have to re-walk
       // the contents of the would-be class to re-translate
       // any characters that were passed through as-is
-      cs = pattern.substr(classStart + 1)
+      cs = pattern.slice(classStart + 1)
       sp = this.parse(cs, SUBPARSE)
-      re = re.substr(0, reClassStart) + '\\[' + sp[0]
+      re = re.substring(0, reClassStart) + '\\[' + sp[0]
       hasMagic = hasMagic || sp[1]
     }
 
@@ -15317,14 +15359,16 @@ class Minimatch {
       // Handle nested stuff like *(*.js|!(*.json)), where open parens
       // mean that we should *not* include the ) in the bit that is considered
       // "after" the negated section.
-      const openParensBefore = nlBefore.split('(').length - 1
+      const closeParensBefore = nlBefore.split(')').length
+      const openParensBefore = nlBefore.split('(').length - closeParensBefore
       let cleanAfter = nlAfter
       for (let i = 0; i < openParensBefore; i++) {
         cleanAfter = cleanAfter.replace(/\)[+*?]?/, '')
       }
       nlAfter = cleanAfter
 
-      const dollar = nlAfter === '' && isSub !== SUBPARSE ? '$' : ''
+      const dollar = nlAfter === '' && isSub !== SUBPARSE ? '(?:$|\\/)' : ''
+
       re = nlBefore + nlFirst + nlAfter + dollar + nlLast
     }
 
@@ -15336,12 +15380,17 @@ class Minimatch {
     }
 
     if (addPatternStart) {
-      re = patternStart + re
+      re = patternStart() + re
     }
 
     // parsing just a piece of a larger pattern.
     if (isSub === SUBPARSE) {
       return [re, hasMagic]
+    }
+
+    // if it's nocase, and the lcase/uppercase don't match, it's magic
+    if (options.nocase && !hasMagic) {
+      hasMagic = pattern.toUpperCase() !== pattern.toLowerCase()
     }
 
     // skip the regexp for non-magical patterns
@@ -38922,7 +38971,7 @@ const process_1 = __importDefault(__nccwpck_require__(7282));
         };
         const parameters = (0, input_parameters_1.getInputParameters)(parseInt(process_1.default.env['GITHUB_RUN_ATTEMPT'] || '0') > 1);
         const config = {
-            userAgentApp: 'GitHubActions push-package-action',
+            userAgentApp: 'GitHubActions (package;push;v3)',
             instanceURL: parameters.server,
             apiKey: parameters.apiKey,
             logging: logger
@@ -39197,7 +39246,7 @@ module.exports = require("zlib");
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
-// Axios v1.2.1 Copyright (c) 2022 Matt Zabriskie and contributors
+// Axios v1.2.6 Copyright (c) 2023 Matt Zabriskie and contributors
 
 
 const FormData$1 = __nccwpck_require__(4334);
@@ -39502,7 +39551,11 @@ function findKey(obj, key) {
   return null;
 }
 
-const _global = typeof self === "undefined" ? typeof global === "undefined" ? undefined : global : self;
+const _global = (() => {
+  /*eslint no-undef:0*/
+  if (typeof globalThis !== "undefined") return globalThis;
+  return typeof self !== "undefined" ? self : (typeof window !== 'undefined' ? window : global)
+})();
 
 const isContextDefined = (context) => !isUndefined(context) && context !== _global;
 
@@ -40984,7 +41037,7 @@ class AxiosHeaders {
   }
 }
 
-AxiosHeaders.accessor(['Content-Type', 'Content-Length', 'Accept', 'Accept-Encoding', 'User-Agent']);
+AxiosHeaders.accessor(['Content-Type', 'Content-Length', 'Accept', 'Accept-Encoding', 'User-Agent', 'Authorization']);
 
 utils.freezeMethods(AxiosHeaders.prototype);
 utils.freezeMethods(AxiosHeaders);
@@ -41106,7 +41159,7 @@ function buildFullPath(baseURL, requestedURL) {
   return requestedURL;
 }
 
-const VERSION = "1.2.1";
+const VERSION = "1.2.6";
 
 function parseProtocol(url) {
   const match = /^([-+\w]{1,25})(:?\/\/|:)/.exec(url);
@@ -41431,6 +41484,11 @@ const AxiosTransformStream$1 = AxiosTransformStream;
 const zlibOptions = {
   flush: zlib__default["default"].constants.Z_SYNC_FLUSH,
   finishFlush: zlib__default["default"].constants.Z_SYNC_FLUSH
+};
+
+const brotliOptions = {
+  flush: zlib__default["default"].constants.BROTLI_OPERATION_FLUSH,
+  finishFlush: zlib__default["default"].constants.BROTLI_OPERATION_FLUSH
 };
 
 const isBrotliSupported = utils.isFunction(zlib__default["default"].createBrotliDecompress);
@@ -41823,7 +41881,9 @@ const httpAdapter = isHttpAdapterSupported && function httpAdapter(config) {
         switch (res.headers['content-encoding']) {
         /*eslint default-case:0*/
         case 'gzip':
+        case 'x-gzip':
         case 'compress':
+        case 'x-compress':
         case 'deflate':
           // add the unzipper to the body stream processing pipeline
           streams.push(zlib__default["default"].createUnzip(zlibOptions));
@@ -41833,7 +41893,7 @@ const httpAdapter = isHttpAdapterSupported && function httpAdapter(config) {
           break;
         case 'br':
           if (isBrotliSupported) {
-            streams.push(zlib__default["default"].createBrotliDecompress(zlibOptions));
+            streams.push(zlib__default["default"].createBrotliDecompress(brotliOptions));
             delete res.headers['content-encoding'];
           }
         }
@@ -43008,6 +43068,78 @@ function isAxiosError(payload) {
   return utils.isObject(payload) && (payload.isAxiosError === true);
 }
 
+const HttpStatusCode = {
+  Continue: 100,
+  SwitchingProtocols: 101,
+  Processing: 102,
+  EarlyHints: 103,
+  Ok: 200,
+  Created: 201,
+  Accepted: 202,
+  NonAuthoritativeInformation: 203,
+  NoContent: 204,
+  ResetContent: 205,
+  PartialContent: 206,
+  MultiStatus: 207,
+  AlreadyReported: 208,
+  ImUsed: 226,
+  MultipleChoices: 300,
+  MovedPermanently: 301,
+  Found: 302,
+  SeeOther: 303,
+  NotModified: 304,
+  UseProxy: 305,
+  Unused: 306,
+  TemporaryRedirect: 307,
+  PermanentRedirect: 308,
+  BadRequest: 400,
+  Unauthorized: 401,
+  PaymentRequired: 402,
+  Forbidden: 403,
+  NotFound: 404,
+  MethodNotAllowed: 405,
+  NotAcceptable: 406,
+  ProxyAuthenticationRequired: 407,
+  RequestTimeout: 408,
+  Conflict: 409,
+  Gone: 410,
+  LengthRequired: 411,
+  PreconditionFailed: 412,
+  PayloadTooLarge: 413,
+  UriTooLong: 414,
+  UnsupportedMediaType: 415,
+  RangeNotSatisfiable: 416,
+  ExpectationFailed: 417,
+  ImATeapot: 418,
+  MisdirectedRequest: 421,
+  UnprocessableEntity: 422,
+  Locked: 423,
+  FailedDependency: 424,
+  TooEarly: 425,
+  UpgradeRequired: 426,
+  PreconditionRequired: 428,
+  TooManyRequests: 429,
+  RequestHeaderFieldsTooLarge: 431,
+  UnavailableForLegalReasons: 451,
+  InternalServerError: 500,
+  NotImplemented: 501,
+  BadGateway: 502,
+  ServiceUnavailable: 503,
+  GatewayTimeout: 504,
+  HttpVersionNotSupported: 505,
+  VariantAlsoNegotiates: 506,
+  InsufficientStorage: 507,
+  LoopDetected: 508,
+  NotExtended: 510,
+  NetworkAuthenticationRequired: 511,
+};
+
+Object.entries(HttpStatusCode).forEach(([key, value]) => {
+  HttpStatusCode[value] = key;
+});
+
+const HttpStatusCode$1 = HttpStatusCode;
+
 /**
  * Create an instance of Axios
  *
@@ -43068,6 +43200,8 @@ axios.mergeConfig = mergeConfig;
 axios.AxiosHeaders = AxiosHeaders$1;
 
 axios.formToJSON = thing => formDataToJSON(utils.isHTMLForm(thing) ? new FormData(thing) : thing);
+
+axios.HttpStatusCode = HttpStatusCode$1;
 
 axios.default = axios;
 
