@@ -13,15 +13,19 @@ From the log output take note of the commit hash and push to GitHub
 
 In a test GitHub action you can use the branched build of the action by referencing the branch or commit hash, see [here](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsuses) for details on the `uses` syntax.
 
-```
-- name: Create Zip Package for Octopus Deploy
-      # You may pin to the exact commit or the version.
-        uses: OctopusDeploy/create-zip-package-action@my-branch
-        with:
-          package_id: output
-          version: 1.0.0
-          output_folder: ./pack
-          base_path: .
-          files: |
-            **/*
+```yml
+steps:
+  - uses: actions/checkout@v3
+
+  - name: Push a package to Octopus Deploy 🐙
+    uses: OctopusDeploy/push-package-action@my-branch
+    env:
+      OCTOPUS_URL: ${{ secrets.SERVER }}
+      OCTOPUS_API_KEY: ${{ secrets.API_KEY }}
+      OCTOPUS_SPACE: 'Default'
+    with:
+      packages: |
+        package1.tar.gz
+        package2.zip
+        packages/**/*.zip
 ```
