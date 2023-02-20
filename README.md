@@ -43,6 +43,10 @@ steps:
 | `api_key`        | The API key used to access Octopus Deploy. An API key is required, but you may also use the OCTOPUS_API_KEY environment variable. It is strongly recommended that this value retrieved from a GitHub secret. |
 | `space`          | The name of a space within which this command will be executed. The space name is required, but you may also use the OCTOPUS_SPACE environment variable.                                                     |
 
+## Developers guide
+
+[Developers Guide](DEVELOPERS_GUIDE.md)
+
 ## 🤝 Contributions
 
 Contributions are welcome! :heart: Please read our [Contributing Guide](CONTRIBUTING.md) for information about how to get involved in this project.
