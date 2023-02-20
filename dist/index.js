@@ -2595,7 +2595,6 @@ exports.BasicRepository = void 0;
 var BasicRepository = /** @class */ (function () {
     function BasicRepository(client, baseApiPathTemplate, listParametersTemplate) {
         var _this = this;
-        this.takeAll = 2147483647;
         this.takeDefaultPageSize = 30;
         this.notifySubscribersToDataModifications = function (resource) {
             Object.keys(_this.subscribersToDataModifications).forEach(function (key) { return _this.subscribersToDataModifications[key](resource); });
@@ -2649,6 +2648,7 @@ var BasicRepository = /** @class */ (function () {
     BasicRepository.prototype.extend = function (arg1, arg2) {
         return __assign(__assign({}, arg1), arg2);
     };
+    BasicRepository.TakeAll = 2147483647;
     return BasicRepository;
 }());
 exports.BasicRepository = BasicRepository;
@@ -7201,6 +7201,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.resolveSpaceId = void 0;
 var apiLocation_1 = __nccwpck_require__(7083);
+var features_1 = __nccwpck_require__(5024);
 var knownSpaces = {};
 function resolveSpaceId(client, spaceName) {
     return __awaiter(this, void 0, void 0, function () {
@@ -7212,7 +7213,7 @@ function resolveSpaceId(client, spaceName) {
                         return [2 /*return*/, knownSpaces[spaceName]];
                     }
                     client.debug("Resolving space from name '".concat(spaceName, "'"));
-                    return [4 /*yield*/, client.get("".concat(apiLocation_1.apiLocation, "/spaces?partialName=").concat(spaceName, "&skip=0&take=2147483647"))];
+                    return [4 /*yield*/, client.get("".concat(apiLocation_1.apiLocation, "/spaces?partialName=").concat(spaceName, "&skip=0&take=").concat(features_1.BasicRepository.TakeAll))];
                 case 1:
                     spaces = _a.sent();
                     spaceId = "";
