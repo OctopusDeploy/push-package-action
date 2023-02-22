@@ -50,3 +50,19 @@ steps:
 ## 🤝 Contributions
 
 Contributions are welcome! :heart: Please read our [Contributing Guide](CONTRIBUTING.md) for information about how to get involved in this project.
+
+## Removing a release
+
+To remove a release from publication:
+
+Delete the release from the [releases](https://github.com/OctopusDeploy/push-package-action/releases) page and delete the corresponding tag from the [tags](https://github.com/OctopusDeploy/push-package-action/tags) page.
+
+To do this in the CLI:
+
+v123 represents the release name
+
+```
+gh release delete v123
+git tag -d v123
+git push --delete origin v123
+```

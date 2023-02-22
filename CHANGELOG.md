@@ -1,11 +1,11 @@
 # Changelog
 
-## [3.0.4](https://github.com/OctopusDeploy/push-package-action/compare/v3.0.3...v3.0.4) (2023-02-20)
-
+## [3.0.4](https://github.com/OctopusDeploy/push-package-action/compare/v3.0.3...v3.0.4) (2023-02-23)
 
 ### Bug Fixes
 
 * space lookups for &gt; 30 spaces ([a496244](https://github.com/OctopusDeploy/push-package-action/commit/a49624404acc0e58123ade5656e95a39c047c144))
+* url encoding in space names ([3f43723](https://github.com/OctopusDeploy/push-package-action/commit/3f437237001aa3eb9c3815e07d977668935e223b))
 
 ## [3.0.3](https://github.com/OctopusDeploy/push-package-action/compare/v3.0.2...v3.0.3) (2023-01-31)
 
