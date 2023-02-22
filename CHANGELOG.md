@@ -1,5 +1,53 @@
 # Changelog
 
+## [3.0.4](https://github.com/OctopusDeploy/push-package-action/compare/v3.0.4...v3.0.4) (2023-02-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* Update action to use the native API client
+* remove unused inputs
+
+### Features
+
+* Added build summary with list of packages that were pushed ([#253](https://github.com/OctopusDeploy/push-package-action/issues/253)) ([5409834](https://github.com/OctopusDeploy/push-package-action/commit/54098349935277c044f57f16750bd2fa3fb7e395))
+* added multiline support for packages ([1134249](https://github.com/OctopusDeploy/push-package-action/commit/11342498f4ff8c63384fcee80b8a3b3a712b8a3d))
+* bump dependencies ([5a3fd14](https://github.com/OctopusDeploy/push-package-action/commit/5a3fd14b20d3b1bc6164be57004c1b0fe14ce7b6))
+* Globbing support for packages ([#271](https://github.com/OctopusDeploy/push-package-action/issues/271)) ([cc89e6d](https://github.com/OctopusDeploy/push-package-action/commit/cc89e6da8eb2bf96b387642fb8197f18887f3935))
+* release 2.0.0 ([#248](https://github.com/OctopusDeploy/push-package-action/issues/248)) ([ba24ea6](https://github.com/OctopusDeploy/push-package-action/commit/ba24ea6be13e5e89c2e0faa4f3d29f7fade95ed1))
+* Update action to use the native API client ([bfb8b66](https://github.com/OctopusDeploy/push-package-action/commit/bfb8b662f41b0ad7e03124a8537a21cc82e776ce))
+* Updated build pipeline and process ([0423898](https://github.com/OctopusDeploy/push-package-action/commit/0423898b33e11eed09eea039292e7189cd133105))
+
+
+### Bug Fixes
+
+* added boolean defaults for testing ([e6be1ed](https://github.com/OctopusDeploy/push-package-action/commit/e6be1edb6c92ad7ba6e06f092ff8835b7d726f4e))
+* Environment variables from the GitHub action context were not passed through to the underlying Octopus CLI ([54192af](https://github.com/OctopusDeploy/push-package-action/commit/54192af3e733e94e49e7498c37000c8b01572e52))
+* failed package push outcome reported ([1519d62](https://github.com/OctopusDeploy/push-package-action/commit/1519d62d98c7d679d11c765e3ff2fba3c75eb69e))
+* fix bug where we'd add the wrong parameter when a log level has been specified ([68b5334](https://github.com/OctopusDeploy/push-package-action/commit/68b5334348cdc49750f5f0bc6ce6a41df04b61ab))
+* replaced use of forEach ([b549384](https://github.com/OctopusDeploy/push-package-action/commit/b54938442c3b9c1355b32288a8a0c3bcaa5a632a))
+* space lookups for &gt; 30 spaces ([a496244](https://github.com/OctopusDeploy/push-package-action/commit/a49624404acc0e58123ade5656e95a39c047c144))
+* StdError and the process exit code returned by the CLI are now shown in Github Action runs ([54192af](https://github.com/OctopusDeploy/push-package-action/commit/54192af3e733e94e49e7498c37000c8b01572e52))
+* updated action YAML configuration ([ac96b74](https://github.com/OctopusDeploy/push-package-action/commit/ac96b7434354b159fe078b2d85333e1e6fb8e5cd))
+* updated dependencies ([0fda2d9](https://github.com/OctopusDeploy/push-package-action/commit/0fda2d9cd68b1b7b5ef610194f2025c043151fb3))
+* updated dependencies ([c5ae0f8](https://github.com/OctopusDeploy/push-package-action/commit/c5ae0f881fe84461f703dec14777c4ed4ff20244))
+* updated logic to fix use_delta_compression bug ([b40ba56](https://github.com/OctopusDeploy/push-package-action/commit/b40ba56f58a70b8a2aea302ab6c2aebb793cfb3a))
+* updated README ([8026f99](https://github.com/OctopusDeploy/push-package-action/commit/8026f99cf977bd6c24395d27ab245dbdac24781f))
+* updated user-agent value ([70b9a85](https://github.com/OctopusDeploy/push-package-action/commit/70b9a859acfc4e4da6e246fb41f6930e061393d0))
+* url encoding in space names ([#301](https://github.com/OctopusDeploy/push-package-action/issues/301)) ([3f43723](https://github.com/OctopusDeploy/push-package-action/commit/3f437237001aa3eb9c3815e07d977668935e223b))
+
+
+### Code Refactoring
+
+* remove unused inputs ([68b5334](https://github.com/OctopusDeploy/push-package-action/commit/68b5334348cdc49750f5f0bc6ce6a41df04b61ab))
+
+
+### Miscellaneous Chores
+
+* release 1.0.2 ([efb8af5](https://github.com/OctopusDeploy/push-package-action/commit/efb8af54e31e03fc01d4e98772aee914bd67e307))
+* release 3.0.2 ([ba02ac8](https://github.com/OctopusDeploy/push-package-action/commit/ba02ac803457d7e70aa6a7826b66ed541484c609))
+* release 3.0.4 ([#303](https://github.com/OctopusDeploy/push-package-action/issues/303)) ([0a12dc4](https://github.com/OctopusDeploy/push-package-action/commit/0a12dc4559edab24932f631343b2cc3ca76e42f2))
+
 ## [3.0.4](https://github.com/OctopusDeploy/push-package-action/compare/v3.0.3...v3.0.4) (2023-02-20)
 
 
