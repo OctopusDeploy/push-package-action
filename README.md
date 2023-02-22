@@ -57,7 +57,7 @@ To remove a release from publication:
 
 Delete the release from the [releases](https://github.com/OctopusDeploy/push-package-action/releases) page and delete the corresponding tag from the [tags](https://github.com/OctopusDeploy/push-package-action/tags) page.
 
-To do this in the cli:
+To do this in the CLI:
 
 v123 represents the release name
 
