@@ -7213,7 +7213,7 @@ function resolveSpaceId(client, spaceName) {
                         return [2 /*return*/, knownSpaces[spaceName]];
                     }
                     client.debug("Resolving space from name '".concat(spaceName, "'"));
-                    return [4 /*yield*/, client.get("".concat(apiLocation_1.apiLocation, "/spaces?partialName=").concat(spaceName, "&skip=0&take=").concat(features_1.BasicRepository.TakeAll))];
+                    return [4 /*yield*/, client.get("".concat(apiLocation_1.apiLocation, "/spaces?partialName=").concat(encodeURIComponent(spaceName), "&skip=0&take=").concat(features_1.BasicRepository.TakeAll))];
                 case 1:
                     spaces = _a.sent();
                     spaceId = "";
