@@ -43,26 +43,7 @@ steps:
 | `api_key`        | The API key used to access Octopus Deploy. An API key is required, but you may also use the OCTOPUS_API_KEY environment variable. It is strongly recommended that this value retrieved from a GitHub secret. |
 | `space`          | The name of a space within which this command will be executed. The space name is required, but you may also use the OCTOPUS_SPACE environment variable.                                                     |
 
-## Developers guide
-
-[Developers Guide](DEVELOPERS_GUIDE.md)
-
 ## 🤝 Contributions
 
 Contributions are welcome! :heart: Please read our [Contributing Guide](CONTRIBUTING.md) for information about how to get involved in this project.
 
-## Removing a release
-
-To remove a release from publication:
-
-Delete the release from the [releases](https://github.com/OctopusDeploy/push-package-action/releases) page and delete the corresponding tag from the [tags](https://github.com/OctopusDeploy/push-package-action/tags) page.
-
-To do this in the CLI:
-
-v123 represents the release name
-
-```
-gh release delete v123
-git tag -d v123
-git push --delete origin v123
-```
