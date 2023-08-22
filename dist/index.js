@@ -1829,11 +1829,12 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AxiosAdapter = void 0;
 var axios_1 = __importDefault(__nccwpck_require__(8757));
 var adapter_1 = __nccwpck_require__(937);
+var createRequestHeaders_1 = __nccwpck_require__(7843);
 var AxiosAdapter = /** @class */ (function () {
     function AxiosAdapter() {
     }
     AxiosAdapter.prototype.execute = function (options) {
-        var _a, _b;
+        var _a;
         return __awaiter(this, void 0, void 0, function () {
             function formatError(response) {
                 if (!response.data) {
@@ -1841,6 +1842,7 @@ var AxiosAdapter = /** @class */ (function () {
                 }
                 var message = response.data.ErrorMessage;
                 if (response.data.Errors) {
+                    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
                     var errors = response.data.Errors;
                     for (var i = 0; i < errors.length; i++) {
                         message += "\n".concat(errors[i]);
@@ -1849,21 +1851,19 @@ var AxiosAdapter = /** @class */ (function () {
                 return message;
             }
             var config, userAgent, response, error_1;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        _c.trys.push([0, 2, , 3]);
+                        _b.trys.push([0, 2, , 3]);
                         config = {
                             httpsAgent: options.configuration.httpsAgent,
                             url: options.url,
                             maxContentLength: Infinity,
                             maxBodyLength: Infinity,
+                            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
                             method: options.method,
                             data: options.requestBody,
-                            headers: {
-                                "Accept-Encoding": "gzip,deflate,compress",
-                                "X-Octopus-ApiKey": (_a = options.configuration.apiKey) !== null && _a !== void 0 ? _a : "",
-                            },
+                            headers: (0, createRequestHeaders_1.createRequestHeaders)(options.configuration),
                             responseType: "json",
                         };
                         if (typeof XMLHttpRequest === "undefined") {
@@ -1877,15 +1877,15 @@ var AxiosAdapter = /** @class */ (function () {
                         }
                         return [4 /*yield*/, axios_1.default.request(config)];
                     case 1:
-                        response = _c.sent();
+                        response = _b.sent();
                         return [2 /*return*/, {
                                 data: response.data,
                                 statusCode: response.status,
                             }];
                     case 2:
-                        error_1 = _c.sent();
+                        error_1 = _b.sent();
                         if (axios_1.default.isAxiosError(error_1) && error_1.response) {
-                            throw new adapter_1.AdapterError(error_1.response.status, (_b = formatError(error_1.response)) !== null && _b !== void 0 ? _b : error_1.message);
+                            throw new adapter_1.AdapterError(error_1.response.status, (_a = formatError(error_1.response)) !== null && _a !== void 0 ? _a : error_1.message);
                         }
                         else {
                             throw error_1;
@@ -1899,6 +1899,34 @@ var AxiosAdapter = /** @class */ (function () {
     return AxiosAdapter;
 }());
 exports.AxiosAdapter = AxiosAdapter;
+
+
+/***/ }),
+
+/***/ 7843:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createRequestHeaders = void 0;
+function createRequestHeaders(configuration) {
+    var headers = {
+        "Accept-Encoding": "gzip,deflate,compress", // HACK: required for https://github.com/axios/axios/issues/5346 -- this line can be removed once this bug has been fixed
+    };
+    if (configuration.apiKey) {
+        headers["X-Octopus-ApiKey"] = configuration.apiKey;
+    }
+    if (configuration.accessToken) {
+        headers["Authorization"] = "Bearer ".concat(configuration.accessToken);
+    }
+    if (!configuration.accessToken && !configuration.apiKey) {
+        // Backward compatibility: Add the api key header in with a blank value
+        headers["X-Octopus-ApiKey"] = "";
+    }
+    return headers;
+}
+exports.createRequestHeaders = createRequestHeaders;
 
 
 /***/ }),
@@ -5210,14 +5238,13 @@ var DeploymentRepository = /** @class */ (function () {
     DeploymentRepository.prototype.create = function (command) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var serverInformation, serverVersion, response, mappedTasks;
+            var serverInformation, response, mappedTasks;
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0: return [4 /*yield*/, this.client.getServerInformation()];
                     case 1:
                         serverInformation = _c.sent();
-                        serverVersion = new semver_1.SemVer(serverInformation.version);
-                        if (serverVersion < new semver_1.SemVer("2022.3.5512")) {
+                        if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
                             (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support deploying releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
                             throw new Error("The Octopus instance doesn't support deploying releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
                         }
@@ -5245,14 +5272,13 @@ var DeploymentRepository = /** @class */ (function () {
     DeploymentRepository.prototype.createTenanted = function (command) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var serverInformation, serverVersion, response, mappedTasks;
+            var serverInformation, response, mappedTasks;
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0: return [4 /*yield*/, this.client.getServerInformation()];
                     case 1:
                         serverInformation = _c.sent();
-                        serverVersion = new semver_1.SemVer(serverInformation.version);
-                        if (serverVersion < new semver_1.SemVer("2022.3.5512")) {
+                        if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
                             (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support deploying tenanted releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
                             throw new Error("The Octopus instance doesn't support deploying tenanted releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
                         }
@@ -5426,14 +5452,13 @@ var ReleaseRepository = /** @class */ (function () {
     ReleaseRepository.prototype.create = function (command) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var serverInformation, serverVersion, response;
+            var serverInformation, response;
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0: return [4 /*yield*/, this.client.getServerInformation()];
                     case 1:
                         serverInformation = _c.sent();
-                        serverVersion = new semver_1.SemVer(serverInformation.version);
-                        if (serverVersion < new semver_1.SemVer("2022.3.5512")) {
+                        if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
                             (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support creating releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
                             throw new Error("The Octopus instance doesn't support creating releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
                         }
@@ -5888,14 +5913,13 @@ var RunbookRunRepository = /** @class */ (function () {
     RunbookRunRepository.prototype.create = function (command) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var serverInformation, serverVersion, response, mappedTasks;
+            var serverInformation, response, mappedTasks;
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0: return [4 /*yield*/, this.client.getServerInformation()];
                     case 1:
                         serverInformation = _c.sent();
-                        serverVersion = new semver_1.SemVer(serverInformation.version);
-                        if (serverVersion < new semver_1.SemVer("2022.3.5512")) {
+                        if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
                             (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support running runbooks using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
                             throw new Error("The Octopus instance doesn't support running runbooks using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
                         }
@@ -6705,18 +6729,29 @@ var TenantRepository = /** @class */ (function (_super) {
         return _super.call(this, client, spaceName, "".concat(__1.spaceScopedRoutePrefix, "/tenants"), "skip,projectId,tags,take,ids,clone,partialName,clonedFromTenantId") || this;
     }
     TenantRepository.prototype.tagTest = function (tenantIds, tags) {
-        return this.client.request("".concat(__1.spaceScopedRoutePrefix, "/tenants/tag-test{?tenantIds,tags}"), { tenantIds: tenantIds, tags: tags });
+        return this.client.request("".concat(__1.spaceScopedRoutePrefix, "/tenants/tag-test{?tenantIds,tags}"), {
+            spaceName: this.spaceName,
+            tenantIds: tenantIds,
+            tags: tags,
+        });
     };
     TenantRepository.prototype.getVariables = function (tenant) {
-        return this.client.request("".concat(__1.spaceScopedRoutePrefix, "/tenants/{id}/variables"));
+        return this.client.request("".concat(__1.spaceScopedRoutePrefix, "/tenants/{id}/variables"), {
+            spaceName: this.spaceName,
+            id: tenant.Id,
+        });
     };
     TenantRepository.prototype.setVariables = function (tenant, variables) {
-        return this.client.doUpdate("".concat(__1.spaceScopedRoutePrefix, "/tenants/{id}/variables"), variables);
+        return this.client.doUpdate("".concat(__1.spaceScopedRoutePrefix, "/tenants/{id}/variables"), variables, {
+            spaceName: this.spaceName,
+            id: tenant.Id,
+        });
     };
     TenantRepository.prototype.missingVariables = function (filterOptions, includeDetails) {
         if (filterOptions === void 0) { filterOptions = {}; }
         if (includeDetails === void 0) { includeDetails = false; }
         var payload = {
+            spaceName: this.spaceName,
             environmentId: filterOptions.environmentId,
             includeDetails: includeDetails,
             projectId: filterOptions.projectId,
@@ -42283,6 +42318,7 @@ const process_1 = __importDefault(__nccwpck_require__(7282));
             userAgentApp: 'GitHubActions (package;push;v3)',
             instanceURL: parameters.server,
             apiKey: parameters.apiKey,
+            accessToken: parameters.accessToken,
             logging: logger
         };
         const client = yield api_client_1.Client.create(config);
@@ -42316,6 +42352,7 @@ const api_client_1 = __nccwpck_require__(586);
 const EnvironmentVariables = {
     URL: 'OCTOPUS_URL',
     ApiKey: 'OCTOPUS_API_KEY',
+    AccessToken: 'OCTOPUS_ACCESS_TOKEN',
     Space: 'OCTOPUS_SPACE'
 };
 function getInputParameters(isRetry) {
@@ -42323,7 +42360,8 @@ function getInputParameters(isRetry) {
         (isRetry ? api_client_1.OverwriteMode.IgnoreIfExists : api_client_1.OverwriteMode.FailIfExists);
     const parameters = {
         server: (0, core_1.getInput)('server') || process.env[EnvironmentVariables.URL] || '',
-        apiKey: (0, core_1.getInput)('api_key') || process.env[EnvironmentVariables.ApiKey] || '',
+        apiKey: (0, core_1.getInput)('api_key') || process.env[EnvironmentVariables.ApiKey],
+        accessToken: (0, core_1.getInput)('access_token') || process.env[EnvironmentVariables.AccessToken],
         space: (0, core_1.getInput)('space') || process.env[EnvironmentVariables.Space] || '',
         packages: (0, core_1.getMultilineInput)('packages', { required: true }),
         overwriteMode

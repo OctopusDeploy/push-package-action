@@ -13,7 +13,9 @@ inputs:
     default: 'FailIfExists'
     description: 'Determines the action to perform with package if it already exists in the repository. Valid values are "FailIfExists", "OverwriteExisting", and "IgnoreIfExists".'
   api_key:
-    description: 'The API key used to access Octopus Deploy. You must provide an API key or username and password. If the guest account is enabled, a key of API-GUEST may be used. It is strongly recommended that this value retrieved from a GitHub secret.'
+    description: 'The API key used to access Octopus Deploy. One of API key or Access Token are required, but you may also use the OCTOPUS_API_KEY environment variable. It is strongly recommended that this value retrieved from a GitHub secret.'
+  access_token:
+    description: 'The access token used to access Octopus Deploy. One of API key or Access Token are required, to obtain an access token please use the `OctopusDeploy/login` action. You may also use the OCTOPUS_ACCESS_TOKEN environment variable if you are obtaining a token another way.'
   server:
     description: 'The base URL hosting Octopus Deploy (i.e. "https://octopus.example.com/"). It is recommended to retrieve this value from an environment variable.'
   space:

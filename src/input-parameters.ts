@@ -4,12 +4,14 @@ import { OverwriteMode } from '@octopusdeploy/api-client'
 const EnvironmentVariables = {
   URL: 'OCTOPUS_URL',
   ApiKey: 'OCTOPUS_API_KEY',
+  AccessToken: 'OCTOPUS_ACCESS_TOKEN',
   Space: 'OCTOPUS_SPACE'
 } as const
 
 export interface InputParameters {
   server: string
-  apiKey: string
+  apiKey?: string
+  accessToken?: string
   space: string
   packages: string[]
   overwriteMode: OverwriteMode
@@ -22,7 +24,8 @@ export function getInputParameters(isRetry: boolean): InputParameters {
 
   const parameters: InputParameters = {
     server: getInput('server') || process.env[EnvironmentVariables.URL] || '',
-    apiKey: getInput('api_key') || process.env[EnvironmentVariables.ApiKey] || '',
+    apiKey: getInput('api_key') || process.env[EnvironmentVariables.ApiKey],
+    accessToken: getInput('access_token') || process.env[EnvironmentVariables.AccessToken],
     space: getInput('space') || process.env[EnvironmentVariables.Space] || '',
     packages: getMultilineInput('packages', { required: true }),
     overwriteMode
