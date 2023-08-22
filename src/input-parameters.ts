@@ -34,17 +34,20 @@ export function getInputParameters(isRetry: boolean): InputParameters {
   const errors: string[] = []
   if (!parameters.server) {
     errors.push(
-      "The Octopus instance URL is required, please specify explictly through the 'server' input or set the OCTOPUS_URL environment variable."
+      "The Octopus instance URL is required, please specify explicitly through the 'server' input or set the OCTOPUS_URL environment variable."
     )
   }
-  if (!parameters.apiKey) {
+
+  if (!parameters.apiKey && !parameters.accessToken)
     errors.push(
-      "The Octopus API Key is required, please specify explictly through the 'api_key' input or set the OCTOPUS_API_KEY environment variable."
+      "One of API Key or Access Token are required, please specify explicitly through the 'api_key'/'access_token' inputs or set the OCTOPUS_API_KEY/OCTOPUS_ACCESS_TOKEN environment variable."
     )
-  }
+
+  if (parameters.apiKey && parameters.accessToken) errors.push('Only one of API Key or Access Token can be supplied.')
+
   if (!parameters.space) {
     errors.push(
-      "The Octopus space name is required, please specify explictly through the 'space' input or set the OCTOPUS_SPACE environment variable."
+      "The Octopus space name is required, please specify explicitly through the 'space' input or set the OCTOPUS_SPACE environment variable."
     )
   }
 
