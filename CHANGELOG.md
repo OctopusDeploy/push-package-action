@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/OctopusDeploy/push-package-action/compare/v3.0.4...v3.1.0) (2023-08-30)
+
+
+### Features
+
+* Adds support for authenticating with access token ([#305](https://github.com/OctopusDeploy/push-package-action/issues/305)) ([0292ab7](https://github.com/OctopusDeploy/push-package-action/commit/0292ab77d93c0f51818ce47d6ea8476791e9ed0e))
+
 ## [3.0.4](https://github.com/OctopusDeploy/push-package-action/compare/v3.0.3...v3.0.4) (2023-02-23)
 
 ### Bug Fixes
