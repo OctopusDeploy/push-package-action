@@ -20,5 +20,5 @@ inputs:
     description: 'The name or ID of a space within which this command will be executed. If omitted, the default space will be used.'
 
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
