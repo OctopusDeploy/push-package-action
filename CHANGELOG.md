@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/OctopusDeploy/push-package-action/compare/v3.1.0...v3.2.0) (2023-12-14)
+
+
+### Features
+
+* Upgrade to node 20 ([#313](https://github.com/OctopusDeploy/push-package-action/issues/313)) ([a6cf689](https://github.com/OctopusDeploy/push-package-action/commit/a6cf68969a6e7579c29f4f1d81b97282a15d7549))
+
 ## [3.1.0](https://github.com/OctopusDeploy/push-package-action/compare/v3.0.4...v3.1.0) (2023-08-30)
 
 
