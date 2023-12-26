@@ -10,7 +10,7 @@
   },
   "description": "GitHub Action to Push a Package to Octopus Deploy",
   "devDependencies": {
-    "@types/glob": "8.0.1",
+    "@types/glob": "8.1.0",
     "@types/jest": "29.4.4",
     "@types/json-patch": "0.0.33",
     "@types/lodash": "4.14.202",
