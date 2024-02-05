@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.2.1](https://github.com/OctopusDeploy/push-package-action/compare/v3.2.0...v3.2.1) (2024-02-04)
+
+
+### Bug Fixes
+
+* **deps:** pin dependencies ([df4c18d](https://github.com/OctopusDeploy/push-package-action/commit/df4c18d59bd9c48e8a7ef8e51f6ac87460639102))
+* **deps:** update dependency @actions/core to v1.10.1 ([eb605c3](https://github.com/OctopusDeploy/push-package-action/commit/eb605c399aefe00169aa9ba48a6f19e3a026850c))
+
 ## [3.2.0](https://github.com/OctopusDeploy/push-package-action/compare/v3.1.0...v3.2.0) (2023-12-14)
 
 
