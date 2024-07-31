@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.2](https://github.com/OctopusDeploy/push-package-action/compare/v3.2.1...v3.2.2) (2024-07-31)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @octopusdeploy/api-client to v3.4.0 ([bb32e37](https://github.com/OctopusDeploy/push-package-action/commit/bb32e379925b30919779ea2ab28afe9acfb66bd1))
+
 ## [3.2.1](https://github.com/OctopusDeploy/push-package-action/compare/v3.2.0...v3.2.1) (2024-02-04)
 
 
