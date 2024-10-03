@@ -2748,10 +2748,10 @@ var BuildInformationRepository = /** @class */ (function () {
     BuildInformationRepository.prototype.push = function (buildInformation, overwriteMode) {
         if (overwriteMode === void 0) { overwriteMode = overwriteMode_1.OverwriteMode.FailIfExists; }
         return __awaiter(this, void 0, void 0, function () {
-            var tasks, _a, _b, pkg;
-            var e_1, _c;
-            return __generator(this, function (_d) {
-                switch (_d.label) {
+            var tasks, _a, _b, pkg, rejectedTasks, completedTasks, completedTasks_1, completedTasks_1_1, t, errors, rejectedTasks_1, rejectedTasks_1_1, e, error;
+            var e_1, _c, e_2, _d, e_3, _e;
+            return __generator(this, function (_f) {
+                switch (_f.label) {
                     case 0:
                         tasks = [];
                         try {
@@ -2781,9 +2781,48 @@ var BuildInformationRepository = /** @class */ (function () {
                             }
                             finally { if (e_1) throw e_1.error; }
                         }
+                        rejectedTasks = [];
                         return [4 /*yield*/, Promise.allSettled(tasks)];
                     case 1:
-                        _d.sent();
+                        completedTasks = _f.sent();
+                        try {
+                            for (completedTasks_1 = __values(completedTasks), completedTasks_1_1 = completedTasks_1.next(); !completedTasks_1_1.done; completedTasks_1_1 = completedTasks_1.next()) {
+                                t = completedTasks_1_1.value;
+                                if (t.status === "rejected") {
+                                    rejectedTasks.push(t.reason);
+                                }
+                            }
+                        }
+                        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                        finally {
+                            try {
+                                if (completedTasks_1_1 && !completedTasks_1_1.done && (_d = completedTasks_1.return)) _d.call(completedTasks_1);
+                            }
+                            finally { if (e_2) throw e_2.error; }
+                        }
+                        errors = [];
+                        try {
+                            for (rejectedTasks_1 = __values(rejectedTasks), rejectedTasks_1_1 = rejectedTasks_1.next(); !rejectedTasks_1_1.done; rejectedTasks_1_1 = rejectedTasks_1.next()) {
+                                e = rejectedTasks_1_1.value;
+                                if (e instanceof Error) {
+                                    errors.push(e);
+                                }
+                                else {
+                                    errors.push(new Error("unexpected error: ".concat(e)));
+                                }
+                            }
+                        }
+                        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                        finally {
+                            try {
+                                if (rejectedTasks_1_1 && !rejectedTasks_1_1.done && (_e = rejectedTasks_1.return)) _e.call(rejectedTasks_1);
+                            }
+                            finally { if (e_3) throw e_3.error; }
+                        }
+                        if (errors.length > 0) {
+                            error = errors.map(function (e) { return "".concat(e); });
+                            throw new Error(error.join("\n"));
+                        }
                         return [2 /*return*/];
                 }
             });
