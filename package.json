@@ -11,7 +11,7 @@
   "description": "GitHub Action to Push a Package to Octopus Deploy",
   "devDependencies": {
     "@types/glob": "8.1.0",
-    "@types/jest": "29.5.13",
+    "@types/jest": "29.5.14",
     "@types/json-patch": "0.0.33",
     "@types/lodash": "4.17.12",
     "@types/node": "20.16.13",
