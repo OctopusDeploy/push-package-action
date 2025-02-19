@@ -4,21 +4,21 @@
     "url": "https://github.com/OctopusDeploy/push-package-action/issues"
   },
   "dependencies": {
-    "@actions/core": "1.10.1",
-    "@octopusdeploy/api-client": "3.2.0",
+    "@actions/core": "1.11.1",
+    "@octopusdeploy/api-client": "3.5.1",
     "glob": "8.1.0"
   },
   "description": "GitHub Action to Push a Package to Octopus Deploy",
   "devDependencies": {
     "@types/glob": "8.1.0",
-    "@types/jest": "29.5.12",
+    "@types/jest": "29.5.14",
     "@types/json-patch": "0.0.33",
-    "@types/lodash": "4.17.0",
-    "@types/node": "20.11.27",
+    "@types/lodash": "4.17.15",
+    "@types/node": "20.17.19",
     "@types/tmp": "0.2.6",
     "@typescript-eslint/parser": "5.62.0",
-    "@vercel/ncc": "0.36.1",
-    "eslint": "8.57.0",
+    "@vercel/ncc": "0.38.3",
+    "eslint": "8.57.1",
     "eslint-plugin-github": "4.10.2",
     "eslint-plugin-jest": "27.9.0",
     "eslint-plugin-prettier": "4.2.1",
@@ -28,7 +28,7 @@
     "js-yaml": "4.1.0",
     "prettier": "2.8.8",
     "tmp": "0.2.3",
-    "ts-jest": "29.1.2",
+    "ts-jest": "29.2.5",
     "typescript": "4.9.5"
   },
   "homepage": "https://github.com/OctopusDeploy/push-package-action#readme",
@@ -86,5 +86,5 @@
     "test:unit": "jest --ci --reporters=default --reporters=jest-junit --testPathPattern=__tests__/unit",
     "test:integration": "jest --ci --reporters=default --reporters=jest-junit --testPathPattern=__tests__/integration"
   },
-  "version": "3.2.1"
+  "version": "3.2.3"
 }
