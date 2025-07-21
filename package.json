@@ -5,7 +5,7 @@
   },
   "dependencies": {
     "@actions/core": "1.11.1",
-    "@octopusdeploy/api-client": "3.5.2",
+    "@octopusdeploy/api-client": "3.7.0",
     "glob": "8.1.0"
   },
   "description": "GitHub Action to Push a Package to Octopus Deploy",
