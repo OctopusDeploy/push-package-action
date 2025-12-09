@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/OctopusDeploy/push-package-action/compare/v3.2.5...v4.0.0) (2025-12-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* Migrate to node 24 ([#513](https://github.com/OctopusDeploy/push-package-action/issues/513))
+
+### Features
+
+* Migrate to node 24 ([#513](https://github.com/OctopusDeploy/push-package-action/issues/513)) ([cf06817](https://github.com/OctopusDeploy/push-package-action/commit/cf06817b694b6df558796a1946c6c465839a992d))
+
 ## [3.2.5](https://github.com/OctopusDeploy/push-package-action/compare/v3.2.4...v3.2.5) (2025-07-29)
 
 
