@@ -13,6 +13,7 @@ steps:
   - uses: actions/checkout@v3
 
   - name: Push a package to Octopus Deploy 🐙
+    id: push_a_package_to_octopus_deploy
     uses: OctopusDeploy/push-package-action@v4
     env:
       OCTOPUS_URL: ${{ secrets.SERVER }}
