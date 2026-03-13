@@ -24,6 +24,7 @@ module.exports = {
   timezone: 'Australia/Brisbane',
   onboarding: false,
   requireConfig: false,
+  allowShellExecutorForPostUpgradeCommands: true,
   allowedPostUpgradeCommands: ['.*'],
   postUpgradeTasks: {
     commands: ['npm install && npm run build'],
