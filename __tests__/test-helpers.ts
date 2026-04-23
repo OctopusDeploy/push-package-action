@@ -1,36 +1,24 @@
-import { CliOutput } from '../src/cli-util'
-import { promises as fs } from 'fs'
-
-export class CaptureOutput implements CliOutput {
-  infos: string[]
-  warns: string[]
+export class CaptureOutput {
+  msgs: string[]
 
   constructor() {
-    this.infos = []
-    this.warns = []
+    this.msgs = []
   }
 
+  debug(message: string): void {
+    this.msgs.push(`[DEBUG] ${message}`)
+  }
   info(message: string): void {
-    this.infos.push(message)
+    this.msgs.push(`[INFO] ${message}`)
   }
   warn(message: string): void {
-    this.warns.push(message)
+    this.msgs.push(`[WARN]  ${message}`)
+  }
+  error(message: string): void {
+    this.msgs.push(`[ERROR]  ${message}`)
   }
 
   getAllMessages(): string[] {
-    return this.infos.concat(this.warns)
-  }
-}
-
-export async function GenerateTestPackages(dirs: string[], names: string[]): Promise<void> {
-  for (const dir of dirs) {
-    await fs.rm(dir, {
-      force: true,
-      recursive: true
-    })
-    await fs.mkdir(dir)
-  }
-  for (const name of names) {
-    await fs.writeFile(name, '')
+    return this.msgs
   }
 }
