@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.0.1](https://github.com/OctopusDeploy/push-package-action/compare/v4.0.0...v4.0.1) (2026-04-23)
+
+
+### Bug Fixes
+
+* **deps:** Resolve dependency security alerts ([#565](https://github.com/OctopusDeploy/push-package-action/issues/565)) ([d71f91c](https://github.com/OctopusDeploy/push-package-action/commit/d71f91c54c20a6ab9a362ea23f28970595ec301a))
+* **deps:** Update core/actions to v3 ([#563](https://github.com/OctopusDeploy/push-package-action/issues/563)) ([76e97cc](https://github.com/OctopusDeploy/push-package-action/commit/76e97cc811f5869eae8f663d675f96eee0260dcd))
+
 ## [4.0.0](https://github.com/OctopusDeploy/push-package-action/compare/v3.2.5...v4.0.0) (2025-12-09)
 
 
