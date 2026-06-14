@@ -6,7 +6,11 @@ var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __commonJS = (cb, mod) => function __require() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  try {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  } catch (e) {
+    throw mod = 0, e;
+  }
 };
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
@@ -266,71 +270,71 @@ var require_tunnel2 = __commonJS({
 var require_symbols = __commonJS({
   "node_modules/undici/lib/core/symbols.js"(exports2, module2) {
     module2.exports = {
-      kClose: Symbol("close"),
-      kDestroy: Symbol("destroy"),
-      kDispatch: Symbol("dispatch"),
-      kUrl: Symbol("url"),
-      kWriting: Symbol("writing"),
-      kResuming: Symbol("resuming"),
-      kQueue: Symbol("queue"),
-      kConnect: Symbol("connect"),
-      kConnecting: Symbol("connecting"),
-      kKeepAliveDefaultTimeout: Symbol("default keep alive timeout"),
-      kKeepAliveMaxTimeout: Symbol("max keep alive timeout"),
-      kKeepAliveTimeoutThreshold: Symbol("keep alive timeout threshold"),
-      kKeepAliveTimeoutValue: Symbol("keep alive timeout"),
-      kKeepAlive: Symbol("keep alive"),
-      kHeadersTimeout: Symbol("headers timeout"),
-      kBodyTimeout: Symbol("body timeout"),
-      kServerName: Symbol("server name"),
-      kLocalAddress: Symbol("local address"),
-      kHost: Symbol("host"),
-      kNoRef: Symbol("no ref"),
-      kBodyUsed: Symbol("used"),
-      kBody: Symbol("abstracted request body"),
-      kRunning: Symbol("running"),
-      kBlocking: Symbol("blocking"),
-      kPending: Symbol("pending"),
-      kSize: Symbol("size"),
-      kBusy: Symbol("busy"),
-      kQueued: Symbol("queued"),
-      kFree: Symbol("free"),
-      kConnected: Symbol("connected"),
-      kClosed: Symbol("closed"),
-      kNeedDrain: Symbol("need drain"),
-      kReset: Symbol("reset"),
-      kDestroyed: Symbol.for("nodejs.stream.destroyed"),
-      kResume: Symbol("resume"),
-      kOnError: Symbol("on error"),
-      kMaxHeadersSize: Symbol("max headers size"),
-      kRunningIdx: Symbol("running index"),
-      kPendingIdx: Symbol("pending index"),
-      kError: Symbol("error"),
-      kClients: Symbol("clients"),
-      kClient: Symbol("client"),
-      kParser: Symbol("parser"),
-      kOnDestroyed: Symbol("destroy callbacks"),
-      kPipelining: Symbol("pipelining"),
-      kSocket: Symbol("socket"),
-      kHostHeader: Symbol("host header"),
-      kConnector: Symbol("connector"),
-      kStrictContentLength: Symbol("strict content length"),
-      kMaxRedirections: Symbol("maxRedirections"),
-      kMaxRequests: Symbol("maxRequestsPerClient"),
-      kProxy: Symbol("proxy agent options"),
-      kCounter: Symbol("socket request counter"),
-      kInterceptors: Symbol("dispatch interceptors"),
-      kMaxResponseSize: Symbol("max response size"),
-      kHTTP2Session: Symbol("http2Session"),
-      kHTTP2SessionState: Symbol("http2Session state"),
-      kRetryHandlerDefaultRetry: Symbol("retry agent default retry"),
-      kConstruct: Symbol("constructable"),
-      kListeners: Symbol("listeners"),
-      kHTTPContext: Symbol("http context"),
-      kMaxConcurrentStreams: Symbol("max concurrent streams"),
-      kNoProxyAgent: Symbol("no proxy agent"),
-      kHttpProxyAgent: Symbol("http proxy agent"),
-      kHttpsProxyAgent: Symbol("https proxy agent")
+      kClose: /* @__PURE__ */ Symbol("close"),
+      kDestroy: /* @__PURE__ */ Symbol("destroy"),
+      kDispatch: /* @__PURE__ */ Symbol("dispatch"),
+      kUrl: /* @__PURE__ */ Symbol("url"),
+      kWriting: /* @__PURE__ */ Symbol("writing"),
+      kResuming: /* @__PURE__ */ Symbol("resuming"),
+      kQueue: /* @__PURE__ */ Symbol("queue"),
+      kConnect: /* @__PURE__ */ Symbol("connect"),
+      kConnecting: /* @__PURE__ */ Symbol("connecting"),
+      kKeepAliveDefaultTimeout: /* @__PURE__ */ Symbol("default keep alive timeout"),
+      kKeepAliveMaxTimeout: /* @__PURE__ */ Symbol("max keep alive timeout"),
+      kKeepAliveTimeoutThreshold: /* @__PURE__ */ Symbol("keep alive timeout threshold"),
+      kKeepAliveTimeoutValue: /* @__PURE__ */ Symbol("keep alive timeout"),
+      kKeepAlive: /* @__PURE__ */ Symbol("keep alive"),
+      kHeadersTimeout: /* @__PURE__ */ Symbol("headers timeout"),
+      kBodyTimeout: /* @__PURE__ */ Symbol("body timeout"),
+      kServerName: /* @__PURE__ */ Symbol("server name"),
+      kLocalAddress: /* @__PURE__ */ Symbol("local address"),
+      kHost: /* @__PURE__ */ Symbol("host"),
+      kNoRef: /* @__PURE__ */ Symbol("no ref"),
+      kBodyUsed: /* @__PURE__ */ Symbol("used"),
+      kBody: /* @__PURE__ */ Symbol("abstracted request body"),
+      kRunning: /* @__PURE__ */ Symbol("running"),
+      kBlocking: /* @__PURE__ */ Symbol("blocking"),
+      kPending: /* @__PURE__ */ Symbol("pending"),
+      kSize: /* @__PURE__ */ Symbol("size"),
+      kBusy: /* @__PURE__ */ Symbol("busy"),
+      kQueued: /* @__PURE__ */ Symbol("queued"),
+      kFree: /* @__PURE__ */ Symbol("free"),
+      kConnected: /* @__PURE__ */ Symbol("connected"),
+      kClosed: /* @__PURE__ */ Symbol("closed"),
+      kNeedDrain: /* @__PURE__ */ Symbol("need drain"),
+      kReset: /* @__PURE__ */ Symbol("reset"),
+      kDestroyed: /* @__PURE__ */ Symbol.for("nodejs.stream.destroyed"),
+      kResume: /* @__PURE__ */ Symbol("resume"),
+      kOnError: /* @__PURE__ */ Symbol("on error"),
+      kMaxHeadersSize: /* @__PURE__ */ Symbol("max headers size"),
+      kRunningIdx: /* @__PURE__ */ Symbol("running index"),
+      kPendingIdx: /* @__PURE__ */ Symbol("pending index"),
+      kError: /* @__PURE__ */ Symbol("error"),
+      kClients: /* @__PURE__ */ Symbol("clients"),
+      kClient: /* @__PURE__ */ Symbol("client"),
+      kParser: /* @__PURE__ */ Symbol("parser"),
+      kOnDestroyed: /* @__PURE__ */ Symbol("destroy callbacks"),
+      kPipelining: /* @__PURE__ */ Symbol("pipelining"),
+      kSocket: /* @__PURE__ */ Symbol("socket"),
+      kHostHeader: /* @__PURE__ */ Symbol("host header"),
+      kConnector: /* @__PURE__ */ Symbol("connector"),
+      kStrictContentLength: /* @__PURE__ */ Symbol("strict content length"),
+      kMaxRedirections: /* @__PURE__ */ Symbol("maxRedirections"),
+      kMaxRequests: /* @__PURE__ */ Symbol("maxRequestsPerClient"),
+      kProxy: /* @__PURE__ */ Symbol("proxy agent options"),
+      kCounter: /* @__PURE__ */ Symbol("socket request counter"),
+      kInterceptors: /* @__PURE__ */ Symbol("dispatch interceptors"),
+      kMaxResponseSize: /* @__PURE__ */ Symbol("max response size"),
+      kHTTP2Session: /* @__PURE__ */ Symbol("http2Session"),
+      kHTTP2SessionState: /* @__PURE__ */ Symbol("http2Session state"),
+      kRetryHandlerDefaultRetry: /* @__PURE__ */ Symbol("retry agent default retry"),
+      kConstruct: /* @__PURE__ */ Symbol("constructable"),
+      kListeners: /* @__PURE__ */ Symbol("listeners"),
+      kHTTPContext: /* @__PURE__ */ Symbol("http context"),
+      kMaxConcurrentStreams: /* @__PURE__ */ Symbol("max concurrent streams"),
+      kNoProxyAgent: /* @__PURE__ */ Symbol("no proxy agent"),
+      kHttpProxyAgent: /* @__PURE__ */ Symbol("http proxy agent"),
+      kHttpsProxyAgent: /* @__PURE__ */ Symbol("https proxy agent")
     };
   }
 });
@@ -339,7 +343,7 @@ var require_symbols = __commonJS({
 var require_errors = __commonJS({
   "node_modules/undici/lib/core/errors.js"(exports2, module2) {
     "use strict";
-    var kUndiciError = Symbol.for("undici.error.UND_ERR");
+    var kUndiciError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR");
     var UndiciError = class extends Error {
       constructor(message) {
         super(message);
@@ -351,7 +355,7 @@ var require_errors = __commonJS({
       }
       [kUndiciError] = true;
     };
-    var kConnectTimeoutError = Symbol.for("undici.error.UND_ERR_CONNECT_TIMEOUT");
+    var kConnectTimeoutError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_CONNECT_TIMEOUT");
     var ConnectTimeoutError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -364,7 +368,7 @@ var require_errors = __commonJS({
       }
       [kConnectTimeoutError] = true;
     };
-    var kHeadersTimeoutError = Symbol.for("undici.error.UND_ERR_HEADERS_TIMEOUT");
+    var kHeadersTimeoutError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_HEADERS_TIMEOUT");
     var HeadersTimeoutError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -377,7 +381,7 @@ var require_errors = __commonJS({
       }
       [kHeadersTimeoutError] = true;
     };
-    var kHeadersOverflowError = Symbol.for("undici.error.UND_ERR_HEADERS_OVERFLOW");
+    var kHeadersOverflowError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_HEADERS_OVERFLOW");
     var HeadersOverflowError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -390,7 +394,7 @@ var require_errors = __commonJS({
       }
       [kHeadersOverflowError] = true;
     };
-    var kBodyTimeoutError = Symbol.for("undici.error.UND_ERR_BODY_TIMEOUT");
+    var kBodyTimeoutError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_BODY_TIMEOUT");
     var BodyTimeoutError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -403,7 +407,7 @@ var require_errors = __commonJS({
       }
       [kBodyTimeoutError] = true;
     };
-    var kResponseStatusCodeError = Symbol.for("undici.error.UND_ERR_RESPONSE_STATUS_CODE");
+    var kResponseStatusCodeError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_RESPONSE_STATUS_CODE");
     var ResponseStatusCodeError = class extends UndiciError {
       constructor(message, statusCode, headers, body) {
         super(message);
@@ -420,7 +424,7 @@ var require_errors = __commonJS({
       }
       [kResponseStatusCodeError] = true;
     };
-    var kInvalidArgumentError = Symbol.for("undici.error.UND_ERR_INVALID_ARG");
+    var kInvalidArgumentError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_INVALID_ARG");
     var InvalidArgumentError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -433,7 +437,7 @@ var require_errors = __commonJS({
       }
       [kInvalidArgumentError] = true;
     };
-    var kInvalidReturnValueError = Symbol.for("undici.error.UND_ERR_INVALID_RETURN_VALUE");
+    var kInvalidReturnValueError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_INVALID_RETURN_VALUE");
     var InvalidReturnValueError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -446,7 +450,7 @@ var require_errors = __commonJS({
       }
       [kInvalidReturnValueError] = true;
     };
-    var kAbortError = Symbol.for("undici.error.UND_ERR_ABORT");
+    var kAbortError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_ABORT");
     var AbortError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -459,7 +463,7 @@ var require_errors = __commonJS({
       }
       [kAbortError] = true;
     };
-    var kRequestAbortedError = Symbol.for("undici.error.UND_ERR_ABORTED");
+    var kRequestAbortedError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_ABORTED");
     var RequestAbortedError = class extends AbortError {
       constructor(message) {
         super(message);
@@ -472,7 +476,7 @@ var require_errors = __commonJS({
       }
       [kRequestAbortedError] = true;
     };
-    var kInformationalError = Symbol.for("undici.error.UND_ERR_INFO");
+    var kInformationalError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_INFO");
     var InformationalError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -485,7 +489,7 @@ var require_errors = __commonJS({
       }
       [kInformationalError] = true;
     };
-    var kRequestContentLengthMismatchError = Symbol.for("undici.error.UND_ERR_REQ_CONTENT_LENGTH_MISMATCH");
+    var kRequestContentLengthMismatchError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_REQ_CONTENT_LENGTH_MISMATCH");
     var RequestContentLengthMismatchError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -498,7 +502,7 @@ var require_errors = __commonJS({
       }
       [kRequestContentLengthMismatchError] = true;
     };
-    var kResponseContentLengthMismatchError = Symbol.for("undici.error.UND_ERR_RES_CONTENT_LENGTH_MISMATCH");
+    var kResponseContentLengthMismatchError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_RES_CONTENT_LENGTH_MISMATCH");
     var ResponseContentLengthMismatchError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -511,7 +515,7 @@ var require_errors = __commonJS({
       }
       [kResponseContentLengthMismatchError] = true;
     };
-    var kClientDestroyedError = Symbol.for("undici.error.UND_ERR_DESTROYED");
+    var kClientDestroyedError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_DESTROYED");
     var ClientDestroyedError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -524,7 +528,7 @@ var require_errors = __commonJS({
       }
       [kClientDestroyedError] = true;
     };
-    var kClientClosedError = Symbol.for("undici.error.UND_ERR_CLOSED");
+    var kClientClosedError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_CLOSED");
     var ClientClosedError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -537,7 +541,7 @@ var require_errors = __commonJS({
       }
       [kClientClosedError] = true;
     };
-    var kSocketError = Symbol.for("undici.error.UND_ERR_SOCKET");
+    var kSocketError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_SOCKET");
     var SocketError = class extends UndiciError {
       constructor(message, socket) {
         super(message);
@@ -551,7 +555,7 @@ var require_errors = __commonJS({
       }
       [kSocketError] = true;
     };
-    var kNotSupportedError = Symbol.for("undici.error.UND_ERR_NOT_SUPPORTED");
+    var kNotSupportedError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_NOT_SUPPORTED");
     var NotSupportedError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -564,7 +568,7 @@ var require_errors = __commonJS({
       }
       [kNotSupportedError] = true;
     };
-    var kBalancedPoolMissingUpstreamError = Symbol.for("undici.error.UND_ERR_BPL_MISSING_UPSTREAM");
+    var kBalancedPoolMissingUpstreamError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_BPL_MISSING_UPSTREAM");
     var BalancedPoolMissingUpstreamError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -577,7 +581,7 @@ var require_errors = __commonJS({
       }
       [kBalancedPoolMissingUpstreamError] = true;
     };
-    var kHTTPParserError = Symbol.for("undici.error.UND_ERR_HTTP_PARSER");
+    var kHTTPParserError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_HTTP_PARSER");
     var HTTPParserError = class extends Error {
       constructor(message, code, data) {
         super(message);
@@ -590,7 +594,7 @@ var require_errors = __commonJS({
       }
       [kHTTPParserError] = true;
     };
-    var kResponseExceededMaxSizeError = Symbol.for("undici.error.UND_ERR_RES_EXCEEDED_MAX_SIZE");
+    var kResponseExceededMaxSizeError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_RES_EXCEEDED_MAX_SIZE");
     var ResponseExceededMaxSizeError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -603,7 +607,7 @@ var require_errors = __commonJS({
       }
       [kResponseExceededMaxSizeError] = true;
     };
-    var kRequestRetryError = Symbol.for("undici.error.UND_ERR_REQ_RETRY");
+    var kRequestRetryError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_REQ_RETRY");
     var RequestRetryError = class extends UndiciError {
       constructor(message, code, { headers, data }) {
         super(message);
@@ -619,7 +623,7 @@ var require_errors = __commonJS({
       }
       [kRequestRetryError] = true;
     };
-    var kResponseError = Symbol.for("undici.error.UND_ERR_RESPONSE");
+    var kResponseError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_RESPONSE");
     var ResponseError = class extends UndiciError {
       constructor(message, code, { headers, data }) {
         super(message);
@@ -635,7 +639,7 @@ var require_errors = __commonJS({
       }
       [kResponseError] = true;
     };
-    var kSecureProxyConnectionError = Symbol.for("undici.error.UND_ERR_PRX_TLS");
+    var kSecureProxyConnectionError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_PRX_TLS");
     var SecureProxyConnectionError = class extends UndiciError {
       constructor(cause, message, options) {
         super(message, { cause, ...options ?? {} });
@@ -649,7 +653,7 @@ var require_errors = __commonJS({
       }
       [kSecureProxyConnectionError] = true;
     };
-    var kMessageSizeExceededError = Symbol.for("undici.error.UND_ERR_WS_MESSAGE_SIZE_EXCEEDED");
+    var kMessageSizeExceededError = /* @__PURE__ */ Symbol.for("undici.error.UND_ERR_WS_MESSAGE_SIZE_EXCEEDED");
     var MessageSizeExceededError = class extends UndiciError {
       constructor(message) {
         super(message);
@@ -1665,7 +1669,7 @@ var require_request = __commonJS({
     var { channels } = require_diagnostics();
     var { headerNameLowerCasedRecord } = require_constants();
     var invalidPathRegex = /[^\u0021-\u00ff]/;
-    var kHandler = Symbol("handler");
+    var kHandler = /* @__PURE__ */ Symbol("handler");
     var Request = class {
       constructor(origin, {
         path,
@@ -2038,10 +2042,10 @@ var require_dispatcher_base = __commonJS({
       InvalidArgumentError
     } = require_errors();
     var { kDestroy, kClose, kClosed, kDestroyed, kDispatch, kInterceptors } = require_symbols();
-    var kOnDestroyed = Symbol("onDestroyed");
-    var kOnClosed = Symbol("onClosed");
-    var kInterceptedDispatch = Symbol("Intercepted Dispatch");
-    var kWebSocketOptions = Symbol("webSocketOptions");
+    var kOnDestroyed = /* @__PURE__ */ Symbol("onDestroyed");
+    var kOnClosed = /* @__PURE__ */ Symbol("onClosed");
+    var kInterceptedDispatch = /* @__PURE__ */ Symbol("Intercepted Dispatch");
+    var kWebSocketOptions = /* @__PURE__ */ Symbol("webSocketOptions");
     var DispatcherBase = class extends Dispatcher {
       constructor(opts) {
         super();
@@ -2203,7 +2207,7 @@ var require_timers = __commonJS({
     var RESOLUTION_MS = 1e3;
     var TICK_MS = (RESOLUTION_MS >> 1) - 1;
     var fastNowTimeout;
-    var kFastTimer = Symbol("kFastTimer");
+    var kFastTimer = /* @__PURE__ */ Symbol("kFastTimer");
     var fastTimers = [];
     var NOT_IN_LIST = -2;
     var TO_BE_CLEARED = -1;
@@ -3187,7 +3191,7 @@ var require_constants3 = __commonJS({
 var require_global = __commonJS({
   "node_modules/undici/lib/web/fetch/global.js"(exports2, module2) {
     "use strict";
-    var globalOrigin = Symbol.for("undici.globalOrigin.1");
+    var globalOrigin = /* @__PURE__ */ Symbol.for("undici.globalOrigin.1");
     function getGlobalOrigin() {
       return globalThis[globalOrigin];
     }
@@ -4865,11 +4869,11 @@ var require_symbols2 = __commonJS({
   "node_modules/undici/lib/web/fetch/symbols.js"(exports2, module2) {
     "use strict";
     module2.exports = {
-      kUrl: Symbol("url"),
-      kHeaders: Symbol("headers"),
-      kSignal: Symbol("signal"),
-      kState: Symbol("state"),
-      kDispatcher: Symbol("dispatcher")
+      kUrl: /* @__PURE__ */ Symbol("url"),
+      kHeaders: /* @__PURE__ */ Symbol("headers"),
+      kSignal: /* @__PURE__ */ Symbol("signal"),
+      kState: /* @__PURE__ */ Symbol("state"),
+      kDispatcher: /* @__PURE__ */ Symbol("dispatcher")
     };
   }
 });
@@ -6701,7 +6705,7 @@ var require_client_h2 = __commonJS({
       kSize,
       kHTTPContext
     } = require_symbols();
-    var kOpenStreams = Symbol("open streams");
+    var kOpenStreams = /* @__PURE__ */ Symbol("open streams");
     var extractBody;
     var h2ExperimentalWarned = false;
     var http2;
@@ -7220,7 +7224,7 @@ var require_redirect_handler = __commonJS({
     var { InvalidArgumentError } = require_errors();
     var EE = require("node:events");
     var redirectableStatusCodes = [300, 301, 302, 303, 307, 308];
-    var kBody = Symbol("body");
+    var kBody = /* @__PURE__ */ Symbol("body");
     var BodyAsyncIterable = class {
       constructor(body) {
         this[kBody] = body;
@@ -7453,7 +7457,7 @@ var require_client = __commonJS({
     var connectH1 = require_client_h1();
     var connectH2 = require_client_h2();
     var deprecatedInterceptorWarned = false;
-    var kClosedResolve = Symbol("kClosedResolve");
+    var kClosedResolve = /* @__PURE__ */ Symbol("kClosedResolve");
     var noop = () => {
     };
     function getPipelining(client) {
@@ -7953,7 +7957,7 @@ var require_fixed_queue = __commonJS({
 var require_pool_stats = __commonJS({
   "node_modules/undici/lib/dispatcher/pool-stats.js"(exports2, module2) {
     var { kFree, kConnected, kPending, kQueued, kRunning, kSize } = require_symbols();
-    var kPool = Symbol("pool");
+    var kPool = /* @__PURE__ */ Symbol("pool");
     var PoolStats = class {
       constructor(pool) {
         this[kPool] = pool;
@@ -7989,18 +7993,18 @@ var require_pool_base = __commonJS({
     var FixedQueue = require_fixed_queue();
     var { kConnected, kSize, kRunning, kPending, kQueued, kBusy, kFree, kUrl, kClose, kDestroy, kDispatch } = require_symbols();
     var PoolStats = require_pool_stats();
-    var kClients = Symbol("clients");
-    var kNeedDrain = Symbol("needDrain");
-    var kQueue = Symbol("queue");
-    var kClosedResolve = Symbol("closed resolve");
-    var kOnDrain = Symbol("onDrain");
-    var kOnConnect = Symbol("onConnect");
-    var kOnDisconnect = Symbol("onDisconnect");
-    var kOnConnectionError = Symbol("onConnectionError");
-    var kGetDispatcher = Symbol("get dispatcher");
-    var kAddClient = Symbol("add client");
-    var kRemoveClient = Symbol("remove client");
-    var kStats = Symbol("stats");
+    var kClients = /* @__PURE__ */ Symbol("clients");
+    var kNeedDrain = /* @__PURE__ */ Symbol("needDrain");
+    var kQueue = /* @__PURE__ */ Symbol("queue");
+    var kClosedResolve = /* @__PURE__ */ Symbol("closed resolve");
+    var kOnDrain = /* @__PURE__ */ Symbol("onDrain");
+    var kOnConnect = /* @__PURE__ */ Symbol("onConnect");
+    var kOnDisconnect = /* @__PURE__ */ Symbol("onDisconnect");
+    var kOnConnectionError = /* @__PURE__ */ Symbol("onConnectionError");
+    var kGetDispatcher = /* @__PURE__ */ Symbol("get dispatcher");
+    var kAddClient = /* @__PURE__ */ Symbol("add client");
+    var kRemoveClient = /* @__PURE__ */ Symbol("remove client");
+    var kStats = /* @__PURE__ */ Symbol("stats");
     var PoolBase = class extends DispatcherBase {
       constructor(opts) {
         super(opts);
@@ -8154,9 +8158,9 @@ var require_pool = __commonJS({
     var util = require_util();
     var { kUrl, kInterceptors } = require_symbols();
     var buildConnector = require_connect();
-    var kOptions = Symbol("options");
-    var kConnections = Symbol("connections");
-    var kFactory = Symbol("factory");
+    var kOptions = /* @__PURE__ */ Symbol("options");
+    var kConnections = /* @__PURE__ */ Symbol("connections");
+    var kFactory = /* @__PURE__ */ Symbol("factory");
     function defaultFactory(origin, opts) {
       return new Client3(origin, opts);
     }
@@ -8246,14 +8250,14 @@ var require_balanced_pool = __commonJS({
     var Pool = require_pool();
     var { kUrl, kInterceptors } = require_symbols();
     var { parseOrigin } = require_util();
-    var kFactory = Symbol("factory");
-    var kOptions = Symbol("options");
-    var kGreatestCommonDivisor = Symbol("kGreatestCommonDivisor");
-    var kCurrentWeight = Symbol("kCurrentWeight");
-    var kIndex = Symbol("kIndex");
-    var kWeight = Symbol("kWeight");
-    var kMaxWeightPerServer = Symbol("kMaxWeightPerServer");
-    var kErrorPenalty = Symbol("kErrorPenalty");
+    var kFactory = /* @__PURE__ */ Symbol("factory");
+    var kOptions = /* @__PURE__ */ Symbol("options");
+    var kGreatestCommonDivisor = /* @__PURE__ */ Symbol("kGreatestCommonDivisor");
+    var kCurrentWeight = /* @__PURE__ */ Symbol("kCurrentWeight");
+    var kIndex = /* @__PURE__ */ Symbol("kIndex");
+    var kWeight = /* @__PURE__ */ Symbol("kWeight");
+    var kMaxWeightPerServer = /* @__PURE__ */ Symbol("kMaxWeightPerServer");
+    var kErrorPenalty = /* @__PURE__ */ Symbol("kErrorPenalty");
     function getGreatestCommonDivisor(a, b) {
       if (a === 0) return b;
       while (b !== 0) {
@@ -8382,13 +8386,13 @@ var require_agent = __commonJS({
     var Client3 = require_client();
     var util = require_util();
     var createRedirectInterceptor = require_redirect_interceptor();
-    var kOnConnect = Symbol("onConnect");
-    var kOnDisconnect = Symbol("onDisconnect");
-    var kOnConnectionError = Symbol("onConnectionError");
-    var kMaxRedirections = Symbol("maxRedirections");
-    var kOnDrain = Symbol("onDrain");
-    var kFactory = Symbol("factory");
-    var kOptions = Symbol("options");
+    var kOnConnect = /* @__PURE__ */ Symbol("onConnect");
+    var kOnDisconnect = /* @__PURE__ */ Symbol("onDisconnect");
+    var kOnConnectionError = /* @__PURE__ */ Symbol("onConnectionError");
+    var kMaxRedirections = /* @__PURE__ */ Symbol("maxRedirections");
+    var kOnDrain = /* @__PURE__ */ Symbol("onDrain");
+    var kFactory = /* @__PURE__ */ Symbol("factory");
+    var kOptions = /* @__PURE__ */ Symbol("options");
     function defaultFactory(origin, opts) {
       return opts && opts.connections === 1 ? new Client3(origin, opts) : new Pool(origin, opts);
     }
@@ -8480,13 +8484,13 @@ var require_proxy_agent = __commonJS({
     var { InvalidArgumentError, RequestAbortedError, SecureProxyConnectionError } = require_errors();
     var buildConnector = require_connect();
     var Client3 = require_client();
-    var kAgent = Symbol("proxy agent");
-    var kClient = Symbol("proxy client");
-    var kProxyHeaders = Symbol("proxy headers");
-    var kRequestTls = Symbol("request tls settings");
-    var kProxyTls = Symbol("proxy tls settings");
-    var kConnectEndpoint = Symbol("connect endpoint function");
-    var kTunnelProxy = Symbol("tunnel proxy");
+    var kAgent = /* @__PURE__ */ Symbol("proxy agent");
+    var kClient = /* @__PURE__ */ Symbol("proxy client");
+    var kProxyHeaders = /* @__PURE__ */ Symbol("proxy headers");
+    var kRequestTls = /* @__PURE__ */ Symbol("request tls settings");
+    var kProxyTls = /* @__PURE__ */ Symbol("proxy tls settings");
+    var kConnectEndpoint = /* @__PURE__ */ Symbol("connect endpoint function");
+    var kTunnelProxy = /* @__PURE__ */ Symbol("tunnel proxy");
     function defaultProtocolPort(protocol) {
       return protocol === "https:" ? 443 : 80;
     }
@@ -9169,12 +9173,12 @@ var require_readable = __commonJS({
     var { RequestAbortedError, NotSupportedError, InvalidArgumentError, AbortError } = require_errors();
     var util = require_util();
     var { ReadableStreamFrom } = require_util();
-    var kConsume = Symbol("kConsume");
-    var kReading = Symbol("kReading");
-    var kBody = Symbol("kBody");
-    var kAbort = Symbol("kAbort");
-    var kContentType = Symbol("kContentType");
-    var kContentLength = Symbol("kContentLength");
+    var kConsume = /* @__PURE__ */ Symbol("kConsume");
+    var kReading = /* @__PURE__ */ Symbol("kReading");
+    var kBody = /* @__PURE__ */ Symbol("kBody");
+    var kAbort = /* @__PURE__ */ Symbol("kAbort");
+    var kContentType = /* @__PURE__ */ Symbol("kContentType");
+    var kContentLength = /* @__PURE__ */ Symbol("kContentLength");
     var noop = () => {
     };
     var BodyReadable = class extends Readable {
@@ -9705,8 +9709,8 @@ var require_abort_signal = __commonJS({
   "node_modules/undici/lib/api/abort-signal.js"(exports2, module2) {
     var { addAbortListener } = require_util();
     var { RequestAbortedError } = require_errors();
-    var kListener = Symbol("kListener");
-    var kSignal = Symbol("kSignal");
+    var kListener = /* @__PURE__ */ Symbol("kListener");
+    var kSignal = /* @__PURE__ */ Symbol("kSignal");
     function abort(self2) {
       if (self2.abort) {
         self2.abort(self2[kSignal]?.reason);
@@ -9942,7 +9946,7 @@ var require_api_pipeline = __commonJS({
     var { AsyncResource } = require("node:async_hooks");
     var { addSignal, removeSignal } = require_abort_signal();
     var assert = require("node:assert");
-    var kResume = Symbol("resume");
+    var kResume = /* @__PURE__ */ Symbol("resume");
     var PipelineRequest = class extends Readable {
       constructor() {
         super({ autoDestroy: true });
@@ -10323,7 +10327,7 @@ var require_mock_errors = __commonJS({
   "node_modules/undici/lib/mock/mock-errors.js"(exports2, module2) {
     "use strict";
     var { UndiciError } = require_errors();
-    var kMockNotMatchedError = Symbol.for("undici.error.UND_MOCK_ERR_MOCK_NOT_MATCHED");
+    var kMockNotMatchedError = /* @__PURE__ */ Symbol.for("undici.error.UND_MOCK_ERR_MOCK_NOT_MATCHED");
     var MockNotMatchedError = class _MockNotMatchedError extends UndiciError {
       constructor(message) {
         super(message);
@@ -10348,25 +10352,25 @@ var require_mock_symbols = __commonJS({
   "node_modules/undici/lib/mock/mock-symbols.js"(exports2, module2) {
     "use strict";
     module2.exports = {
-      kAgent: Symbol("agent"),
-      kOptions: Symbol("options"),
-      kFactory: Symbol("factory"),
-      kDispatches: Symbol("dispatches"),
-      kDispatchKey: Symbol("dispatch key"),
-      kDefaultHeaders: Symbol("default headers"),
-      kDefaultTrailers: Symbol("default trailers"),
-      kContentLength: Symbol("content length"),
-      kMockAgent: Symbol("mock agent"),
-      kMockAgentSet: Symbol("mock agent set"),
-      kMockAgentGet: Symbol("mock agent get"),
-      kMockDispatch: Symbol("mock dispatch"),
-      kClose: Symbol("close"),
-      kOriginalClose: Symbol("original agent close"),
-      kOrigin: Symbol("origin"),
-      kIsMockActive: Symbol("is mock active"),
-      kNetConnect: Symbol("net connect"),
-      kGetNetConnect: Symbol("get net connect"),
-      kConnected: Symbol("connected")
+      kAgent: /* @__PURE__ */ Symbol("agent"),
+      kOptions: /* @__PURE__ */ Symbol("options"),
+      kFactory: /* @__PURE__ */ Symbol("factory"),
+      kDispatches: /* @__PURE__ */ Symbol("dispatches"),
+      kDispatchKey: /* @__PURE__ */ Symbol("dispatch key"),
+      kDefaultHeaders: /* @__PURE__ */ Symbol("default headers"),
+      kDefaultTrailers: /* @__PURE__ */ Symbol("default trailers"),
+      kContentLength: /* @__PURE__ */ Symbol("content length"),
+      kMockAgent: /* @__PURE__ */ Symbol("mock agent"),
+      kMockAgentSet: /* @__PURE__ */ Symbol("mock agent set"),
+      kMockAgentGet: /* @__PURE__ */ Symbol("mock agent get"),
+      kMockDispatch: /* @__PURE__ */ Symbol("mock dispatch"),
+      kClose: /* @__PURE__ */ Symbol("close"),
+      kOriginalClose: /* @__PURE__ */ Symbol("original agent close"),
+      kOrigin: /* @__PURE__ */ Symbol("origin"),
+      kIsMockActive: /* @__PURE__ */ Symbol("is mock active"),
+      kNetConnect: /* @__PURE__ */ Symbol("net connect"),
+      kGetNetConnect: /* @__PURE__ */ Symbol("get net connect"),
+      kConnected: /* @__PURE__ */ Symbol("connected")
     };
   }
 });
@@ -11141,7 +11145,7 @@ ${pendingInterceptorsFormatter.format(pending)}
 var require_global2 = __commonJS({
   "node_modules/undici/lib/global.js"(exports2, module2) {
     "use strict";
-    var globalDispatcher = Symbol.for("undici.globalDispatcher.1");
+    var globalDispatcher = /* @__PURE__ */ Symbol.for("undici.globalDispatcher.1");
     var { InvalidArgumentError } = require_errors();
     var Agent = require_agent();
     if (getGlobalDispatcher() === void 0) {
@@ -11659,8 +11663,8 @@ var require_headers = __commonJS({
     var { webidl } = require_webidl();
     var assert = require("node:assert");
     var util = require("node:util");
-    var kHeadersMap = Symbol("headers map");
-    var kHeadersSortedMap = Symbol("headers map sorted");
+    var kHeadersMap = /* @__PURE__ */ Symbol("headers map");
+    var kHeadersSortedMap = /* @__PURE__ */ Symbol("headers map sorted");
     function isHTTPWhiteSpaceCharCode(code) {
       return code === 10 || code === 13 || code === 9 || code === 32;
     }
@@ -12561,7 +12565,7 @@ var require_request2 = __commonJS({
     var { kConstruct } = require_symbols();
     var assert = require("node:assert");
     var { getMaxListeners, setMaxListeners, getEventListeners, defaultMaxListeners } = require("node:events");
-    var kAbortController = Symbol("abortController");
+    var kAbortController = /* @__PURE__ */ Symbol("abortController");
     var requestFinalizer = new FinalizationRegistry2(({ signal, abort }) => {
       signal.removeEventListener("abort", abort);
     });
@@ -14035,7 +14039,7 @@ var require_fetch = __commonJS({
             fetchParams.controller.terminate(e);
           }
         };
-        requestBody = async function* () {
+        requestBody = (async function* () {
           try {
             for await (const bytes of request.body.stream) {
               yield* processBodyChunk(bytes);
@@ -14044,7 +14048,7 @@ var require_fetch = __commonJS({
           } catch (err) {
             processBodyError(err);
           }
-        }();
+        })();
       }
       try {
         const { body, status, statusText, headersList, socket } = await dispatch({ body: requestBody });
@@ -14297,12 +14301,12 @@ var require_symbols3 = __commonJS({
   "node_modules/undici/lib/web/fileapi/symbols.js"(exports2, module2) {
     "use strict";
     module2.exports = {
-      kState: Symbol("FileReader state"),
-      kResult: Symbol("FileReader result"),
-      kError: Symbol("FileReader error"),
-      kLastProgressEventFired: Symbol("FileReader last progress event fired timestamp"),
-      kEvents: Symbol("FileReader events"),
-      kAborted: Symbol("FileReader aborted")
+      kState: /* @__PURE__ */ Symbol("FileReader state"),
+      kResult: /* @__PURE__ */ Symbol("FileReader result"),
+      kError: /* @__PURE__ */ Symbol("FileReader error"),
+      kLastProgressEventFired: /* @__PURE__ */ Symbol("FileReader last progress event fired timestamp"),
+      kEvents: /* @__PURE__ */ Symbol("FileReader events"),
+      kAborted: /* @__PURE__ */ Symbol("FileReader aborted")
     };
   }
 });
@@ -14312,7 +14316,7 @@ var require_progressevent = __commonJS({
   "node_modules/undici/lib/web/fileapi/progressevent.js"(exports2, module2) {
     "use strict";
     var { webidl } = require_webidl();
-    var kState = Symbol("ProgressEvent state");
+    var kState = /* @__PURE__ */ Symbol("ProgressEvent state");
     var ProgressEvent = class _ProgressEvent extends Event {
       constructor(type, eventInitDict = {}) {
         type = webidl.converters.DOMString(type, "ProgressEvent constructor", "type");
@@ -16580,14 +16584,14 @@ var require_symbols5 = __commonJS({
   "node_modules/undici/lib/web/websocket/symbols.js"(exports2, module2) {
     "use strict";
     module2.exports = {
-      kWebSocketURL: Symbol("url"),
-      kReadyState: Symbol("ready state"),
-      kController: Symbol("controller"),
-      kResponse: Symbol("response"),
-      kBinaryType: Symbol("binary type"),
-      kSentClose: Symbol("sent close"),
-      kReceivedClose: Symbol("received close"),
-      kByteParser: Symbol("byte parser")
+      kWebSocketURL: /* @__PURE__ */ Symbol("url"),
+      kReadyState: /* @__PURE__ */ Symbol("ready state"),
+      kController: /* @__PURE__ */ Symbol("controller"),
+      kResponse: /* @__PURE__ */ Symbol("response"),
+      kBinaryType: /* @__PURE__ */ Symbol("binary type"),
+      kSentClose: /* @__PURE__ */ Symbol("sent close"),
+      kReceivedClose: /* @__PURE__ */ Symbol("received close"),
+      kByteParser: /* @__PURE__ */ Symbol("byte parser")
     };
   }
 });
@@ -17035,8 +17039,8 @@ var require_permessage_deflate = __commonJS({
     var { isValidClientWindowBits } = require_util7();
     var { MessageSizeExceededError } = require_errors();
     var tail = Buffer.from([0, 0, 255, 255]);
-    var kBuffer = Symbol("kBuffer");
-    var kLength = Symbol("kLength");
+    var kBuffer = /* @__PURE__ */ Symbol("kBuffer");
+    var kLength = /* @__PURE__ */ Symbol("kLength");
     var PerMessageDeflate = class {
       /** @type {import('node:zlib').InflateRaw} */
       #inflate;
@@ -18760,7 +18764,7 @@ var require_buildInformationRepository = __commonJS({
     var __1 = require_dist2();
     var BuildInformationRepository = (
       /** @class */
-      function() {
+      (function() {
         function BuildInformationRepository2(client, spaceName) {
           this.client = client;
           this.spaceName = spaceName;
@@ -18860,7 +18864,7 @@ var require_buildInformationRepository = __commonJS({
           });
         };
         return BuildInformationRepository2;
-      }()
+      })()
     );
     exports2.BuildInformationRepository = BuildInformationRepository;
   }
@@ -18882,13 +18886,13 @@ var require_package_identity = __commonJS({
     exports2.PackageIdentity = void 0;
     var PackageIdentity = (
       /** @class */
-      /* @__PURE__ */ function() {
+      /* @__PURE__ */ (function() {
         function PackageIdentity2(Id, Version) {
           this.Id = Id;
           this.Version = Version;
         }
         return PackageIdentity2;
-      }()
+      })()
     );
     exports2.PackageIdentity = PackageIdentity;
   }
@@ -18898,7 +18902,7 @@ var require_package_identity = __commonJS({
 var require_buildInformation = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/buildInformation/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -18907,10 +18911,10 @@ var require_buildInformation = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -18935,7 +18939,7 @@ var require_apiLocation = __commonJS({
 var require_octopusError = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/octopusError.js"(exports2) {
     "use strict";
-    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ function() {
+    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ (function() {
       var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
           d2.__proto__ = b2;
@@ -18953,7 +18957,7 @@ var require_octopusError = __commonJS({
         }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
-    }();
+    })();
     var __assign = exports2 && exports2.__assign || function() {
       __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -18969,7 +18973,7 @@ var require_octopusError = __commonJS({
     exports2.OctopusError = void 0;
     var OctopusError = (
       /** @class */
-      function(_super) {
+      (function(_super) {
         __extends(OctopusError2, _super);
         function OctopusError2(StatusCode, message) {
           var _this = _super.call(this, message) || this;
@@ -18986,7 +18990,7 @@ var require_octopusError = __commonJS({
           return n;
         };
         return OctopusError2;
-      }(Error)
+      })(Error)
     );
     exports2.OctopusError = OctopusError;
   }
@@ -19134,7 +19138,7 @@ var require_capability = __commonJS({
 var require_capabilities = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/capabilities/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -19143,10 +19147,10 @@ var require_capabilities = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -19182,7 +19186,7 @@ var require_basicRepository = __commonJS({
     exports2.BasicRepository = void 0;
     var BasicRepository = (
       /** @class */
-      function() {
+      (function() {
         function BasicRepository2(client, baseApiPathTemplate, listParametersTemplate) {
           var _this = this;
           this.takeDefaultPageSize = 30;
@@ -19245,7 +19249,7 @@ var require_basicRepository = __commonJS({
         };
         BasicRepository2.TakeAll = 2147483647;
         return BasicRepository2;
-      }()
+      })()
     );
     exports2.BasicRepository = BasicRepository;
   }
@@ -19266,7 +19270,7 @@ var require_spaceScopedRoutePrefix = __commonJS({
 var require_spaceScopedBasicRepository = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/spaceScopedBasicRepository.js"(exports2) {
     "use strict";
-    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ function() {
+    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ (function() {
       var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
           d2.__proto__ = b2;
@@ -19284,7 +19288,7 @@ var require_spaceScopedBasicRepository = __commonJS({
         }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
-    }();
+    })();
     var __assign = exports2 && exports2.__assign || function() {
       __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -19302,7 +19306,7 @@ var require_spaceScopedBasicRepository = __commonJS({
     var spaceScopedRoutePrefix_1 = require_spaceScopedRoutePrefix();
     var SpaceScopedBasicRepository = (
       /** @class */
-      function(_super) {
+      (function(_super) {
         __extends(SpaceScopedBasicRepository2, _super);
         function SpaceScopedBasicRepository2(client, spaceName, baseApiPathTemplate, listParametersTemplate) {
           var _this = _super.call(this, client, baseApiPathTemplate, listParametersTemplate) || this;
@@ -19331,7 +19335,7 @@ var require_spaceScopedBasicRepository = __commonJS({
           return _super.prototype.modify.call(this, resource, __assign({ spaceName: this.spaceName }, args));
         };
         return SpaceScopedBasicRepository2;
-      }(basicRepository_1.BasicRepository)
+      })(basicRepository_1.BasicRepository)
     );
     exports2.SpaceScopedBasicRepository = SpaceScopedBasicRepository;
   }
@@ -19341,7 +19345,7 @@ var require_spaceScopedBasicRepository = __commonJS({
 var require_environmentRepository = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/deploymentEnvironments/environmentRepository.js"(exports2) {
     "use strict";
-    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ function() {
+    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ (function() {
       var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
           d2.__proto__ = b2;
@@ -19359,7 +19363,7 @@ var require_environmentRepository = __commonJS({
         }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
-    }();
+    })();
     var __assign = exports2 && exports2.__assign || function() {
       __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -19474,7 +19478,7 @@ var require_environmentRepository = __commonJS({
     var console_1 = require("console");
     var EnvironmentRepository = (
       /** @class */
-      function(_super) {
+      (function(_super) {
         __extends(EnvironmentRepository2, _super);
         function EnvironmentRepository2(client, spaceName) {
           return _super.call(this, client, spaceName, "".concat(__1.spaceScopedRoutePrefix, "/environments"), "skip,take,ids,partialName") || this;
@@ -19590,7 +19594,7 @@ var require_environmentRepository = __commonJS({
           });
         };
         return EnvironmentRepository2;
-      }(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
+      })(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
     );
     exports2.EnvironmentRepository = EnvironmentRepository;
   }
@@ -19712,7 +19716,7 @@ var require_environmentV2Repository = __commonJS({
     var __1 = require_dist2();
     var EnvironmentV2Repository = (
       /** @class */
-      function() {
+      (function() {
         function EnvironmentV2Repository2(client, spaceName) {
           this.client = client;
           this.spaceName = spaceName;
@@ -19725,7 +19729,7 @@ var require_environmentV2Repository = __commonJS({
           });
         };
         return EnvironmentV2Repository2;
-      }()
+      })()
     );
     exports2.EnvironmentV2Repository = EnvironmentV2Repository;
   }
@@ -19735,7 +19739,7 @@ var require_environmentV2Repository = __commonJS({
 var require_deploymentEnvironments = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/deploymentEnvironments/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -19744,10 +19748,10 @@ var require_deploymentEnvironments = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -19809,7 +19813,7 @@ var require_dynamicFormResources = __commonJS({
 var require_forms = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/forms/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -19818,10 +19822,10 @@ var require_forms = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -19843,7 +19847,7 @@ var require_lifecycle = __commonJS({
 var require_lifecycleRepository = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/lifecycles/lifecycleRepository.js"(exports2) {
     "use strict";
-    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ function() {
+    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ (function() {
       var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
           d2.__proto__ = b2;
@@ -19861,20 +19865,20 @@ var require_lifecycleRepository = __commonJS({
         }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
-    }();
+    })();
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.LifecycleRepository = void 0;
     var spaceScopedRoutePrefix_1 = require_spaceScopedRoutePrefix();
     var spaceScopedBasicRepository_1 = require_spaceScopedBasicRepository();
     var LifecycleRepository = (
       /** @class */
-      function(_super) {
+      (function(_super) {
         __extends(LifecycleRepository2, _super);
         function LifecycleRepository2(client, spaceName) {
           return _super.call(this, client, spaceName, "".concat(spaceScopedRoutePrefix_1.spaceScopedRoutePrefix, "/lifecycles"), "skip,take,ids,partialName") || this;
         }
         return LifecycleRepository2;
-      }(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
+      })(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
     );
     exports2.LifecycleRepository = LifecycleRepository;
   }
@@ -19906,7 +19910,7 @@ var require_retentionPeriod = __commonJS({
 var require_lifecycles = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/lifecycles/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -19915,10 +19919,10 @@ var require_lifecycles = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -21834,11 +21838,11 @@ var require_adm_zip = __commonJS({
          */
         addLocalFolder: function(localPath, zipPath, filter, attr) {
           if (filter instanceof RegExp) {
-            filter = /* @__PURE__ */ function(rx) {
+            filter = /* @__PURE__ */ (function(rx) {
               return function(filename) {
                 return rx.test(filename);
               };
-            }(filter);
+            })(filter);
           } else if ("function" !== typeof filter) {
             filter = function() {
               return true;
@@ -21876,11 +21880,11 @@ var require_adm_zip = __commonJS({
          */
         addLocalFolderAsync: function(localPath, callback, zipPath, filter) {
           if (filter instanceof RegExp) {
-            filter = /* @__PURE__ */ function(rx) {
+            filter = /* @__PURE__ */ (function(rx) {
               return function(filename) {
                 return rx.test(filename);
               };
-            }(filter);
+            })(filter);
           } else if ("function" !== typeof filter) {
             filter = function() {
               return true;
@@ -22751,7 +22755,7 @@ var require_minimatch = __commonJS({
     module2.exports = minimatch;
     var path = require_path();
     minimatch.sep = path.sep;
-    var GLOBSTAR = Symbol("globstar **");
+    var GLOBSTAR = /* @__PURE__ */ Symbol("globstar **");
     minimatch.GLOBSTAR = GLOBSTAR;
     var expand = require_brace_expansion();
     var plTypes = {
@@ -22815,7 +22819,7 @@ var require_minimatch = __commonJS({
         throw new TypeError("pattern is too long");
       }
     };
-    var SUBPARSE = Symbol("subparse");
+    var SUBPARSE = /* @__PURE__ */ Symbol("subparse");
     minimatch.makeRe = (pattern, options) => new Minimatch(pattern, options || {}).makeRe();
     minimatch.match = (list, pattern, options = {}) => {
       const mm = new Minimatch(pattern, options);
@@ -25056,7 +25060,7 @@ var require_nugetPackageBuilder = __commonJS({
     var path_1 = __importDefault(require("path"));
     var NuGetPackageBuilder = (
       /** @class */
-      function() {
+      (function() {
         function NuGetPackageBuilder2() {
         }
         NuGetPackageBuilder2.prototype.pack = function(args) {
@@ -25096,7 +25100,7 @@ var require_nugetPackageBuilder = __commonJS({
           });
         };
         return NuGetPackageBuilder2;
-      }()
+      })()
     );
     exports2.NuGetPackageBuilder = NuGetPackageBuilder;
   }
@@ -25215,7 +25219,7 @@ var require_zipPackageBuilder = __commonJS({
     var zipUtils_1 = require_zipUtils();
     var ZipPackageBuilder = (
       /** @class */
-      function() {
+      (function() {
         function ZipPackageBuilder2() {
         }
         ZipPackageBuilder2.prototype.pack = function(args) {
@@ -25234,7 +25238,7 @@ var require_zipPackageBuilder = __commonJS({
           });
         };
         return ZipPackageBuilder2;
-      }()
+      })()
     );
     exports2.ZipPackageBuilder = ZipPackageBuilder;
   }
@@ -25244,7 +25248,7 @@ var require_zipPackageBuilder = __commonJS({
 var require_pack = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/packages/pack/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -25253,10 +25257,10 @@ var require_pack = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -34554,7 +34558,7 @@ var require_shams = __commonJS({
         return true;
       }
       var obj = {};
-      var sym = Symbol("test");
+      var sym = /* @__PURE__ */ Symbol("test");
       var symObj = Object(sym);
       if (typeof sym === "string") {
         return false;
@@ -34613,7 +34617,7 @@ var require_has_symbols = __commonJS({
       if (typeof origSymbol("foo") !== "symbol") {
         return false;
       }
-      if (typeof Symbol("bar") !== "symbol") {
+      if (typeof /* @__PURE__ */ Symbol("bar") !== "symbol") {
         return false;
       }
       return hasSymbolSham();
@@ -34870,7 +34874,7 @@ var require_get_intrinsic = __commonJS({
     var throwTypeError = function() {
       throw new $TypeError();
     };
-    var ThrowTypeError = $gOPD ? function() {
+    var ThrowTypeError = $gOPD ? (function() {
       try {
         arguments.callee;
         return throwTypeError;
@@ -34881,7 +34885,7 @@ var require_get_intrinsic = __commonJS({
           return throwTypeError;
         }
       }
-    }() : throwTypeError;
+    })() : throwTypeError;
     var hasSymbols = require_has_symbols()();
     var getProto = require_get_proto();
     var $ObjectGPO = require_Object_getPrototypeOf();
@@ -35822,7 +35826,7 @@ var require_packageRepository = __commonJS({
     var spaceResolver_1 = require_spaceResolver();
     var PackageRepository2 = (
       /** @class */
-      function() {
+      (function() {
         function PackageRepository3(client, spaceName) {
           this.client = client;
           this.spaceName = spaceName;
@@ -35979,7 +35983,7 @@ var require_packageRepository = __commonJS({
           });
         };
         return PackageRepository3;
-      }()
+      })()
     );
     exports2.PackageRepository = PackageRepository2;
   }
@@ -35989,7 +35993,7 @@ var require_packageRepository = __commonJS({
 var require_packages = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/packages/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -35998,10 +36002,10 @@ var require_packages = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -36024,7 +36028,7 @@ var require_projectGroup = __commonJS({
 var require_projectGroupRepository = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/projectGroups/projectGroupRepository.js"(exports2) {
     "use strict";
-    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ function() {
+    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ (function() {
       var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
           d2.__proto__ = b2;
@@ -36042,20 +36046,20 @@ var require_projectGroupRepository = __commonJS({
         }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
-    }();
+    })();
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ProjectGroupRepository = void 0;
     var __1 = require_dist2();
     var spaceScopedBasicRepository_1 = require_spaceScopedBasicRepository();
     var ProjectGroupRepository = (
       /** @class */
-      function(_super) {
+      (function(_super) {
         __extends(ProjectGroupRepository2, _super);
         function ProjectGroupRepository2(client, spaceName) {
           return _super.call(this, client, spaceName, "".concat(__1.spaceScopedRoutePrefix, "/projectgroups"), "skip,take,ids,partialName") || this;
         }
         return ProjectGroupRepository2;
-      }(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
+      })(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
     );
     exports2.ProjectGroupRepository = ProjectGroupRepository;
   }
@@ -36065,7 +36069,7 @@ var require_projectGroupRepository = __commonJS({
 var require_projectGroups = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/projectGroups/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -36074,10 +36078,10 @@ var require_projectGroups = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -36453,7 +36457,7 @@ var require_lodash = __commonJS({
       var freeModule = freeExports && typeof module2 == "object" && module2 && !module2.nodeType && module2;
       var moduleExports = freeModule && freeModule.exports === freeExports;
       var freeProcess = moduleExports && freeGlobal.process;
-      var nodeUtil = function() {
+      var nodeUtil = (function() {
         try {
           var types = freeModule && freeModule.require && freeModule.require("util").types;
           if (types) {
@@ -36462,7 +36466,7 @@ var require_lodash = __commonJS({
           return freeProcess && freeProcess.binding && freeProcess.binding("util");
         } catch (e) {
         }
-      }();
+      })();
       var nodeIsArrayBuffer = nodeUtil && nodeUtil.isArrayBuffer, nodeIsDate = nodeUtil && nodeUtil.isDate, nodeIsMap = nodeUtil && nodeUtil.isMap, nodeIsRegExp = nodeUtil && nodeUtil.isRegExp, nodeIsSet = nodeUtil && nodeUtil.isSet, nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
       function apply(func, thisArg, args) {
         switch (args.length) {
@@ -36808,7 +36812,7 @@ var require_lodash = __commonJS({
       function unicodeWords(string) {
         return string.match(reUnicodeWord) || [];
       }
-      var runInContext = function runInContext2(context) {
+      var runInContext = (function runInContext2(context) {
         context = context == null ? root : _.defaults(root.Object(), context, _.pick(root, contextProps));
         var Array2 = context.Array, Date2 = context.Date, Error2 = context.Error, Function2 = context.Function, Math2 = context.Math, Object2 = context.Object, RegExp2 = context.RegExp, String2 = context.String, TypeError2 = context.TypeError;
         var arrayProto = Array2.prototype, funcProto = Function2.prototype, objectProto = Object2.prototype;
@@ -36816,10 +36820,10 @@ var require_lodash = __commonJS({
         var funcToString = funcProto.toString;
         var hasOwnProperty = objectProto.hasOwnProperty;
         var idCounter = 0;
-        var maskSrcKey = function() {
+        var maskSrcKey = (function() {
           var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || "");
           return uid ? "Symbol(src)_1." + uid : "";
-        }();
+        })();
         var nativeObjectToString = objectProto.toString;
         var objectCtorString = funcToString.call(Object2);
         var oldDash = root._;
@@ -36827,14 +36831,14 @@ var require_lodash = __commonJS({
           "^" + funcToString.call(hasOwnProperty).replace(reRegExpChar, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"
         );
         var Buffer2 = moduleExports ? context.Buffer : undefined2, Symbol2 = context.Symbol, Uint8Array2 = context.Uint8Array, allocUnsafe = Buffer2 ? Buffer2.allocUnsafe : undefined2, getPrototype = overArg(Object2.getPrototypeOf, Object2), objectCreate = Object2.create, propertyIsEnumerable = objectProto.propertyIsEnumerable, splice = arrayProto.splice, spreadableSymbol = Symbol2 ? Symbol2.isConcatSpreadable : undefined2, symIterator = Symbol2 ? Symbol2.iterator : undefined2, symToStringTag = Symbol2 ? Symbol2.toStringTag : undefined2;
-        var defineProperty = function() {
+        var defineProperty = (function() {
           try {
             var func = getNative(Object2, "defineProperty");
             func({}, "", {});
             return func;
           } catch (e) {
           }
-        }();
+        })();
         var ctxClearTimeout = context.clearTimeout !== root.clearTimeout && context.clearTimeout, ctxNow = Date2 && Date2.now !== root.Date.now && Date2.now, ctxSetTimeout = context.setTimeout !== root.setTimeout && context.setTimeout;
         var nativeCeil = Math2.ceil, nativeFloor = Math2.floor, nativeGetSymbols = Object2.getOwnPropertySymbols, nativeIsBuffer = Buffer2 ? Buffer2.isBuffer : undefined2, nativeIsFinite = context.isFinite, nativeJoin = arrayProto.join, nativeKeys = overArg(Object2.keys, Object2), nativeMax = Math2.max, nativeMin = Math2.min, nativeNow = Date2.now, nativeParseInt = context.parseInt, nativeRandom = Math2.random, nativeReverse = arrayProto.reverse;
         var DataView2 = getNative(context, "DataView"), Map2 = getNative(context, "Map"), Promise2 = getNative(context, "Promise"), Set2 = getNative(context, "Set"), WeakMap2 = getNative(context, "WeakMap"), nativeCreate = getNative(Object2, "create");
@@ -36853,7 +36857,7 @@ var require_lodash = __commonJS({
           }
           return new LodashWrapper(value);
         }
-        var baseCreate = /* @__PURE__ */ function() {
+        var baseCreate = /* @__PURE__ */ (function() {
           function object() {
           }
           return function(proto) {
@@ -36868,7 +36872,7 @@ var require_lodash = __commonJS({
             object.prototype = undefined2;
             return result2;
           };
-        }();
+        })();
         function baseLodash() {
         }
         function LodashWrapper(value, chainAll) {
@@ -40173,9 +40177,9 @@ var require_lodash = __commonJS({
         var gte = createRelationalOperation(function(value, other) {
           return value >= other;
         });
-        var isArguments = baseIsArguments(/* @__PURE__ */ function() {
+        var isArguments = baseIsArguments(/* @__PURE__ */ (function() {
           return arguments;
-        }()) ? baseIsArguments : function(value) {
+        })()) ? baseIsArguments : function(value) {
           return isObjectLike(value) && hasOwnProperty.call(value, "callee") && !propertyIsEnumerable.call(value, "callee");
         };
         var isArray = Array2.isArray;
@@ -41432,7 +41436,7 @@ var require_lodash = __commonJS({
         lodash.each = forEach;
         lodash.eachRight = forEachRight;
         lodash.first = head;
-        mixin(lodash, function() {
+        mixin(lodash, (function() {
           var source = {};
           baseForOwn(lodash, function(func, methodName) {
             if (!hasOwnProperty.call(lodash.prototype, methodName)) {
@@ -41440,7 +41444,7 @@ var require_lodash = __commonJS({
             }
           });
           return source;
-        }(), { "chain": false });
+        })(), { "chain": false });
         lodash.VERSION = VERSION;
         arrayEach(["bind", "bindKey", "curry", "curryRight", "partial", "partialRight"], function(methodName) {
           lodash[methodName].placeholder = lodash;
@@ -41600,7 +41604,7 @@ var require_lodash = __commonJS({
           lodash.prototype[symIterator] = wrapperToIterator;
         }
         return lodash;
-      };
+      });
       var _ = runInContext();
       if (typeof define == "function" && typeof define.amd == "object" && define.amd) {
         root._ = _;
@@ -41710,7 +41714,7 @@ var require_feed = __commonJS({
 var require_feedRepository = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/feeds/feedRepository.js"(exports2) {
     "use strict";
-    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ function() {
+    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ (function() {
       var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
           d2.__proto__ = b2;
@@ -41728,20 +41732,20 @@ var require_feedRepository = __commonJS({
         }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
-    }();
+    })();
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.FeedRepository = void 0;
     var __1 = require_dist2();
     var spaceScopedBasicRepository_1 = require_spaceScopedBasicRepository();
     var FeedRepository = (
       /** @class */
-      function(_super) {
+      (function(_super) {
         __extends(FeedRepository2, _super);
         function FeedRepository2(client, spaceName) {
           return _super.call(this, client, spaceName, "".concat(__1.spaceScopedRoutePrefix, "/feeds"), "skip,take,ids,partialName,feedType") || this;
         }
         return FeedRepository2;
-      }(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
+      })(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
     );
     exports2.FeedRepository = FeedRepository;
   }
@@ -41799,7 +41803,7 @@ var require_retryFeed = __commonJS({
 var require_feeds = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/feeds/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -41808,10 +41812,10 @@ var require_feeds = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -41875,7 +41879,7 @@ var require_deploymentAction = __commonJS({
       };
       return __assign.apply(this, arguments);
     };
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -41884,13 +41888,13 @@ var require_deploymentAction = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
-    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+    }));
+    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? (function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
-    } : function(o, v) {
+    }) : function(o, v) {
       o["default"] = v;
     });
     var __importStar = exports2 && exports2.__importStar || function(mod) {
@@ -42038,7 +42042,7 @@ var require_deploymentActionContainer = __commonJS({
 var require_deploymentActionPackage = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/projects/deploymentProcesses/deploymentActionPackage.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -42047,13 +42051,13 @@ var require_deploymentActionPackage = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
-    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+    }));
+    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? (function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
-    } : function(o, v) {
+    }) : function(o, v) {
       o["default"] = v;
     });
     var __importStar = exports2 && exports2.__importStar || function(mod) {
@@ -44882,7 +44886,7 @@ var require_resolver = __commonJS({
     var URITemplate = require_URITemplate();
     var Resolver = (
       /** @class */
-      function() {
+      (function() {
         function Resolver2(baseUri) {
           this.baseUri = baseUri;
           this.baseUri = this.baseUri.endsWith("/") ? this.baseUri : this.baseUri + "/";
@@ -44914,7 +44918,7 @@ var require_resolver = __commonJS({
           return result;
         };
         return Resolver2;
-      }()
+      })()
     );
     exports2.Resolver = Resolver;
   }
@@ -45259,7 +45263,7 @@ var require_deploymentProcessRepository = __commonJS({
     var __1 = require_dist2();
     var DeploymentProcessRepository = (
       /** @class */
-      function() {
+      (function() {
         function DeploymentProcessRepository2(client, spaceName) {
           this.client = client;
           this.spaceName = spaceName;
@@ -45335,7 +45339,7 @@ var require_deploymentProcessRepository = __commonJS({
           });
         };
         return DeploymentProcessRepository2;
-      }()
+      })()
     );
     exports2.DeploymentProcessRepository = DeploymentProcessRepository;
   }
@@ -45401,7 +45405,7 @@ var require_runConditionForAction = __commonJS({
 var require_deploymentProcesses = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/projects/deploymentProcesses/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -45410,10 +45414,10 @@ var require_deploymentProcesses = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -46710,7 +46714,7 @@ var require_range2 = __commonJS({
 var require_comparator = __commonJS({
   "node_modules/semver/classes/comparator.js"(exports2, module2) {
     "use strict";
-    var ANY = Symbol("SemVer ANY");
+    var ANY = /* @__PURE__ */ Symbol("SemVer ANY");
     var Comparator = class _Comparator {
       static get ANY() {
         return ANY;
@@ -47506,7 +47510,7 @@ var require_deploymentRepository = __commonJS({
     var semver_1 = require_semver2();
     var DeploymentRepository = (
       /** @class */
-      function() {
+      (function() {
         function DeploymentRepository2(client, spaceName) {
           this.baseApiPathTemplate = "".concat(__1.spaceScopedRoutePrefix, "/deployments");
           this.client = client;
@@ -47593,7 +47597,7 @@ var require_deploymentRepository = __commonJS({
           });
         };
         return DeploymentRepository2;
-      }()
+      })()
     );
     exports2.DeploymentRepository = DeploymentRepository;
   }
@@ -47611,7 +47615,7 @@ var require_deploymentServerTask = __commonJS({
 var require_deployments = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/projects/releases/deployments/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -47620,10 +47624,10 @@ var require_deployments = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -47785,7 +47789,7 @@ var require_releaseRepository = __commonJS({
     var semver_1 = require_semver2();
     var ReleaseRepository = (
       /** @class */
-      function() {
+      (function() {
         function ReleaseRepository2(client, spaceName) {
           this.client = client;
           this.spaceName = spaceName;
@@ -47836,7 +47840,7 @@ var require_releaseRepository = __commonJS({
           });
         };
         return ReleaseRepository2;
-      }()
+      })()
     );
     exports2.ReleaseRepository = ReleaseRepository;
   }
@@ -47846,7 +47850,7 @@ var require_releaseRepository = __commonJS({
 var require_releases = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/projects/releases/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -47855,10 +47859,10 @@ var require_releases = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -48005,7 +48009,7 @@ var require_runbookRunRepository = __commonJS({
     var semver_1 = require_semver2();
     var RunbookRunRepository = (
       /** @class */
-      function() {
+      (function() {
         function RunbookRunRepository2(client, spaceName) {
           this.baseApiPathTemplate = "".concat(spaceScopedRoutePrefix_1.spaceScopedRoutePrefix, "/runbookRuns");
           this.client = client;
@@ -48092,7 +48096,7 @@ var require_runbookRunRepository = __commonJS({
           });
         };
         return RunbookRunRepository2;
-      }()
+      })()
     );
     exports2.RunbookRunRepository = RunbookRunRepository;
   }
@@ -48110,7 +48114,7 @@ var require_runbookRunServerTask = __commonJS({
 var require_runs = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/projects/runbooks/runs/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -48119,10 +48123,10 @@ var require_runs = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -48262,7 +48266,7 @@ var require_runbookProcessRepository = __commonJS({
     var spaceScopedRoutePrefix_1 = require_spaceScopedRoutePrefix();
     var RunbookProcessRepository = (
       /** @class */
-      function() {
+      (function() {
         function RunbookProcessRepository2(client, spaceName, project) {
           this.client = client;
           this.spaceName = spaceName;
@@ -48343,7 +48347,7 @@ var require_runbookProcessRepository = __commonJS({
           });
         };
         return RunbookProcessRepository2;
-      }()
+      })()
     );
     exports2.RunbookProcessRepository = RunbookProcessRepository;
   }
@@ -48353,7 +48357,7 @@ var require_runbookProcessRepository = __commonJS({
 var require_runbookRepository = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/projects/runbooks/runbookRepository.js"(exports2) {
     "use strict";
-    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ function() {
+    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ (function() {
       var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
           d2.__proto__ = b2;
@@ -48371,7 +48375,7 @@ var require_runbookRepository = __commonJS({
         }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
-    }();
+    })();
     var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
         return value instanceof P ? value : new P(function(resolve) {
@@ -48474,7 +48478,7 @@ var require_runbookRepository = __commonJS({
     var spaceScopedBasicRepository_1 = require_spaceScopedBasicRepository();
     var RunbookRepository = (
       /** @class */
-      function(_super) {
+      (function(_super) {
         __extends(RunbookRepository2, _super);
         function RunbookRepository2(client, spaceName, project) {
           var _this = _super.call(this, client, spaceName, "".concat(spaceScopedRoutePrefix_1.spaceScopedRoutePrefix, "/projects/").concat(project.Id, "/runbooks"), "skip,take,ids,partialName") || this;
@@ -48557,7 +48561,7 @@ var require_runbookRepository = __commonJS({
           });
         };
         return RunbookRepository2;
-      }(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
+      })(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
     );
     exports2.RunbookRepository = RunbookRepository;
   }
@@ -48690,7 +48694,7 @@ var require_runbookSnapshotRepository = __commonJS({
     var spaceScopedRoutePrefix_1 = require_spaceScopedRoutePrefix();
     var RunbookSnapshotRepository = (
       /** @class */
-      function() {
+      (function() {
         function RunbookSnapshotRepository2(client, spaceName, project) {
           this.client = client;
           this.spaceName = spaceName;
@@ -48721,7 +48725,7 @@ var require_runbookSnapshotRepository = __commonJS({
           });
         };
         return RunbookSnapshotRepository2;
-      }()
+      })()
     );
     exports2.RunbookSnapshotRepository = RunbookSnapshotRepository;
   }
@@ -48731,7 +48735,7 @@ var require_runbookSnapshotRepository = __commonJS({
 var require_runbooks = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/projects/runbooks/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -48740,10 +48744,10 @@ var require_runbooks = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -48830,7 +48834,7 @@ var require_project = __commonJS({
 var require_projectRepository = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/projects/projectRepository.js"(exports2) {
     "use strict";
-    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ function() {
+    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ (function() {
       var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
           d2.__proto__ = b2;
@@ -48848,20 +48852,20 @@ var require_projectRepository = __commonJS({
         }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
-    }();
+    })();
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ProjectRepository = void 0;
     var spaceScopedBasicRepository_1 = require_spaceScopedBasicRepository();
     var __1 = require_dist2();
     var ProjectRepository = (
       /** @class */
-      function(_super) {
+      (function(_super) {
         __extends(ProjectRepository2, _super);
         function ProjectRepository2(client, spaceName) {
           return _super.call(this, client, spaceName, "".concat(__1.spaceScopedRoutePrefix, "/projects"), "skip,take,ids,partialName,clonedFromProjectId") || this;
         }
         return ProjectRepository2;
-      }(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
+      })(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
     );
     exports2.ProjectRepository = ProjectRepository;
   }
@@ -48886,7 +48890,7 @@ var require_tenantedDeploymentMode = __commonJS({
 var require_projects = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/projects/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -48895,10 +48899,10 @@ var require_projects = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -49063,7 +49067,7 @@ var require_serverTaskRepository = __commonJS({
     var apiLocation_1 = require_apiLocation();
     var ServerTaskRepository = (
       /** @class */
-      function() {
+      (function() {
         function ServerTaskRepository2(client) {
           this.baseApiPathTemplate = "".concat(apiLocation_1.apiLocation, "/tasks");
           this.client = client;
@@ -49088,7 +49092,7 @@ var require_serverTaskRepository = __commonJS({
           });
         };
         return ServerTaskRepository2;
-      }()
+      })()
     );
     exports2.ServerTaskRepository = ServerTaskRepository;
   }
@@ -49211,7 +49215,7 @@ var require_serverTaskWaiter = __commonJS({
     var serverTasks_2 = require_serverTasks();
     var ServerTaskWaiter = (
       /** @class */
-      function() {
+      (function() {
         function ServerTaskWaiter2(client, spaceName, options) {
           var _a, _b;
           this.client = client;
@@ -49512,7 +49516,7 @@ var require_serverTaskWaiter = __commonJS({
           }
         };
         return ServerTaskWaiter2;
-      }()
+      })()
     );
     exports2.ServerTaskWaiter = ServerTaskWaiter;
   }
@@ -49652,7 +49656,7 @@ var require_spaceServerTaskRepository = __commonJS({
     var spaceScopedRoutePrefix_1 = require_spaceScopedRoutePrefix();
     var SpaceServerTaskRepository = (
       /** @class */
-      function() {
+      (function() {
         function SpaceServerTaskRepository2(client, spaceName) {
           this.baseApiPathTemplate = "".concat(spaceScopedRoutePrefix_1.spaceScopedRoutePrefix, "/tasks");
           this.client = client;
@@ -49751,7 +49755,7 @@ var require_spaceServerTaskRepository = __commonJS({
           });
         };
         return SpaceServerTaskRepository2;
-      }()
+      })()
     );
     exports2.SpaceServerTaskRepository = SpaceServerTaskRepository;
   }
@@ -49780,7 +49784,7 @@ var require_taskState = __commonJS({
 var require_serverTasks = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/serverTasks/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -49789,10 +49793,10 @@ var require_serverTasks = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -49818,7 +49822,7 @@ var require_space = __commonJS({
 var require_spaceRepository = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/spaces/spaceRepository.js"(exports2) {
     "use strict";
-    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ function() {
+    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ (function() {
       var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
           d2.__proto__ = b2;
@@ -49836,20 +49840,20 @@ var require_spaceRepository = __commonJS({
         }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
-    }();
+    })();
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.SpaceRepository = void 0;
     var __1 = require_dist2();
     var basicRepository_1 = require_basicRepository();
     var SpaceRepository = (
       /** @class */
-      function(_super) {
+      (function(_super) {
         __extends(SpaceRepository2, _super);
         function SpaceRepository2(client) {
           return _super.call(this, client, "".concat(__1.apiLocation, "/spaces"), "skip,ids,take,partialName") || this;
         }
         return SpaceRepository2;
-      }(basicRepository_1.BasicRepository)
+      })(basicRepository_1.BasicRepository)
     );
     exports2.SpaceRepository = SpaceRepository;
   }
@@ -49859,7 +49863,7 @@ var require_spaceRepository = __commonJS({
 var require_spaces = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/spaces/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -49868,10 +49872,10 @@ var require_spaces = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -49901,7 +49905,7 @@ var require_tagSet = __commonJS({
 var require_tagSetRepository = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/tagSets/tagSetRepository.js"(exports2) {
     "use strict";
-    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ function() {
+    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ (function() {
       var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
           d2.__proto__ = b2;
@@ -49919,14 +49923,14 @@ var require_tagSetRepository = __commonJS({
         }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
-    }();
+    })();
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.TagSetRepository = void 0;
     var spaceScopedRoutePrefix_1 = require_spaceScopedRoutePrefix();
     var spaceScopedBasicRepository_1 = require_spaceScopedBasicRepository();
     var TagSetRepository = (
       /** @class */
-      function(_super) {
+      (function(_super) {
         __extends(TagSetRepository2, _super);
         function TagSetRepository2(client, spaceName) {
           return _super.call(this, client, spaceName, "".concat(spaceScopedRoutePrefix_1.spaceScopedRoutePrefix, "/tagsets"), "skip,take,ids,partialName") || this;
@@ -49935,7 +49939,7 @@ var require_tagSetRepository = __commonJS({
           return this.client.doUpdate("".concat(spaceScopedRoutePrefix_1.spaceScopedRoutePrefix, "/tagsets/sortorder"), ids, { spaceName: this.spaceName });
         };
         return TagSetRepository2;
-      }(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
+      })(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
     );
     exports2.TagSetRepository = TagSetRepository;
   }
@@ -49945,7 +49949,7 @@ var require_tagSetRepository = __commonJS({
 var require_tagSets = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/tagSets/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -49954,10 +49958,10 @@ var require_tagSets = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -49988,7 +49992,7 @@ var require_tenantMissingVariables = __commonJS({
 var require_tenantRepository = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/tenants/tenantRepository.js"(exports2) {
     "use strict";
-    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ function() {
+    var __extends = exports2 && exports2.__extends || /* @__PURE__ */ (function() {
       var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
           d2.__proto__ = b2;
@@ -50006,14 +50010,14 @@ var require_tenantRepository = __commonJS({
         }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
       };
-    }();
+    })();
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.TenantRepository = void 0;
     var __1 = require_dist2();
     var spaceScopedBasicRepository_1 = require_spaceScopedBasicRepository();
     var TenantRepository = (
       /** @class */
-      function(_super) {
+      (function(_super) {
         __extends(TenantRepository2, _super);
         function TenantRepository2(client, spaceName) {
           return _super.call(this, client, spaceName, "".concat(__1.spaceScopedRoutePrefix, "/tenants"), "skip,projectId,tags,take,ids,clone,partialName,clonedFromTenantId") || this;
@@ -50118,7 +50122,7 @@ var require_tenantRepository = __commonJS({
           });
         };
         return TenantRepository2;
-      }(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
+      })(spaceScopedBasicRepository_1.SpaceScopedBasicRepository)
     );
     exports2.TenantRepository = TenantRepository;
   }
@@ -50136,7 +50140,7 @@ var require_tenantVariable = __commonJS({
 var require_tenants = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/tenants/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -50145,10 +50149,10 @@ var require_tenants = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -50317,7 +50321,7 @@ var require_user_get_current = __commonJS({
 var require_users = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/users/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -50326,10 +50330,10 @@ var require_users = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -50369,7 +50373,7 @@ var require_propertyValue = __commonJS({
 var require_variables = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/variables/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -50378,10 +50382,10 @@ var require_variables = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -50567,7 +50571,7 @@ var require_observabilityRepository = __commonJS({
     var __1 = require_dist2();
     var ObservabilityRepository = (
       /** @class */
-      function() {
+      (function() {
         function ObservabilityRepository2(client, spaceName) {
           this.client = client;
           this.spaceName = spaceName;
@@ -50740,7 +50744,7 @@ var require_observabilityRepository = __commonJS({
           });
         };
         return ObservabilityRepository2;
-      }()
+      })()
     );
     exports2.ObservabilityRepository = ObservabilityRepository;
   }
@@ -50851,7 +50855,7 @@ var require_kubernetesMonitorRepository = __commonJS({
     var __1 = require_dist2();
     var KubernetesMonitorRepository = (
       /** @class */
-      function() {
+      (function() {
         function KubernetesMonitorRepository2(client, spaceName) {
           this.client = client;
           this.spaceName = spaceName;
@@ -50914,7 +50918,7 @@ var require_kubernetesMonitorRepository = __commonJS({
           });
         };
         return KubernetesMonitorRepository2;
-      }()
+      })()
     );
     exports2.KubernetesMonitorRepository = KubernetesMonitorRepository;
   }
@@ -50924,7 +50928,7 @@ var require_kubernetesMonitorRepository = __commonJS({
 var require_observability = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/observability/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -50933,10 +50937,10 @@ var require_observability = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -50956,7 +50960,7 @@ var require_observability = __commonJS({
 var require_features = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -50965,10 +50969,10 @@ var require_features = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
@@ -51006,13 +51010,13 @@ var require_adapter = __commonJS({
     exports2.AdapterError = void 0;
     var AdapterError = (
       /** @class */
-      /* @__PURE__ */ function() {
+      /* @__PURE__ */ (function() {
         function AdapterError2(code, message) {
           this.code = code;
           this.message = message;
         }
         return AdapterError2;
-      }()
+      })()
     );
     exports2.AdapterError = AdapterError;
   }
@@ -53309,7 +53313,7 @@ var require_axios = __commonJS({
       });
       return byteStringHeaders;
     }
-    var $internals = Symbol("internals");
+    var $internals = /* @__PURE__ */ Symbol("internals");
     function normalizeHeader(header) {
       return header && String(header).trim().toLowerCase();
     }
@@ -54292,7 +54296,7 @@ var require_axios = __commonJS({
       }
       throw new AxiosError("Unsupported protocol " + protocol, AxiosError.ERR_NOT_SUPPORT);
     }
-    var kInternals = Symbol("internals");
+    var kInternals = /* @__PURE__ */ Symbol("internals");
     var AxiosTransformStream = class extends stream.Transform {
       constructor(options) {
         options = utils$1.toFlatObject(options, {
@@ -54490,13 +54494,13 @@ var require_axios = __commonJS({
         computedHeaders["Content-Length"] = contentLength;
       }
       headersHandler && headersHandler(computedHeaders);
-      return stream.Readable.from(async function* () {
+      return stream.Readable.from((async function* () {
         for (const part of parts) {
           yield boundaryBytes;
           yield* part.encode();
         }
         yield footerBytes;
-      }());
+      })());
     };
     var ZlibHeaderTransformStream = class extends stream.Transform {
       __transform(chunk, encoding, callback) {
@@ -54928,9 +54932,9 @@ var require_axios = __commonJS({
         }
       });
     }
-    var kAxiosSocketListener = Symbol("axios.http.socketListener");
-    var kAxiosCurrentReq = Symbol("axios.http.currentReq");
-    var kAxiosInstalledTunnel = Symbol("axios.http.installedTunnel");
+    var kAxiosSocketListener = /* @__PURE__ */ Symbol("axios.http.socketListener");
+    var kAxiosCurrentReq = /* @__PURE__ */ Symbol("axios.http.currentReq");
+    var kAxiosInstalledTunnel = /* @__PURE__ */ Symbol("axios.http.installedTunnel");
     var tunnelingAgentCache = /* @__PURE__ */ new Map();
     var tunnelingAgentCacheUser = /* @__PURE__ */ new WeakMap();
     function getTunnelingAgent(agentOptions, userHttpsAgent) {
@@ -57141,7 +57145,7 @@ var require_axiosAdapter = __commonJS({
     var createRequestHeaders_1 = require_createRequestHeaders();
     var AxiosAdapter = (
       /** @class */
-      function() {
+      (function() {
         function AxiosAdapter2() {
         }
         AxiosAdapter2.prototype.execute = function(options) {
@@ -57210,7 +57214,7 @@ var require_axiosAdapter = __commonJS({
           });
         };
         return AxiosAdapter2;
-      }()
+      })()
     );
     exports2.AxiosAdapter = AxiosAdapter;
   }
@@ -57322,7 +57326,7 @@ var require_apiClient = __commonJS({
     var axiosAdapter_1 = require_axiosAdapter();
     var ApiClient = (
       /** @class */
-      function() {
+      (function() {
         function ApiClient2(options) {
           var _this = this;
           this.handleSuccess = function(response) {
@@ -57396,7 +57400,7 @@ var require_apiClient = __commonJS({
           });
         };
         return ApiClient2;
-      }()
+      })()
     );
     exports2.default = ApiClient;
     var generateOctopusError = function(requestError) {
@@ -57417,7 +57421,7 @@ var require_caching = __commonJS({
     var MAX_MEMORY = Math.pow(1024, 2) * 1e3 / 2;
     var Caching = (
       /** @class */
-      function() {
+      (function() {
         function Caching2(options) {
           this.cache = {};
           options = options || {
@@ -57500,7 +57504,7 @@ var require_caching = __commonJS({
           }, 0);
         };
         return Caching2;
-      }()
+      })()
     );
     exports2.default = Caching;
   }
@@ -57514,7 +57518,7 @@ var require_subscriptionRecord = __commonJS({
     exports2.SubscriptionRecord = void 0;
     var SubscriptionRecord = (
       /** @class */
-      function() {
+      (function() {
         function SubscriptionRecord2() {
           this.subscriptions = {};
         }
@@ -57545,7 +57549,7 @@ var require_subscriptionRecord = __commonJS({
           }
         };
         return SubscriptionRecord2;
-      }()
+      })()
     );
     exports2.SubscriptionRecord = SubscriptionRecord;
   }
@@ -57716,7 +57720,7 @@ var require_client2 = __commonJS({
     var apiLocation_1 = require_apiLocation();
     var Client3 = (
       /** @class */
-      function() {
+      (function() {
         function Client4(resolver, configuration) {
           var _this = this;
           this.resolver = resolver;
@@ -58017,7 +58021,7 @@ var require_client2 = __commonJS({
           return this.resolve(path, args);
         };
         return Client4;
-      }()
+      })()
     );
     exports2.Client = Client3;
   }
@@ -58070,14 +58074,14 @@ var require_environment = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     var Environment = (
       /** @class */
-      function() {
+      (function() {
         function Environment2() {
         }
         Environment2.isInDevelopmentMode = function() {
           return !process.env.NODE_ENV || process.env.NODE_ENV !== "production";
         };
         return Environment2;
-      }()
+      })()
     );
     exports2.default = Environment;
   }
@@ -58169,7 +58173,7 @@ var require_spaceScopedResource = __commonJS({
 var require_dist2 = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
       if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
@@ -58178,10 +58182,10 @@ var require_dist2 = __commonJS({
         } };
       }
       Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
+    }) : (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       o[k2] = m[k];
-    });
+    }));
     var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
       for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
     };
