@@ -41768,9 +41768,11 @@ var require_feedType = __commonJS({
       FeedType2["AwsElasticContainerRegistry"] = "AwsElasticContainerRegistry";
       FeedType2["BuiltIn"] = "BuiltIn";
       FeedType2["Docker"] = "Docker";
+      FeedType2["GcsStorage"] = "GcsStorage";
       FeedType2["GitHub"] = "GitHub";
       FeedType2["Helm"] = "Helm";
       FeedType2["Maven"] = "Maven";
+      FeedType2["Npm"] = "Npm";
       FeedType2["Nuget"] = "NuGet";
       FeedType2["OctopusProject"] = "OctopusProject";
     })(FeedType = exports2.FeedType || (exports2.FeedType = {}));
@@ -41863,6 +41865,14 @@ var require_feedRepository = __commonJS({
   }
 });
 
+// node_modules/@octopusdeploy/api-client/dist/features/feeds/gcsStorageFeed.js
+var require_gcsStorageFeed = __commonJS({
+  "node_modules/@octopusdeploy/api-client/dist/features/feeds/gcsStorageFeed.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+  }
+});
+
 // node_modules/@octopusdeploy/api-client/dist/features/feeds/gitHubFeed.js
 var require_gitHubFeed = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/feeds/gitHubFeed.js"(exports2) {
@@ -41938,6 +41948,7 @@ var require_feeds = __commonJS({
     __exportStar(require_feed(), exports2);
     __exportStar(require_feedRepository(), exports2);
     __exportStar(require_feedType(), exports2);
+    __exportStar(require_gcsStorageFeed(), exports2);
     __exportStar(require_gitHubFeed(), exports2);
     __exportStar(require_helmFeed(), exports2);
     __exportStar(require_mavenFeed(), exports2);
@@ -47505,6 +47516,147 @@ var require_semver2 = __commonJS({
   }
 });
 
+// node_modules/@octopusdeploy/api-client/dist/versionCheck.js
+var require_versionCheck = __commonJS({
+  "node_modules/@octopusdeploy/api-client/dist/versionCheck.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    var __generator = exports2 && exports2.__generator || function(thisArg, body) {
+      var _ = { label: 0, sent: function() {
+        if (t[0] & 1) throw t[1];
+        return t[1];
+      }, trys: [], ops: [] }, f, y, t, g;
+      return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+        return this;
+      }), g;
+      function verb(n) {
+        return function(v) {
+          return step([n, v]);
+        };
+      }
+      function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+          if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+          if (y = 0, t) op = [op[0] & 2, t.value];
+          switch (op[0]) {
+            case 0:
+            case 1:
+              t = op;
+              break;
+            case 4:
+              _.label++;
+              return { value: op[1], done: false };
+            case 5:
+              _.label++;
+              y = op[1];
+              op = [0];
+              continue;
+            case 7:
+              op = _.ops.pop();
+              _.trys.pop();
+              continue;
+            default:
+              if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                _ = 0;
+                continue;
+              }
+              if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                _.label = op[1];
+                break;
+              }
+              if (op[0] === 6 && _.label < t[1]) {
+                _.label = t[1];
+                t = op;
+                break;
+              }
+              if (t && _.label < t[2]) {
+                _.label = t[2];
+                _.ops.push(op);
+                break;
+              }
+              if (t[2]) _.ops.pop();
+              _.trys.pop();
+              continue;
+          }
+          op = body.call(thisArg, _);
+        } catch (e) {
+          op = [6, e];
+          y = 0;
+        } finally {
+          f = t = 0;
+        }
+        if (op[0] & 5) throw op[1];
+        return { value: op[0] ? op[1] : void 0, done: true };
+      }
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.ensureServerVersionAtLeast = exports2.isServerVersionAtLeast = exports2.isLocalOctopusVersion = void 0;
+    var semver_1 = require_semver2();
+    function isLocalOctopusVersion(version) {
+      return /^0\.0\.0(?:[-+].*)?$/.test(version);
+    }
+    exports2.isLocalOctopusVersion = isLocalOctopusVersion;
+    function isServerVersionAtLeast(serverVersion, minimumVersion) {
+      if (isLocalOctopusVersion(serverVersion))
+        return true;
+      if (!(0, semver_1.valid)(serverVersion))
+        return false;
+      return !(0, semver_1.lt)(serverVersion, minimumVersion);
+    }
+    exports2.isServerVersionAtLeast = isServerVersionAtLeast;
+    function ensureServerVersionAtLeast(client, minimumVersion, featureDescription) {
+      var _a;
+      return __awaiter2(this, void 0, void 0, function() {
+        var serverInformation, message;
+        return __generator(this, function(_b) {
+          switch (_b.label) {
+            case 0:
+              return [4, client.getServerInformation()];
+            case 1:
+              serverInformation = _b.sent();
+              if (isServerVersionAtLeast(serverInformation.version, minimumVersion))
+                return [
+                  2
+                  /*return*/
+                ];
+              message = "The Octopus instance doesn't support ".concat(featureDescription, ", it will need to be upgraded to at least ").concat(minimumVersion, " in order to access this API.");
+              (_a = client.error) === null || _a === void 0 ? void 0 : _a.call(client, message);
+              throw new Error(message);
+          }
+        });
+      });
+    }
+    exports2.ensureServerVersionAtLeast = ensureServerVersionAtLeast;
+  }
+});
+
 // node_modules/@octopusdeploy/api-client/dist/features/projects/releases/deployments/deploymentRepository.js
 var require_deploymentRepository = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/projects/releases/deployments/deploymentRepository.js"(exports2) {
@@ -47619,7 +47771,7 @@ var require_deploymentRepository = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DeploymentRepository = void 0;
     var __1 = require_dist2();
-    var semver_1 = require_semver2();
+    var versionCheck_1 = require_versionCheck();
     var DeploymentRepository = (
       /** @class */
       function() {
@@ -47635,23 +47787,18 @@ var require_deploymentRepository = __commonJS({
           return this.client.request("".concat(this.baseApiPathTemplate, "{?skip,take,ids,projects,environments,tenants,channels,taskState}"), __assign({ spaceName: this.spaceName }, args));
         };
         DeploymentRepository2.prototype.create = function(command) {
-          var _a, _b;
           return __awaiter2(this, void 0, void 0, function() {
-            var serverInformation, response, mappedTasks;
-            return __generator(this, function(_c) {
-              switch (_c.label) {
+            var response, mappedTasks;
+            return __generator(this, function(_a) {
+              switch (_a.label) {
                 case 0:
-                  return [4, this.client.getServerInformation()];
+                  return [4, (0, versionCheck_1.ensureServerVersionAtLeast)(this.client, "2022.3.5512", "deploying releases using the Executions API")];
                 case 1:
-                  serverInformation = _c.sent();
-                  if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
-                    (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support deploying releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                    throw new Error("The Octopus instance doesn't support deploying releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                  }
+                  _a.sent();
                   this.client.debug("Deploying a release...");
                   return [4, this.client.doCreate("".concat(this.baseApiPathTemplate, "/create/untenanted/v1"), __assign({ spaceIdOrName: command.spaceName }, command))];
                 case 2:
-                  response = _c.sent();
+                  response = _a.sent();
                   if (response.DeploymentServerTasks.length == 0) {
                     throw new Error("No server task details returned");
                   }
@@ -47672,23 +47819,18 @@ var require_deploymentRepository = __commonJS({
           });
         };
         DeploymentRepository2.prototype.createTenanted = function(command) {
-          var _a, _b;
           return __awaiter2(this, void 0, void 0, function() {
-            var serverInformation, response, mappedTasks;
-            return __generator(this, function(_c) {
-              switch (_c.label) {
+            var response, mappedTasks;
+            return __generator(this, function(_a) {
+              switch (_a.label) {
                 case 0:
-                  return [4, this.client.getServerInformation()];
+                  return [4, (0, versionCheck_1.ensureServerVersionAtLeast)(this.client, "2022.3.5512", "deploying tenanted releases using the Executions API")];
                 case 1:
-                  serverInformation = _c.sent();
-                  if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
-                    (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support deploying tenanted releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                    throw new Error("The Octopus instance doesn't support deploying tenanted releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                  }
+                  _a.sent();
                   this.client.debug("Deploying a tenanted release...");
                   return [4, this.client.doCreate("".concat(this.baseApiPathTemplate, "/create/tenanted/v1"), __assign({ spaceIdOrName: command.spaceName }, command))];
                 case 2:
-                  response = _c.sent();
+                  response = _a.sent();
                   if (response.DeploymentServerTasks.length == 0) {
                     throw new Error("No server task details returned");
                   }
@@ -47898,7 +48040,7 @@ var require_releaseRepository = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ReleaseRepository = void 0;
     var __1 = require_dist2();
-    var semver_1 = require_semver2();
+    var versionCheck_1 = require_versionCheck();
     var ReleaseRepository = (
       /** @class */
       function() {
@@ -47907,23 +48049,18 @@ var require_releaseRepository = __commonJS({
           this.spaceName = spaceName;
         }
         ReleaseRepository2.prototype.create = function(command) {
-          var _a, _b;
           return __awaiter2(this, void 0, void 0, function() {
-            var serverInformation, response;
-            return __generator(this, function(_c) {
-              switch (_c.label) {
+            var response;
+            return __generator(this, function(_a) {
+              switch (_a.label) {
                 case 0:
-                  return [4, this.client.getServerInformation()];
+                  return [4, (0, versionCheck_1.ensureServerVersionAtLeast)(this.client, "2022.3.5512", "creating releases using the Executions API")];
                 case 1:
-                  serverInformation = _c.sent();
-                  if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
-                    (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support creating releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                    throw new Error("The Octopus instance doesn't support creating releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                  }
+                  _a.sent();
                   this.client.debug("Creating a release...");
                   return [4, this.client.doCreate("".concat(__1.spaceScopedRoutePrefix, "/releases/create/v1"), __assign({ spaceIdOrName: command.spaceName }, command))];
                 case 2:
-                  response = _c.sent();
+                  response = _a.sent();
                   this.client.debug("Release created successfully.");
                   return [2, response];
               }
@@ -48118,7 +48255,7 @@ var require_runbookRunRepository = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.RunbookRunRepository = void 0;
     var spaceScopedRoutePrefix_1 = require_spaceScopedRoutePrefix();
-    var semver_1 = require_semver2();
+    var versionCheck_1 = require_versionCheck();
     var RunbookRunRepository = (
       /** @class */
       function() {
@@ -48134,23 +48271,18 @@ var require_runbookRunRepository = __commonJS({
           return this.client.request("".concat(this.baseApiPathTemplate, "{?skip,take,ids,projects,environments,tenants,runbooks,taskState,partialName}"), __assign({ spaceName: this.spaceName }, args));
         };
         RunbookRunRepository2.prototype.create = function(command) {
-          var _a, _b;
           return __awaiter2(this, void 0, void 0, function() {
-            var serverInformation, response, mappedTasks;
-            return __generator(this, function(_c) {
-              switch (_c.label) {
+            var response, mappedTasks;
+            return __generator(this, function(_a) {
+              switch (_a.label) {
                 case 0:
-                  return [4, this.client.getServerInformation()];
+                  return [4, (0, versionCheck_1.ensureServerVersionAtLeast)(this.client, "2022.3.5512", "running runbooks using the Executions API")];
                 case 1:
-                  serverInformation = _c.sent();
-                  if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
-                    (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support running runbooks using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                    throw new Error("The Octopus instance doesn't support running runbooks using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                  }
+                  _a.sent();
                   this.client.debug("Running a runbook...");
                   return [4, this.client.doCreate("".concat(spaceScopedRoutePrefix_1.spaceScopedRoutePrefix, "/runbook-runs/create/v1"), __assign({ spaceIdOrName: command.spaceName }, command))];
                 case 2:
-                  response = _c.sent();
+                  response = _a.sent();
                   if (response.RunbookRunServerTasks.length == 0) {
                     throw new Error("No server task details returned");
                   }
@@ -48171,23 +48303,18 @@ var require_runbookRunRepository = __commonJS({
           });
         };
         RunbookRunRepository2.prototype.createGit = function(command, gitRef) {
-          var _a, _b;
           return __awaiter2(this, void 0, void 0, function() {
-            var serverInformation, response, mappedTasks;
-            return __generator(this, function(_c) {
-              switch (_c.label) {
+            var response, mappedTasks;
+            return __generator(this, function(_a) {
+              switch (_a.label) {
                 case 0:
-                  return [4, this.client.getServerInformation()];
+                  return [4, (0, versionCheck_1.ensureServerVersionAtLeast)(this.client, "2022.3.5512", "running runbooks using the Executions API")];
                 case 1:
-                  serverInformation = _c.sent();
-                  if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
-                    (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support running runbooks using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                    throw new Error("The Octopus instance doesn't support running runbooks using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                  }
+                  _a.sent();
                   this.client.debug("Running a runbook...");
                   return [4, this.client.doCreate("".concat(spaceScopedRoutePrefix_1.spaceScopedRoutePrefix, "/runbook-runs/git/create/v1"), __assign({ spaceIdOrName: command.spaceName, gitRef }, command))];
                 case 2:
-                  response = _c.sent();
+                  response = _a.sent();
                   if (response.RunbookRunServerTasks.length == 0) {
                     throw new Error("No server task details returned");
                   }
@@ -58330,6 +58457,7 @@ var require_dist2 = __commonJS({
     __exportStar(require_spaceScopedRoutePrefix(), exports2);
     __exportStar(require_subscriptionRecord(), exports2);
     __exportStar(require_utils3(), exports2);
+    __exportStar(require_versionCheck(), exports2);
   }
 });
 
