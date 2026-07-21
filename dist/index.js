@@ -20043,24 +20043,6 @@ var require_lifecycles = __commonJS({
   }
 });
 
-// node_modules/adm-zip/util/fileSystem.js
-var require_fileSystem = __commonJS({
-  "node_modules/adm-zip/util/fileSystem.js"(exports2) {
-    exports2.require = function() {
-      if (typeof process === "object" && process.versions && process.versions["electron"]) {
-        try {
-          const originalFs = require("original-fs");
-          if (Object.keys(originalFs).length > 0) {
-            return originalFs;
-          }
-        } catch (e) {
-        }
-      }
-      return require("fs");
-    };
-  }
-});
-
 // node_modules/adm-zip/util/constants.js
 var require_constants6 = __commonJS({
   "node_modules/adm-zip/util/constants.js"(exports2, module2) {
@@ -20282,16 +20264,20 @@ var require_constants6 = __commonJS({
 
 // node_modules/adm-zip/util/errors.js
 var require_errors2 = __commonJS({
-  "node_modules/adm-zip/util/errors.js"(exports2, module2) {
-    module2.exports = {
+  "node_modules/adm-zip/util/errors.js"(exports2) {
+    var errors = {
       /* Header error messages */
       INVALID_LOC: "Invalid LOC header (bad signature)",
       INVALID_CEN: "Invalid CEN header (bad signature)",
       INVALID_END: "Invalid END header (bad signature)",
+      /* Descriptor */
+      DESCRIPTOR_NOT_EXIST: "No descriptor present",
+      DESCRIPTOR_UNKNOWN: "Unknown descriptor format",
+      DESCRIPTOR_FAULTY: "Descriptor data is malformed",
       /* ZipEntry error messages*/
       NO_DATA: "Nothing to decompress",
-      BAD_CRC: "CRC32 checksum failed",
-      FILE_IN_THE_WAY: "There is a file in the way: %s",
+      BAD_CRC: "CRC32 checksum failed {0}",
+      FILE_IN_THE_WAY: "There is a file in the way: {0}",
       UNKNOWN_METHOD: "Invalid/unsupported compression method",
       /* Inflater error messages */
       AVAIL_DATA: "inflate::Available inflate data did not terminate",
@@ -20307,26 +20293,44 @@ var require_errors2 = __commonJS({
       /* ADM-ZIP error messages */
       CANT_EXTRACT_FILE: "Could not extract the file",
       CANT_OVERRIDE: "Target file already exists",
+      DISK_ENTRY_TOO_LARGE: "Number of disk entries is too large",
       NO_ZIP: "No zip file was loaded",
       NO_ENTRY: "Entry doesn't exist",
       DIRECTORY_CONTENT_ERROR: "A directory cannot have content",
-      FILE_NOT_FOUND: "File not found: %s",
+      FILE_NOT_FOUND: 'File not found: "{0}"',
       NOT_IMPLEMENTED: "Not implemented",
       INVALID_FILENAME: "Invalid filename",
-      INVALID_FORMAT: "Invalid or unsupported zip format. No END header found"
+      INVALID_FORMAT: "Invalid or unsupported zip format. No END header found",
+      INVALID_PASS_PARAM: "Incompatible password parameter",
+      WRONG_PASSWORD: "Wrong Password",
+      /* ADM-ZIP */
+      COMMENT_TOO_LONG: "Comment is too long",
+      // Comment can be max 65535 bytes long (NOTE: some non-US characters may take more space)
+      EXTRA_FIELD_PARSE_ERROR: "Extra field parsing error"
     };
+    function E(message) {
+      return function(...args) {
+        if (args.length) {
+          message = message.replace(/\{(\d)\}/g, (_, n) => args[n] || "");
+        }
+        return new Error("ADM-ZIP: " + message);
+      };
+    }
+    for (const msg of Object.keys(errors)) {
+      exports2[msg] = E(errors[msg]);
+    }
   }
 });
 
 // node_modules/adm-zip/util/utils.js
 var require_utils2 = __commonJS({
   "node_modules/adm-zip/util/utils.js"(exports2, module2) {
-    var fsystem = require_fileSystem().require();
+    var fsystem = require("fs");
     var pth = require("path");
     var Constants = require_constants6();
     var Errors = require_errors2();
     var isWin = typeof process === "object" && "win32" === process.platform;
-    var is_Obj = (obj) => obj && typeof obj === "object";
+    var is_Obj = (obj) => typeof obj === "object" && obj !== null;
     var crcTable = new Uint32Array(256).map((t, c) => {
       for (let k = 0; k < 8; k++) {
         if ((c & 1) !== 0) {
@@ -20358,9 +20362,13 @@ var require_utils2 = __commonJS({
           try {
             stat2 = self2.fs.statSync(resolvedPath);
           } catch (e) {
-            self2.fs.mkdirSync(resolvedPath);
+            if (e.message && e.message.startsWith("ENOENT")) {
+              self2.fs.mkdirSync(resolvedPath);
+            } else {
+              throw e;
+            }
           }
-          if (stat2 && stat2.isFile()) throw Errors.FILE_IN_THE_WAY.replace("%s", resolvedPath);
+          if (stat2 && stat2.isFile()) throw Errors.FILE_IN_THE_WAY(`"${resolvedPath}"`);
         });
       }
       mkdirSync(folder);
@@ -20404,37 +20412,40 @@ var require_utils2 = __commonJS({
       self2.fs.exists(path, function(exist) {
         if (exist && !overwrite) return callback(false);
         self2.fs.stat(path, function(err, stat2) {
-          if (exist && stat2.isDirectory()) {
+          if (exist && stat2 && stat2.isDirectory()) {
             return callback(false);
           }
           var folder = pth.dirname(path);
           self2.fs.exists(folder, function(exists2) {
-            if (!exists2) self2.makeDir(folder);
+            if (!exists2) {
+              try {
+                self2.makeDir(folder);
+              } catch (e) {
+                return callback(false);
+              }
+            }
+            const writeToFd = function(fd) {
+              self2.fs.write(fd, content, 0, content.length, 0, function(writeErr) {
+                self2.fs.close(fd, function() {
+                  if (writeErr) return callback(false);
+                  self2.fs.chmod(path, attr || 438, function() {
+                    callback(true);
+                  });
+                });
+              });
+            };
             self2.fs.open(path, "w", 438, function(err2, fd) {
               if (err2) {
                 self2.fs.chmod(path, 438, function() {
-                  self2.fs.open(path, "w", 438, function(err3, fd2) {
-                    self2.fs.write(fd2, content, 0, content.length, 0, function() {
-                      self2.fs.close(fd2, function() {
-                        self2.fs.chmod(path, attr || 438, function() {
-                          callback(true);
-                        });
-                      });
-                    });
+                  self2.fs.open(path, "w", 438, function(retryErr, fd2) {
+                    if (retryErr || !fd2) return callback(false);
+                    writeToFd(fd2);
                   });
                 });
               } else if (fd) {
-                self2.fs.write(fd, content, 0, content.length, 0, function() {
-                  self2.fs.close(fd, function() {
-                    self2.fs.chmod(path, attr || 438, function() {
-                      callback(true);
-                    });
-                  });
-                });
+                writeToFd(fd);
               } else {
-                self2.fs.chmod(path, attr || 438, function() {
-                  callback(true);
-                });
+                callback(false);
               }
             });
           });
@@ -20443,22 +20454,77 @@ var require_utils2 = __commonJS({
     };
     Utils.prototype.findFiles = function(path) {
       const self2 = this;
-      function findSync(dir, pattern, recursive) {
+      function findSync(dir, pattern, recursive, visited) {
         if (typeof pattern === "boolean") {
           recursive = pattern;
           pattern = void 0;
         }
         let files = [];
         self2.fs.readdirSync(dir).forEach(function(file) {
-          var path2 = pth.join(dir, file);
-          if (self2.fs.statSync(path2).isDirectory() && recursive) files = files.concat(findSync(path2, pattern, recursive));
+          const path2 = pth.join(dir, file);
+          const stat2 = self2.fs.statSync(path2);
           if (!pattern || pattern.test(path2)) {
-            files.push(pth.normalize(path2) + (self2.fs.statSync(path2).isDirectory() ? self2.sep : ""));
+            files.push(pth.normalize(path2) + (stat2.isDirectory() ? self2.sep : ""));
+          }
+          if (stat2.isDirectory() && recursive) {
+            const realDir = self2.fs.realpathSync(path2);
+            if (!visited.has(realDir)) {
+              visited.add(realDir);
+              files = files.concat(findSync(path2, pattern, recursive, visited));
+            }
           }
         });
         return files;
       }
-      return findSync(path, void 0, true);
+      return findSync(path, void 0, true, /* @__PURE__ */ new Set([self2.fs.realpathSync(path)]));
+    };
+    Utils.prototype.findFilesAsync = function(dir, cb) {
+      const self2 = this;
+      const results = [];
+      let finished = false;
+      const finish = function(err) {
+        if (finished) return;
+        finished = true;
+        cb(err, err ? void 0 : results);
+      };
+      const walk = function(dir2, visited, done) {
+        self2.fs.readdir(dir2, function(err, list) {
+          if (err) return done(err);
+          let pending = list.length;
+          if (!pending) return done();
+          list.forEach(function(name) {
+            const file = pth.join(dir2, name);
+            self2.fs.stat(file, function(err2, stat2) {
+              if (err2) return done(err2);
+              if (!stat2) {
+                if (!--pending) done();
+                return;
+              }
+              results.push(pth.normalize(file) + (stat2.isDirectory() ? self2.sep : ""));
+              if (!stat2.isDirectory()) {
+                if (!--pending) done();
+                return;
+              }
+              self2.fs.realpath(file, function(err3, realDir) {
+                if (err3) return done(err3);
+                if (visited.has(realDir)) {
+                  if (!--pending) done();
+                  return;
+                }
+                visited.add(realDir);
+                walk(file, visited, function(err4) {
+                  if (err4) return done(err4);
+                  if (!--pending) done();
+                });
+              });
+            });
+          });
+        });
+      };
+      self2.fs.realpath(dir, function(err, realDir) {
+        if (err) return finish(err);
+        walk(dir, /* @__PURE__ */ new Set([realDir]), finish);
+      });
     };
     Utils.prototype.getAttributes = function() {
     };
@@ -20471,7 +20537,6 @@ var require_utils2 = __commonJS({
       if (typeof buf === "string") {
         buf = Buffer.from(buf, "utf8");
       }
-      if (!crcTable.length) genCRCTable();
       let len = buf.length;
       let crc = ~0;
       for (let off = 0; off < len; ) crc = Utils.crc32update(crc, buf[off++]);
@@ -20489,33 +20554,66 @@ var require_utils2 = __commonJS({
     };
     Utils.canonical = function(path) {
       if (!path) return "";
-      var safeSuffix = pth.posix.normalize("/" + path.split("\\").join("/"));
+      const safeSuffix = pth.posix.normalize("/" + path.split("\\").join("/"));
       return pth.join(".", safeSuffix);
+    };
+    Utils.zipnamefix = function(path) {
+      if (!path) return "";
+      const safeSuffix = pth.posix.normalize("/" + path.split("\\").join("/"));
+      return pth.posix.join(".", safeSuffix);
+    };
+    Utils.findLast = function(arr, callback) {
+      if (!Array.isArray(arr)) throw new TypeError("arr is not array");
+      const len = arr.length >>> 0;
+      for (let i = len - 1; i >= 0; i--) {
+        if (callback(arr[i], i, arr)) {
+          return arr[i];
+        }
+      }
+      return void 0;
     };
     Utils.sanitize = function(prefix, name) {
       prefix = pth.resolve(pth.normalize(prefix));
       var parts = name.split("/");
       for (var i = 0, l = parts.length; i < l; i++) {
         var path = pth.normalize(pth.join(prefix, parts.slice(i, l).join(pth.sep)));
-        if (path.indexOf(prefix) === 0) {
+        if (path === prefix || path.startsWith(prefix + pth.sep)) {
           return path;
         }
       }
       return pth.normalize(pth.join(prefix, pth.basename(name)));
     };
-    Utils.toBuffer = function toBuffer(input) {
+    Utils.toBuffer = function toBuffer(input, encoder) {
       if (Buffer.isBuffer(input)) {
         return input;
       } else if (input instanceof Uint8Array) {
         return Buffer.from(input);
       } else {
-        return typeof input === "string" ? Buffer.from(input, "utf8") : Buffer.alloc(0);
+        return typeof input === "string" ? encoder(input) : Buffer.alloc(0);
       }
     };
     Utils.readBigUInt64LE = function(buffer, index) {
-      var slice = Buffer.from(buffer.slice(index, index + 8));
-      slice.swap64();
-      return parseInt(`0x${slice.toString("hex")}`);
+      const lo = buffer.readUInt32LE(index);
+      const hi = buffer.readUInt32LE(index + 4);
+      return hi * 4294967296 + lo;
+    };
+    Utils.writeBigUInt64LE = function(buffer, value, index) {
+      const lo = value >>> 0;
+      const hi = Math.floor(value / 4294967296) >>> 0;
+      buffer.writeUInt32LE(lo, index);
+      buffer.writeUInt32LE(hi, index + 4);
+    };
+    Utils.fromDOS2Date = function(val) {
+      return new Date((val >> 25 & 127) + 1980, Math.max((val >> 21 & 15) - 1, 0), Math.max(val >> 16 & 31, 1), val >> 11 & 31, val >> 5 & 63, (val & 31) << 1);
+    };
+    Utils.fromDate2DOS = function(val) {
+      let date = 0;
+      let time = 0;
+      if (val.getFullYear() > 1979) {
+        date = (val.getFullYear() - 1980 & 127) << 9 | val.getMonth() + 1 << 5 | val.getDate();
+        time = val.getHours() << 11 | val.getMinutes() << 5 | val.getSeconds() >> 1;
+      }
+      return date << 16 | time;
     };
     Utils.isWin = isWin;
     Utils.crcTable = crcTable;
@@ -20525,10 +20623,8 @@ var require_utils2 = __commonJS({
 // node_modules/adm-zip/util/fattr.js
 var require_fattr = __commonJS({
   "node_modules/adm-zip/util/fattr.js"(exports2, module2) {
-    var fs2 = require_fileSystem().require();
     var pth = require("path");
-    fs2.existsSync = fs2.existsSync || pth.existsSync;
-    module2.exports = function(path) {
+    module2.exports = function(path, { fs: fs2 }) {
       var _path = path || "", _obj = newAttr(), _stat = null;
       function newAttr() {
         return {
@@ -20593,6 +20689,17 @@ var require_fattr = __commonJS({
   }
 });
 
+// node_modules/adm-zip/util/decoder.js
+var require_decoder = __commonJS({
+  "node_modules/adm-zip/util/decoder.js"(exports2, module2) {
+    module2.exports = {
+      efs: true,
+      encode: (data) => Buffer.from(data, "utf8"),
+      decode: (data) => data.toString("utf8")
+    };
+  }
+});
+
 // node_modules/adm-zip/util/index.js
 var require_util9 = __commonJS({
   "node_modules/adm-zip/util/index.js"(exports2, module2) {
@@ -20600,6 +20707,7 @@ var require_util9 = __commonJS({
     module2.exports.Constants = require_constants6();
     module2.exports.Errors = require_errors2();
     module2.exports.FileAttr = require_fattr();
+    module2.exports.decoder = require_decoder();
   }
 });
 
@@ -20612,18 +20720,13 @@ var require_entryHeader = __commonJS({
       var _verMade = 20, _version = 10, _flags = 0, _method = 0, _time = 0, _crc = 0, _compressedSize = 0, _size = 0, _fnameLen = 0, _extraLen = 0, _comLen = 0, _diskStart = 0, _inattr = 0, _attr = 0, _offset = 0;
       _verMade |= Utils.isWin ? 2560 : 768;
       _flags |= Constants.FLG_EFS;
-      var _dataHeader = {};
-      function setTime(val) {
-        val = new Date(val);
-        _time = (val.getFullYear() - 1980 & 127) << 25 | // b09-16 years from 1980
-        val.getMonth() + 1 << 21 | // b05-08 month
-        val.getDate() << 16 | // b00-04 hour
-        // 2 bytes time
-        val.getHours() << 11 | // b11-15 hour
-        val.getMinutes() << 5 | // b05-10 minute
-        val.getSeconds() >> 1;
-      }
-      setTime(+/* @__PURE__ */ new Date());
+      const _localHeader = {
+        extraLen: 0
+      };
+      const uint32 = (val) => Math.max(0, val) >>> 0;
+      const uint16 = (val) => Math.max(0, val) & 65535;
+      const uint8 = (val) => Math.max(0, val) & 255;
+      _time = Utils.fromDate2DOS(/* @__PURE__ */ new Date());
       return {
         get made() {
           return _verMade;
@@ -20643,6 +20746,26 @@ var require_entryHeader = __commonJS({
         set flags(val) {
           _flags = val;
         },
+        get flags_efs() {
+          return (_flags & Constants.FLG_EFS) > 0;
+        },
+        set flags_efs(val) {
+          if (val) {
+            _flags |= Constants.FLG_EFS;
+          } else {
+            _flags &= ~Constants.FLG_EFS;
+          }
+        },
+        get flags_desc() {
+          return (_flags & Constants.FLG_DESC) > 0;
+        },
+        set flags_desc(val) {
+          if (val) {
+            _flags |= Constants.FLG_DESC;
+          } else {
+            _flags &= ~Constants.FLG_DESC;
+          }
+        },
         get method() {
           return _method;
         },
@@ -20650,6 +20773,7 @@ var require_entryHeader = __commonJS({
           switch (val) {
             case Constants.STORED:
               this.version = 10;
+              break;
             case Constants.DEFLATED:
             default:
               this.version = 20;
@@ -20657,28 +20781,38 @@ var require_entryHeader = __commonJS({
           _method = val;
         },
         get time() {
-          return new Date((_time >> 25 & 127) + 1980, (_time >> 21 & 15) - 1, _time >> 16 & 31, _time >> 11 & 31, _time >> 5 & 63, (_time & 31) << 1);
+          return Utils.fromDOS2Date(this.timeval);
         },
         set time(val) {
-          setTime(val);
+          val = new Date(val);
+          this.timeval = Utils.fromDate2DOS(val);
+        },
+        get timeval() {
+          return _time;
+        },
+        set timeval(val) {
+          _time = uint32(val);
+        },
+        get timeHighByte() {
+          return uint8(_time >>> 8);
         },
         get crc() {
           return _crc;
         },
         set crc(val) {
-          _crc = Math.max(0, val) >>> 0;
+          _crc = uint32(val);
         },
         get compressedSize() {
           return _compressedSize;
         },
         set compressedSize(val) {
-          _compressedSize = Math.max(0, val) >>> 0;
+          _compressedSize = uint32(val);
         },
         get size() {
           return _size;
         },
         set size(val) {
-          _size = Math.max(0, val) >>> 0;
+          _size = uint32(val);
         },
         get fileNameLength() {
           return _fnameLen;
@@ -20692,6 +20826,12 @@ var require_entryHeader = __commonJS({
         set extraLength(val) {
           _extraLen = val;
         },
+        get extraLocalLength() {
+          return _localHeader.extraLen;
+        },
+        set extraLocalLength(val) {
+          _localHeader.extraLen = val;
+        },
         get commentLength() {
           return _comLen;
         },
@@ -20702,71 +20842,64 @@ var require_entryHeader = __commonJS({
           return _diskStart;
         },
         set diskNumStart(val) {
-          _diskStart = Math.max(0, val) >>> 0;
+          _diskStart = uint32(val);
         },
         get inAttr() {
           return _inattr;
         },
         set inAttr(val) {
-          _inattr = Math.max(0, val) >>> 0;
+          _inattr = uint32(val);
         },
         get attr() {
           return _attr;
         },
         set attr(val) {
-          _attr = Math.max(0, val) >>> 0;
+          _attr = uint32(val);
         },
         // get Unix file permissions
         get fileAttr() {
-          return _attr ? (_attr >>> 0 | 0) >> 16 & 4095 : 0;
+          return (_attr || 0) >> 16 & 4095;
         },
         get offset() {
           return _offset;
         },
         set offset(val) {
-          _offset = Math.max(0, val) >>> 0;
+          _offset = uint32(val);
         },
-        get encripted() {
-          return (_flags & 1) === 1;
+        get encrypted() {
+          return (_flags & Constants.FLG_ENC) === Constants.FLG_ENC;
         },
-        get entryHeaderSize() {
+        get centralHeaderSize() {
           return Constants.CENHDR + _fnameLen + _extraLen + _comLen;
         },
         get realDataOffset() {
-          return _offset + Constants.LOCHDR + _dataHeader.fnameLen + _dataHeader.extraLen;
+          return _offset + Constants.LOCHDR + _localHeader.fnameLen + _localHeader.extraLen;
         },
-        get dataHeader() {
-          return _dataHeader;
+        get localHeader() {
+          return _localHeader;
         },
-        loadDataHeaderFromBinary: function(input) {
+        loadLocalHeaderFromBinary: function(input) {
           var data = input.slice(_offset, _offset + Constants.LOCHDR);
           if (data.readUInt32LE(0) !== Constants.LOCSIG) {
-            throw new Error(Utils.Errors.INVALID_LOC);
+            throw Utils.Errors.INVALID_LOC();
           }
-          _dataHeader = {
-            // version needed to extract
-            version: data.readUInt16LE(Constants.LOCVER),
-            // general purpose bit flag
-            flags: data.readUInt16LE(Constants.LOCFLG),
-            // compression method
-            method: data.readUInt16LE(Constants.LOCHOW),
-            // modification time (2 bytes time, 2 bytes date)
-            time: data.readUInt32LE(Constants.LOCTIM),
-            // uncompressed file crc-32 value
-            crc: data.readUInt32LE(Constants.LOCCRC),
-            // compressed size
-            compressedSize: data.readUInt32LE(Constants.LOCSIZ),
-            // uncompressed size
-            size: data.readUInt32LE(Constants.LOCLEN),
-            // filename length
-            fnameLen: data.readUInt16LE(Constants.LOCNAM),
-            // extra field length
-            extraLen: data.readUInt16LE(Constants.LOCEXT)
-          };
+          _localHeader.version = data.readUInt16LE(Constants.LOCVER);
+          _localHeader.flags = data.readUInt16LE(Constants.LOCFLG);
+          _localHeader.flags_desc = (_localHeader.flags & Constants.FLG_DESC) > 0;
+          _localHeader.method = data.readUInt16LE(Constants.LOCHOW);
+          _localHeader.time = data.readUInt32LE(Constants.LOCTIM);
+          _localHeader.crc = data.readUInt32LE(Constants.LOCCRC);
+          _localHeader.compressedSize = data.readUInt32LE(Constants.LOCSIZ);
+          _localHeader.size = data.readUInt32LE(Constants.LOCLEN);
+          _localHeader.fnameLen = data.readUInt16LE(Constants.LOCNAM);
+          _localHeader.extraLen = data.readUInt16LE(Constants.LOCEXT);
+          const extraStart = _offset + Constants.LOCHDR + _localHeader.fnameLen;
+          const extraEnd = extraStart + _localHeader.extraLen;
+          return input.slice(extraStart, extraEnd);
         },
         loadFromBinary: function(data) {
           if (data.length !== Constants.CENHDR || data.readUInt32LE(0) !== Constants.CENSIG) {
-            throw new Error(Utils.Errors.INVALID_CEN);
+            throw Utils.Errors.INVALID_CEN();
           }
           _verMade = data.readUInt16LE(Constants.CENVEM);
           _version = data.readUInt16LE(Constants.CENVER);
@@ -20784,26 +20917,26 @@ var require_entryHeader = __commonJS({
           _attr = data.readUInt32LE(Constants.CENATX);
           _offset = data.readUInt32LE(Constants.CENOFF);
         },
-        dataHeaderToBinary: function() {
+        localHeaderToBinary: function() {
           var data = Buffer.alloc(Constants.LOCHDR);
           data.writeUInt32LE(Constants.LOCSIG, 0);
           data.writeUInt16LE(_version, Constants.LOCVER);
-          data.writeUInt16LE(_flags, Constants.LOCFLG);
+          data.writeUInt16LE(_flags & ~Constants.FLG_DESC, Constants.LOCFLG);
           data.writeUInt16LE(_method, Constants.LOCHOW);
           data.writeUInt32LE(_time, Constants.LOCTIM);
           data.writeUInt32LE(_crc, Constants.LOCCRC);
           data.writeUInt32LE(_compressedSize, Constants.LOCSIZ);
           data.writeUInt32LE(_size, Constants.LOCLEN);
           data.writeUInt16LE(_fnameLen, Constants.LOCNAM);
-          data.writeUInt16LE(_extraLen, Constants.LOCEXT);
+          data.writeUInt16LE(_localHeader.extraLen, Constants.LOCEXT);
           return data;
         },
-        entryHeaderToBinary: function() {
+        centralHeaderToBinary: function() {
           var data = Buffer.alloc(Constants.CENHDR + _fnameLen + _extraLen + _comLen);
           data.writeUInt32LE(Constants.CENSIG, 0);
           data.writeUInt16LE(_verMade, Constants.CENVEM);
           data.writeUInt16LE(_version, Constants.CENVER);
-          data.writeUInt16LE(_flags, Constants.CENFLG);
+          data.writeUInt16LE(_flags & ~Constants.FLG_DESC, Constants.CENFLG);
           data.writeUInt16LE(_method, Constants.CENHOW);
           data.writeUInt32LE(_time, Constants.CENTIM);
           data.writeUInt32LE(_crc, Constants.CENCRC);
@@ -20816,7 +20949,6 @@ var require_entryHeader = __commonJS({
           data.writeUInt16LE(_inattr, Constants.CENATT);
           data.writeUInt32LE(_attr, Constants.CENATX);
           data.writeUInt32LE(_offset, Constants.CENOFF);
-          data.fill(0, Constants.CENHDR);
           return data;
         },
         toJSON: function() {
@@ -20839,7 +20971,7 @@ var require_entryHeader = __commonJS({
             inAttr: _inattr,
             attr: _attr,
             offset: _offset,
-            entryHeaderSize: bytes(Constants.CENHDR + _fnameLen + _extraLen + _comLen)
+            centralHeaderSize: bytes(Constants.CENHDR + _fnameLen + _extraLen + _comLen)
           };
         },
         toString: function() {
@@ -20857,6 +20989,7 @@ var require_mainHeader = __commonJS({
     var Constants = Utils.Constants;
     module2.exports = function() {
       var _volumeEntries = 0, _totalEntries = 0, _size = 0, _offset = 0, _commentLength = 0;
+      const needsZip64 = () => _volumeEntries > Constants.EF_ZIP64_OR_16 || _totalEntries > Constants.EF_ZIP64_OR_16 || _size > Constants.EF_ZIP64_OR_32 || _offset > Constants.EF_ZIP64_OR_32;
       return {
         get diskEntries() {
           return _volumeEntries;
@@ -20889,11 +21022,11 @@ var require_mainHeader = __commonJS({
           _commentLength = val;
         },
         get mainHeaderSize() {
-          return Constants.ENDHDR + _commentLength;
+          return (needsZip64() ? Constants.ZIP64HDR + Constants.END64HDR : 0) + Constants.ENDHDR + _commentLength;
         },
         loadFromBinary: function(data) {
           if ((data.length !== Constants.ENDHDR || data.readUInt32LE(0) !== Constants.ENDSIG) && (data.length < Constants.ZIP64HDR || data.readUInt32LE(0) !== Constants.ZIP64SIG)) {
-            throw new Error(Utils.Errors.INVALID_END);
+            throw Utils.Errors.INVALID_END();
           }
           if (data.readUInt32LE(0) === Constants.ENDSIG) {
             _volumeEntries = data.readUInt16LE(Constants.ENDSUB);
@@ -20904,21 +21037,51 @@ var require_mainHeader = __commonJS({
           } else {
             _volumeEntries = Utils.readBigUInt64LE(data, Constants.ZIP64SUB);
             _totalEntries = Utils.readBigUInt64LE(data, Constants.ZIP64TOT);
-            _size = Utils.readBigUInt64LE(data, Constants.ZIP64SIZE);
+            _size = Utils.readBigUInt64LE(data, Constants.ZIP64SIZB);
             _offset = Utils.readBigUInt64LE(data, Constants.ZIP64OFF);
             _commentLength = 0;
           }
         },
         toBinary: function() {
-          var b = Buffer.alloc(Constants.ENDHDR + _commentLength);
-          b.writeUInt32LE(Constants.ENDSIG, 0);
-          b.writeUInt32LE(0, 4);
-          b.writeUInt16LE(_volumeEntries, Constants.ENDSUB);
-          b.writeUInt16LE(_totalEntries, Constants.ENDTOT);
-          b.writeUInt32LE(_size, Constants.ENDSIZ);
-          b.writeUInt32LE(_offset, Constants.ENDOFF);
-          b.writeUInt16LE(_commentLength, Constants.ENDCOM);
-          b.fill(" ", Constants.ENDHDR);
+          if (!needsZip64()) {
+            var b = Buffer.alloc(Constants.ENDHDR + _commentLength);
+            b.writeUInt32LE(Constants.ENDSIG, 0);
+            b.writeUInt32LE(0, 4);
+            b.writeUInt16LE(_volumeEntries, Constants.ENDSUB);
+            b.writeUInt16LE(_totalEntries, Constants.ENDTOT);
+            b.writeUInt32LE(_size, Constants.ENDSIZ);
+            b.writeUInt32LE(_offset, Constants.ENDOFF);
+            b.writeUInt16LE(_commentLength, Constants.ENDCOM);
+            b.fill(" ", Constants.ENDHDR);
+            return b;
+          }
+          var b = Buffer.alloc(this.mainHeaderSize);
+          let offset = 0;
+          b.writeUInt32LE(Constants.ZIP64SIG, offset);
+          Utils.writeBigUInt64LE(b, Constants.ZIP64HDR - Constants.ZIP64LEAD, offset + Constants.ZIP64SIZE);
+          b.writeUInt16LE(45, offset + Constants.ZIP64VEM);
+          b.writeUInt16LE(45, offset + Constants.ZIP64VER);
+          b.writeUInt32LE(0, offset + Constants.ZIP64DSK);
+          b.writeUInt32LE(0, offset + Constants.ZIP64DSKDIR);
+          Utils.writeBigUInt64LE(b, _volumeEntries, offset + Constants.ZIP64SUB);
+          Utils.writeBigUInt64LE(b, _totalEntries, offset + Constants.ZIP64TOT);
+          Utils.writeBigUInt64LE(b, _size, offset + Constants.ZIP64SIZB);
+          Utils.writeBigUInt64LE(b, _offset, offset + Constants.ZIP64OFF);
+          const zip64EndOffset = _offset + _size;
+          offset += Constants.ZIP64HDR;
+          b.writeUInt32LE(Constants.END64SIG, offset);
+          b.writeUInt32LE(0, offset + Constants.END64START);
+          Utils.writeBigUInt64LE(b, zip64EndOffset, offset + Constants.END64OFF);
+          b.writeUInt32LE(1, offset + Constants.END64NUMDISKS);
+          offset += Constants.END64HDR;
+          b.writeUInt32LE(Constants.ENDSIG, offset);
+          b.writeUInt32LE(0, offset + 4);
+          b.writeUInt16LE(Math.min(_volumeEntries, Constants.EF_ZIP64_OR_16), offset + Constants.ENDSUB);
+          b.writeUInt16LE(Math.min(_totalEntries, Constants.EF_ZIP64_OR_16), offset + Constants.ENDTOT);
+          b.writeUInt32LE(Math.min(_size, Constants.EF_ZIP64_OR_32), offset + Constants.ENDSIZ);
+          b.writeUInt32LE(Math.min(_offset, Constants.EF_ZIP64_OR_32), offset + Constants.ENDOFF);
+          b.writeUInt16LE(_commentLength, offset + Constants.ENDCOM);
+          b.fill(" ", offset + Constants.ENDHDR);
           return b;
         },
         toJSON: function() {
@@ -20987,14 +21150,16 @@ var require_deflater = __commonJS({
 // node_modules/adm-zip/methods/inflater.js
 var require_inflater = __commonJS({
   "node_modules/adm-zip/methods/inflater.js"(exports2, module2) {
-    module2.exports = function(inbuf) {
+    var version = +(process?.versions?.node ?? "").split(".")[0] || 0;
+    module2.exports = function(inbuf, expectedLength) {
       var zlib = require("zlib");
+      const option = version >= 15 && expectedLength > 0 ? { maxOutputLength: expectedLength } : {};
       return {
         inflate: function() {
-          return zlib.inflateRawSync(inbuf);
+          return zlib.inflateRawSync(inbuf, option);
         },
         inflateAsync: function(callback) {
-          var tmp = zlib.createInflateRaw(), parts = [], total = 0;
+          var tmp = zlib.createInflateRaw(option), parts = [], total = 0;
           tmp.on("data", function(data) {
             parts.push(data);
             total += data.length;
@@ -21021,6 +21186,7 @@ var require_zipcrypto = __commonJS({
   "node_modules/adm-zip/methods/zipcrypto.js"(exports2, module2) {
     "use strict";
     var { randomFillSync } = require("crypto");
+    var Errors = require_errors2();
     var crctable = new Uint32Array(256).map((t, crc) => {
       for (let j = 0; j < 8; j++) {
         if (0 !== (crc & 1)) {
@@ -21099,8 +21265,9 @@ var require_zipcrypto = __commonJS({
       }
       const decrypter = make_decrypter(pwd);
       const salt = decrypter(data.slice(0, 12));
-      if (salt[11] !== header.crc >>> 24) {
-        throw "ADM-ZIP: Wrong Password";
+      const verifyByte = (header.flags & 8) === 8 ? header.timeHighByte : header.crc >>> 24;
+      if (salt[11] !== verifyByte) {
+        throw Errors.WRONG_PASSWORD();
       }
       return decrypter(data.slice(12));
     }
@@ -21146,23 +21313,21 @@ var require_zipEntry = __commonJS({
     var Headers2 = require_headers2();
     var Constants = Utils.Constants;
     var Methods = require_methods();
-    module2.exports = function(input) {
-      var _entryHeader = new Headers2.EntryHeader(), _entryName = Buffer.alloc(0), _comment = Buffer.alloc(0), _isDirectory = false, uncompressedData = null, _extra = Buffer.alloc(0);
+    module2.exports = function(options, input) {
+      var _centralHeader = new Headers2.EntryHeader(), _entryName = Buffer.alloc(0), _comment = Buffer.alloc(0), _isDirectory = false, uncompressedData = null, _extra = Buffer.alloc(0), _extralocal = Buffer.alloc(0), _efs = true;
+      const opts = options;
+      const decoder = typeof opts.decoder === "object" ? opts.decoder : Utils.decoder;
+      _efs = decoder.hasOwnProperty("efs") ? decoder.efs : false;
       function getCompressedDataFromZip() {
-        if (!input || !Buffer.isBuffer(input)) {
+        if (!input || !(input instanceof Uint8Array)) {
           return Buffer.alloc(0);
         }
-        _entryHeader.loadDataHeaderFromBinary(input);
-        return input.slice(_entryHeader.realDataOffset, _entryHeader.realDataOffset + _entryHeader.compressedSize);
+        _extralocal = _centralHeader.loadLocalHeaderFromBinary(input);
+        return input.slice(_centralHeader.realDataOffset, _centralHeader.realDataOffset + _centralHeader.compressedSize);
       }
       function crc32OK(data) {
-        if ((_entryHeader.flags & 8) !== 8) {
-          if (Utils.crc32(data) !== _entryHeader.dataHeader.crc) {
-            return false;
-          }
-        } else {
-        }
-        return true;
+        const expectedCrc = _centralHeader.flags_desc || _centralHeader.localHeader.flags_desc ? _centralHeader.crc : _centralHeader.localHeader.crc;
+        return Utils.crc32(data) === expectedCrc;
       }
       function decompress(async, callback, pass) {
         if (typeof callback === "undefined" && typeof async === "string") {
@@ -21171,7 +21336,7 @@ var require_zipEntry = __commonJS({
         }
         if (_isDirectory) {
           if (async && callback) {
-            callback(Buffer.alloc(0), Utils.Errors.DIRECTORY_CONTENT_ERROR);
+            callback(Buffer.alloc(0), Utils.Errors.DIRECTORY_CONTENT_ERROR());
           }
           return Buffer.alloc(0);
         }
@@ -21180,38 +21345,37 @@ var require_zipEntry = __commonJS({
           if (async && callback) callback(compressedData);
           return compressedData;
         }
-        if (_entryHeader.encripted) {
+        if (_centralHeader.encrypted) {
           if ("string" !== typeof pass && !Buffer.isBuffer(pass)) {
-            throw new Error("ADM-ZIP: Incompatible password parameter");
+            throw Utils.Errors.INVALID_PASS_PARAM();
           }
-          compressedData = Methods.ZipCrypto.decrypt(compressedData, _entryHeader, pass);
+          compressedData = Methods.ZipCrypto.decrypt(compressedData, _centralHeader, pass);
         }
-        var data = Buffer.alloc(_entryHeader.size);
-        switch (_entryHeader.method) {
+        var data;
+        switch (_centralHeader.method) {
           case Utils.Constants.STORED:
+            data = Buffer.alloc(compressedData.length);
             compressedData.copy(data);
             if (!crc32OK(data)) {
-              if (async && callback) callback(data, Utils.Errors.BAD_CRC);
-              throw new Error(Utils.Errors.BAD_CRC);
+              if (async && callback) callback(data, Utils.Errors.BAD_CRC());
+              throw Utils.Errors.BAD_CRC();
             } else {
               if (async && callback) callback(data);
               return data;
             }
           case Utils.Constants.DEFLATED:
-            var inflater = new Methods.Inflater(compressedData);
+            var inflater = new Methods.Inflater(compressedData, _centralHeader.size);
             if (!async) {
-              const result = inflater.inflate(data);
-              result.copy(data, 0);
+              data = inflater.inflate();
               if (!crc32OK(data)) {
-                throw new Error(Utils.Errors.BAD_CRC + " " + _entryName.toString());
+                throw Utils.Errors.BAD_CRC(`"${decoder.decode(_entryName)}"`);
               }
               return data;
             } else {
               inflater.inflateAsync(function(result) {
-                result.copy(result, 0);
                 if (callback) {
                   if (!crc32OK(result)) {
-                    callback(result, Utils.Errors.BAD_CRC);
+                    callback(result, Utils.Errors.BAD_CRC());
                   } else {
                     callback(result);
                   }
@@ -21220,8 +21384,8 @@ var require_zipEntry = __commonJS({
             }
             break;
           default:
-            if (async && callback) callback(Buffer.alloc(0), Utils.Errors.UNKNOWN_METHOD);
-            throw new Error(Utils.Errors.UNKNOWN_METHOD);
+            if (async && callback) callback(Buffer.alloc(0), Utils.Errors.UNKNOWN_METHOD());
+            throw Utils.Errors.UNKNOWN_METHOD();
         }
       }
       function compress(async, callback) {
@@ -21231,9 +21395,9 @@ var require_zipEntry = __commonJS({
         }
         if (uncompressedData.length && !_isDirectory) {
           var compressedData;
-          switch (_entryHeader.method) {
+          switch (_centralHeader.method) {
             case Utils.Constants.STORED:
-              _entryHeader.compressedSize = _entryHeader.size;
+              _centralHeader.compressedSize = _centralHeader.size;
               compressedData = Buffer.alloc(uncompressedData.length);
               uncompressedData.copy(compressedData);
               if (async && callback) callback(compressedData);
@@ -21243,12 +21407,12 @@ var require_zipEntry = __commonJS({
               var deflater = new Methods.Deflater(uncompressedData);
               if (!async) {
                 var deflated = deflater.deflate();
-                _entryHeader.compressedSize = deflated.length;
+                _centralHeader.compressedSize = deflated.length;
                 return deflated;
               } else {
                 deflater.deflateAsync(function(data) {
                   compressedData = Buffer.alloc(data.length);
-                  _entryHeader.compressedSize = data.length;
+                  _centralHeader.compressedSize = data.length;
                   data.copy(compressedData);
                   callback && callback(compressedData);
                 });
@@ -21263,81 +21427,93 @@ var require_zipEntry = __commonJS({
         }
       }
       function readUInt64LE(buffer, offset) {
-        return (buffer.readUInt32LE(offset + 4) << 4) + buffer.readUInt32LE(offset);
+        return Utils.readBigUInt64LE(buffer, offset);
       }
       function parseExtra(data) {
-        var offset = 0;
-        var signature, size, part;
-        while (offset < data.length) {
-          signature = data.readUInt16LE(offset);
-          offset += 2;
-          size = data.readUInt16LE(offset);
-          offset += 2;
-          part = data.slice(offset, offset + size);
-          offset += size;
-          if (Constants.ID_ZIP64 === signature) {
-            parseZip64ExtendedInformation(part);
+        try {
+          var offset = 0;
+          var signature, size, part;
+          while (offset + 4 < data.length) {
+            signature = data.readUInt16LE(offset);
+            offset += 2;
+            size = data.readUInt16LE(offset);
+            offset += 2;
+            part = data.slice(offset, offset + size);
+            offset += size;
+            if (Constants.ID_ZIP64 === signature) {
+              parseZip64ExtendedInformation(part);
+            }
           }
+        } catch (error2) {
+          throw Utils.Errors.EXTRA_FIELD_PARSE_ERROR();
         }
       }
       function parseZip64ExtendedInformation(data) {
         var size, compressedSize, offset, diskNumStart;
         if (data.length >= Constants.EF_ZIP64_SCOMP) {
           size = readUInt64LE(data, Constants.EF_ZIP64_SUNCOMP);
-          if (_entryHeader.size === Constants.EF_ZIP64_OR_32) {
-            _entryHeader.size = size;
+          if (_centralHeader.size === Constants.EF_ZIP64_OR_32) {
+            _centralHeader.size = size;
           }
         }
         if (data.length >= Constants.EF_ZIP64_RHO) {
           compressedSize = readUInt64LE(data, Constants.EF_ZIP64_SCOMP);
-          if (_entryHeader.compressedSize === Constants.EF_ZIP64_OR_32) {
-            _entryHeader.compressedSize = compressedSize;
+          if (_centralHeader.compressedSize === Constants.EF_ZIP64_OR_32) {
+            _centralHeader.compressedSize = compressedSize;
           }
         }
         if (data.length >= Constants.EF_ZIP64_DSN) {
           offset = readUInt64LE(data, Constants.EF_ZIP64_RHO);
-          if (_entryHeader.offset === Constants.EF_ZIP64_OR_32) {
-            _entryHeader.offset = offset;
+          if (_centralHeader.offset === Constants.EF_ZIP64_OR_32) {
+            _centralHeader.offset = offset;
           }
         }
         if (data.length >= Constants.EF_ZIP64_DSN + 4) {
           diskNumStart = data.readUInt32LE(Constants.EF_ZIP64_DSN);
-          if (_entryHeader.diskNumStart === Constants.EF_ZIP64_OR_16) {
-            _entryHeader.diskNumStart = diskNumStart;
+          if (_centralHeader.diskNumStart === Constants.EF_ZIP64_OR_16) {
+            _centralHeader.diskNumStart = diskNumStart;
           }
         }
       }
       return {
         get entryName() {
-          return _entryName.toString();
+          return decoder.decode(_entryName);
         },
         get rawEntryName() {
           return _entryName;
         },
         set entryName(val) {
-          _entryName = Utils.toBuffer(val);
+          _entryName = Utils.toBuffer(val, decoder.encode);
           var lastChar = _entryName[_entryName.length - 1];
           _isDirectory = lastChar === 47 || lastChar === 92;
-          _entryHeader.fileNameLength = _entryName.length;
+          _centralHeader.fileNameLength = _entryName.length;
+        },
+        get efs() {
+          if (typeof _efs === "function") {
+            return _efs(this.entryName);
+          } else {
+            return _efs;
+          }
         },
         get extra() {
           return _extra;
         },
         set extra(val) {
           _extra = val;
-          _entryHeader.extraLength = val.length;
+          _centralHeader.extraLength = val.length;
           parseExtra(val);
         },
         get comment() {
-          return _comment.toString();
+          return decoder.decode(_comment);
         },
         set comment(val) {
-          _comment = Utils.toBuffer(val);
-          _entryHeader.commentLength = _comment.length;
+          _comment = Utils.toBuffer(val, decoder.encode);
+          _centralHeader.commentLength = _comment.length;
+          if (_comment.length > 65535) throw Utils.Errors.COMMENT_TOO_LONG();
         },
         get name() {
-          var n = _entryName.toString();
-          return _isDirectory ? n.substr(n.length - 1).split("/").pop() : n.split("/").pop();
+          const n = decoder.decode(_entryName);
+          return _isDirectory ? n.replace(/[/\\]$/, "").split("/").pop() : n.split("/").pop();
         },
         get isDirectory() {
           return _isDirectory;
@@ -21349,55 +21525,67 @@ var require_zipEntry = __commonJS({
           compress(true, callback);
         },
         setData: function(value) {
-          uncompressedData = Utils.toBuffer(value);
+          uncompressedData = Utils.toBuffer(value, Utils.decoder.encode);
           if (!_isDirectory && uncompressedData.length) {
-            _entryHeader.size = uncompressedData.length;
-            _entryHeader.method = Utils.Constants.DEFLATED;
-            _entryHeader.crc = Utils.crc32(value);
-            _entryHeader.changed = true;
+            _centralHeader.size = uncompressedData.length;
+            _centralHeader.method = Utils.Constants.DEFLATED;
+            _centralHeader.crc = Utils.crc32(value);
+            _centralHeader.changed = true;
           } else {
-            _entryHeader.method = Utils.Constants.STORED;
+            _centralHeader.method = Utils.Constants.STORED;
           }
         },
         getData: function(pass) {
-          if (_entryHeader.changed) {
+          if (_centralHeader.changed) {
             return uncompressedData;
           } else {
             return decompress(false, null, pass);
           }
         },
         getDataAsync: function(callback, pass) {
-          if (_entryHeader.changed) {
+          if (_centralHeader.changed) {
             callback(uncompressedData);
           } else {
             decompress(true, callback, pass);
           }
         },
         set attr(attr) {
-          _entryHeader.attr = attr;
+          _centralHeader.attr = attr;
         },
         get attr() {
-          return _entryHeader.attr;
+          return _centralHeader.attr;
         },
         set header(data) {
-          _entryHeader.loadFromBinary(data);
+          _centralHeader.loadFromBinary(data);
         },
         get header() {
-          return _entryHeader;
+          return _centralHeader;
         },
-        packHeader: function() {
-          var header = _entryHeader.entryHeaderToBinary();
+        packCentralHeader: function() {
+          _centralHeader.flags_efs = this.efs;
+          _centralHeader.extraLength = _extra.length;
+          var header = _centralHeader.centralHeaderToBinary();
           var addpos = Utils.Constants.CENHDR;
           _entryName.copy(header, addpos);
           addpos += _entryName.length;
-          if (_entryHeader.extraLength) {
-            _extra.copy(header, addpos);
-            addpos += _entryHeader.extraLength;
-          }
-          if (_entryHeader.commentLength) {
-            _comment.copy(header, addpos);
-          }
+          _extra.copy(header, addpos);
+          addpos += _centralHeader.extraLength;
+          _comment.copy(header, addpos);
           return header;
+        },
+        packLocalHeader: function() {
+          let addpos = 0;
+          _centralHeader.flags_efs = this.efs;
+          _centralHeader.extraLocalLength = _extralocal.length;
+          const localHeaderBuf = _centralHeader.localHeaderToBinary();
+          const localHeader = Buffer.alloc(localHeaderBuf.length + _entryName.length + _centralHeader.extraLocalLength);
+          localHeaderBuf.copy(localHeader, addpos);
+          addpos += localHeaderBuf.length;
+          _entryName.copy(localHeader, addpos);
+          addpos += _entryName.length;
+          _extralocal.copy(localHeader, addpos);
+          addpos += _extralocal.length;
+          return localHeader;
         },
         toJSON: function() {
           const bytes = function(nr) {
@@ -21408,7 +21596,7 @@ var require_zipEntry = __commonJS({
             name: this.name,
             comment: this.comment,
             isDirectory: this.isDirectory,
-            header: _entryHeader.toJSON(),
+            header: _centralHeader.toJSON(),
             compressedData: bytes(input),
             data: bytes(uncompressedData)
           };
@@ -21428,46 +21616,66 @@ var require_zipFile = __commonJS({
     var Headers2 = require_headers2();
     var Utils = require_util9();
     module2.exports = function(inBuffer, options) {
-      var entryList = [], entryTable = {}, _comment = Buffer.alloc(0), mainHeader = new Headers2.MainHeader(), loadedEntries = false;
-      const opts = Object.assign(/* @__PURE__ */ Object.create(null), options);
-      const { noSort } = opts;
+      var entryList = [], entryTable = /* @__PURE__ */ Object.create(null), _comment = Buffer.alloc(0), mainHeader = new Headers2.MainHeader(), loadedEntries = false;
+      var password = null;
+      const temporary = /* @__PURE__ */ new Set();
+      const opts = options;
+      const { noSort, decoder } = opts;
       if (inBuffer) {
         readMainHeader(opts.readEntries);
       } else {
         loadedEntries = true;
       }
-      function iterateEntries(callback) {
-        const totalEntries = mainHeader.diskEntries;
-        let index = mainHeader.offset;
-        for (let i = 0; i < totalEntries; i++) {
-          let tmp = index;
-          const entry = new ZipEntry(inBuffer);
-          entry.header = inBuffer.slice(tmp, tmp += Utils.Constants.CENHDR);
-          entry.entryName = inBuffer.slice(tmp, tmp += entry.header.fileNameLength);
-          index += entry.header.entryHeaderSize;
-          callback(entry);
+      function makeTemporaryFolders() {
+        const foldersList = /* @__PURE__ */ new Set();
+        for (const elem of Object.keys(entryTable)) {
+          const elements = elem.split("/");
+          elements.pop();
+          if (!elements.length) continue;
+          for (let i = 0; i < elements.length; i++) {
+            const sub = elements.slice(0, i + 1).join("/") + "/";
+            foldersList.add(sub);
+          }
+        }
+        for (const elem of foldersList) {
+          if (!(elem in entryTable)) {
+            const tempfolder = new ZipEntry(opts);
+            tempfolder.entryName = elem;
+            tempfolder.attr = 16;
+            tempfolder.temporary = true;
+            entryList.push(tempfolder);
+            entryTable[tempfolder.entryName] = tempfolder;
+            temporary.add(tempfolder);
+          }
         }
       }
       function readEntries() {
         loadedEntries = true;
-        entryTable = {};
+        entryTable = /* @__PURE__ */ Object.create(null);
+        if (mainHeader.diskEntries > (inBuffer.length - mainHeader.offset) / Utils.Constants.CENHDR) {
+          throw Utils.Errors.DISK_ENTRY_TOO_LARGE();
+        }
         entryList = new Array(mainHeader.diskEntries);
         var index = mainHeader.offset;
         for (var i = 0; i < entryList.length; i++) {
-          var tmp = index, entry = new ZipEntry(inBuffer);
+          var tmp = index, entry = new ZipEntry(opts, inBuffer);
           entry.header = inBuffer.slice(tmp, tmp += Utils.Constants.CENHDR);
           entry.entryName = inBuffer.slice(tmp, tmp += entry.header.fileNameLength);
           if (entry.header.extraLength) {
             entry.extra = inBuffer.slice(tmp, tmp += entry.header.extraLength);
           }
           if (entry.header.commentLength) entry.comment = inBuffer.slice(tmp, tmp + entry.header.commentLength);
-          index += entry.header.entryHeaderSize;
+          index += entry.header.centralHeaderSize;
           entryList[i] = entry;
           entryTable[entry.entryName] = entry;
         }
+        temporary.clear();
+        makeTemporaryFolders();
       }
       function readMainHeader(readNow) {
         var i = inBuffer.length - Utils.Constants.ENDHDR, max = Math.max(0, i - 65535), n = max, endStart = inBuffer.length, endOffset = -1, commentEnd = 0;
+        const trailingSpace = typeof opts.trailingSpace === "boolean" ? opts.trailingSpace : false;
+        if (trailingSpace) max = 0;
         for (i; i >= n; i--) {
           if (inBuffer[i] !== 80) continue;
           if (inBuffer.readUInt32LE(i) === Utils.Constants.ENDSIG) {
@@ -21487,7 +21695,7 @@ var require_zipFile = __commonJS({
             break;
           }
         }
-        if (!~endOffset) throw new Error(Utils.Errors.INVALID_FORMAT);
+        if (endOffset == -1) throw Utils.Errors.INVALID_FORMAT();
         mainHeader.loadFromBinary(inBuffer.slice(endOffset, endStart));
         if (mainHeader.commentLength) {
           _comment = inBuffer.slice(commentEnd + Utils.Constants.ENDHDR);
@@ -21496,7 +21704,7 @@ var require_zipFile = __commonJS({
       }
       function sortEntries() {
         if (entryList.length > 1 && !noSort) {
-          entryList.sort((a, b) => a.entryName.toLowerCase().localeCompare(b.entryName.toLowerCase()));
+          entryList = entryList.map((entry) => ({ entry, key: entry.entryName.toLowerCase() })).sort((a, b) => a.key.localeCompare(b.key)).map((pair) => pair.entry);
         }
       }
       return {
@@ -21508,17 +21716,17 @@ var require_zipFile = __commonJS({
           if (!loadedEntries) {
             readEntries();
           }
-          return entryList;
+          return entryList.filter((e) => !temporary.has(e));
         },
         /**
          * Archive comment
          * @return {String}
          */
         get comment() {
-          return _comment.toString();
+          return decoder.decode(_comment);
         },
         set comment(val) {
-          _comment = Utils.toBuffer(val);
+          _comment = Utils.toBuffer(val, decoder.encode);
           mainHeader.commentLength = _comment.length;
         },
         getEntryCount: function() {
@@ -21528,11 +21736,7 @@ var require_zipFile = __commonJS({
           return entryList.length;
         },
         forEach: function(callback) {
-          if (!loadedEntries) {
-            iterateEntries(callback);
-            return;
-          }
-          entryList.forEach(callback);
+          this.entries.forEach(callback);
         },
         /**
          * Returns a reference to the entry with the given name or null if entry is inexistent
@@ -21560,27 +21764,37 @@ var require_zipFile = __commonJS({
           mainHeader.totalEntries = entryList.length;
         },
         /**
-         * Removes the entry with the given name from the entry list.
+         * Removes the file with the given name from the entry list.
          *
          * If the entry is a directory, then all nested files and directories will be removed
          * @param entryName
+         * @returns {void}
+         */
+        deleteFile: function(entryName, withsubfolders = true) {
+          if (!loadedEntries) {
+            readEntries();
+          }
+          const entry = entryTable[entryName];
+          const list = this.getEntryChildren(entry, withsubfolders).map((child) => child.entryName);
+          list.forEach(this.deleteEntry);
+        },
+        /**
+         * Removes the entry with the given name from the entry list.
+         *
+         * @param {string} entryName
+         * @returns {void}
          */
         deleteEntry: function(entryName) {
           if (!loadedEntries) {
             readEntries();
           }
-          var entry = entryTable[entryName];
-          if (entry && entry.isDirectory) {
-            var _self = this;
-            this.getEntryChildren(entry).forEach(function(child) {
-              if (child.entryName !== entryName) {
-                _self.deleteEntry(child.entryName);
-              }
-            });
+          const entry = entryTable[entryName];
+          const index = entryList.indexOf(entry);
+          if (index >= 0) {
+            entryList.splice(index, 1);
+            delete entryTable[entryName];
+            mainHeader.totalEntries = entryList.length;
           }
-          entryList.splice(entryList.indexOf(entry), 1);
-          delete entryTable[entryName];
-          mainHeader.totalEntries = entryList.length;
         },
         /**
          *  Iterates and returns all nested files and directories of the given entry
@@ -21588,22 +21802,38 @@ var require_zipFile = __commonJS({
          * @param entry
          * @return Array
          */
-        getEntryChildren: function(entry) {
+        getEntryChildren: function(entry, subfolders = true) {
           if (!loadedEntries) {
             readEntries();
           }
-          if (entry && entry.isDirectory) {
-            const list = [];
-            const name = entry.entryName;
-            const len = name.length;
-            entryList.forEach(function(zipEntry) {
-              if (zipEntry.entryName.substr(0, len) === name) {
-                list.push(zipEntry);
+          if (typeof entry === "object") {
+            if (entry.isDirectory && subfolders) {
+              const list = [];
+              const name = entry.entryName;
+              for (const zipEntry of entryList) {
+                if (zipEntry.entryName.startsWith(name)) {
+                  list.push(zipEntry);
+                }
               }
-            });
-            return list;
+              return list;
+            } else {
+              return [entry];
+            }
           }
           return [];
+        },
+        /**
+         *  How many child elements entry has
+         *
+         * @param {ZipEntry} entry
+         * @return {integer}
+         */
+        getChildCount: function(entry) {
+          if (entry && entry.isDirectory) {
+            const list = this.getEntryChildren(entry);
+            return list.includes(entry) ? list.length - 1 : list.length;
+          }
+          return 0;
         },
         /**
          * Returns the zip file
@@ -21616,46 +21846,46 @@ var require_zipFile = __commonJS({
           }
           sortEntries();
           const dataBlock = [];
-          const entryHeaders = [];
+          const headerBlocks = [];
           let totalSize = 0;
           let dindex = 0;
           mainHeader.size = 0;
           mainHeader.offset = 0;
-          for (const entry of entryList) {
+          let totalEntries = 0;
+          for (const entry of this.entries) {
             const compressedData = entry.getCompressedData();
             entry.header.offset = dindex;
-            const dataHeader = entry.header.dataHeaderToBinary();
-            const entryNameLen = entry.rawEntryName.length;
-            const postHeader = Buffer.alloc(entryNameLen + entry.extra.length);
-            entry.rawEntryName.copy(postHeader, 0);
-            postHeader.copy(entry.extra, entryNameLen);
-            const dataLength = dataHeader.length + postHeader.length + compressedData.length;
+            const localHeader = entry.packLocalHeader();
+            const dataLength = localHeader.length + compressedData.length;
             dindex += dataLength;
-            dataBlock.push(dataHeader);
-            dataBlock.push(postHeader);
+            dataBlock.push(localHeader);
             dataBlock.push(compressedData);
-            const entryHeader = entry.packHeader();
-            entryHeaders.push(entryHeader);
-            mainHeader.size += entryHeader.length;
-            totalSize += dataLength + entryHeader.length;
+            const centralHeader = entry.packCentralHeader();
+            headerBlocks.push(centralHeader);
+            mainHeader.size += centralHeader.length;
+            totalSize += dataLength + centralHeader.length;
+            totalEntries++;
           }
           totalSize += mainHeader.mainHeaderSize;
           mainHeader.offset = dindex;
+          mainHeader.totalEntries = totalEntries;
           dindex = 0;
           const outBuffer = Buffer.alloc(totalSize);
           for (const content of dataBlock) {
             content.copy(outBuffer, dindex);
             dindex += content.length;
           }
-          for (const content of entryHeaders) {
+          for (const content of headerBlocks) {
             content.copy(outBuffer, dindex);
             dindex += content.length;
           }
           const mh = mainHeader.toBinary();
           if (_comment) {
-            _comment.copy(mh, Utils.Constants.ENDHDR);
+            _comment.copy(mh, mh.length - _comment.length);
           }
           mh.copy(outBuffer, dindex);
+          inBuffer = outBuffer;
+          loadedEntries = false;
           return outBuffer;
         },
         toAsyncBuffer: function(onSuccess, onFail, onItemStart, onItemEnd) {
@@ -21665,54 +21895,57 @@ var require_zipFile = __commonJS({
             }
             sortEntries();
             const dataBlock = [];
-            const entryHeaders = [];
+            const centralHeaders = [];
             let totalSize = 0;
             let dindex = 0;
+            let totalEntries = 0;
             mainHeader.size = 0;
             mainHeader.offset = 0;
             const compress2Buffer = function(entryLists) {
-              if (entryLists.length) {
-                const entry = entryLists.pop();
+              if (entryLists.length > 0) {
+                const entry = entryLists.shift();
                 const name = entry.entryName + entry.extra.toString();
                 if (onItemStart) onItemStart(name);
                 entry.getCompressedDataAsync(function(compressedData) {
                   if (onItemEnd) onItemEnd(name);
                   entry.header.offset = dindex;
-                  const dataHeader = entry.header.dataHeaderToBinary();
-                  const postHeader = Buffer.alloc(name.length, name);
-                  const dataLength = dataHeader.length + postHeader.length + compressedData.length;
+                  const localHeader = entry.packLocalHeader();
+                  const dataLength = localHeader.length + compressedData.length;
                   dindex += dataLength;
-                  dataBlock.push(dataHeader);
-                  dataBlock.push(postHeader);
+                  dataBlock.push(localHeader);
                   dataBlock.push(compressedData);
-                  const entryHeader = entry.packHeader();
-                  entryHeaders.push(entryHeader);
-                  mainHeader.size += entryHeader.length;
-                  totalSize += dataLength + entryHeader.length;
+                  const centalHeader = entry.packCentralHeader();
+                  centralHeaders.push(centalHeader);
+                  mainHeader.size += centalHeader.length;
+                  totalSize += dataLength + centalHeader.length;
+                  totalEntries++;
                   compress2Buffer(entryLists);
                 });
               } else {
                 totalSize += mainHeader.mainHeaderSize;
                 mainHeader.offset = dindex;
+                mainHeader.totalEntries = totalEntries;
                 dindex = 0;
                 const outBuffer = Buffer.alloc(totalSize);
                 dataBlock.forEach(function(content) {
                   content.copy(outBuffer, dindex);
                   dindex += content.length;
                 });
-                entryHeaders.forEach(function(content) {
+                centralHeaders.forEach(function(content) {
                   content.copy(outBuffer, dindex);
                   dindex += content.length;
                 });
                 const mh = mainHeader.toBinary();
                 if (_comment) {
-                  _comment.copy(mh, Utils.Constants.ENDHDR);
+                  _comment.copy(mh, mh.length - _comment.length);
                 }
                 mh.copy(outBuffer, dindex);
+                inBuffer = outBuffer;
+                loadedEntries = false;
                 onSuccess(outBuffer);
               }
             };
-            compress2Buffer(entryList);
+            compress2Buffer(Array.from(this.entries));
           } catch (e) {
             onFail(e);
           }
@@ -21729,8 +21962,9 @@ var require_adm_zip = __commonJS({
     var pth = require("path");
     var ZipEntry = require_zipEntry();
     var ZipFile = require_zipFile();
-    var get_Bool = (val, def) => typeof val === "boolean" ? val : def;
-    var get_Str = (val, def) => typeof val === "string" ? val : def;
+    var get_Bool = (...val) => Utils.findLast(val, (c) => typeof c === "boolean");
+    var get_Str = (...val) => Utils.findLast(val, (c) => typeof c === "string");
+    var get_Fun = (...val) => Utils.findLast(val, (c) => typeof c === "function");
     var defaultOptions = {
       // option "noSort" : if true it disables files sorting
       noSort: false,
@@ -21758,21 +21992,27 @@ var require_adm_zip = __commonJS({
       }
       Object.assign(opts, options);
       const filetools = new Utils(opts);
+      const applyDirAttributes = (dirEntries) => {
+        dirEntries.filter((d) => d.attr).sort((a, b) => b.path.length - a.path.length).forEach((d) => filetools.fs.chmodSync(d.path, d.attr));
+      };
+      if (typeof opts.decoder !== "object" || typeof opts.decoder.encode !== "function" || typeof opts.decoder.decode !== "function") {
+        opts.decoder = Utils.decoder;
+      }
       if (input && "string" === typeof input) {
         if (filetools.fs.existsSync(input)) {
           opts.method = Utils.Constants.FILE;
           opts.filename = input;
           inBuffer = filetools.fs.readFileSync(input);
         } else {
-          throw new Error(Utils.Errors.INVALID_FILENAME);
+          throw Utils.Errors.INVALID_FILENAME();
         }
       }
       const _zip = new ZipFile(inBuffer, opts);
-      const { canonical, sanitize } = Utils;
+      const { canonical, sanitize, zipnamefix } = Utils;
       function getEntry(entry) {
         if (entry && _zip) {
           var item;
-          if (typeof entry === "string") item = _zip.getEntry(entry);
+          if (typeof entry === "string") item = _zip.getEntry(pth.posix.normalize(entry));
           if (typeof entry === "object" && typeof entry.entryName !== "undefined" && typeof entry.header !== "undefined") item = _zip.getEntry(entry.entryName);
           if (item) {
             return item;
@@ -21782,13 +22022,30 @@ var require_adm_zip = __commonJS({
       }
       function fixPath(zipPath) {
         const { join, normalize, sep } = pth.posix;
-        return join(".", normalize(sep + zipPath.split("\\").join(sep) + sep));
+        return join(pth.isAbsolute(zipPath) ? "/" : ".", normalize(sep + zipPath.split("\\").join(sep) + sep));
       }
+      function filenameFilter(filterfn) {
+        if (filterfn instanceof RegExp) {
+          return /* @__PURE__ */ function(rx) {
+            return function(filename) {
+              return rx.test(filename);
+            };
+          }(filterfn);
+        } else if ("function" !== typeof filterfn) {
+          return () => true;
+        }
+        return filterfn;
+      }
+      const relativePath = (local, entry) => {
+        let lastChar = entry.slice(-1);
+        lastChar = lastChar === filetools.sep ? filetools.sep : "";
+        return pth.relative(local, entry) + lastChar;
+      };
       return {
         /**
          * Extracts the given entry from the archive and returns the content as a Buffer object
-         * @param entry ZipEntry object or String with the full path of the entry
-         *
+         * @param {ZipEntry|string} entry ZipEntry object or String with the full path of the entry
+         * @param {Buffer|string} [pass] - password
          * @return Buffer or Null in case of error
          */
         readFile: function(entry, pass) {
@@ -21796,9 +22053,20 @@ var require_adm_zip = __commonJS({
           return item && item.getData(pass) || null;
         },
         /**
+         * Returns how many child elements has on entry (directories) on files it is always 0
+         * @param {ZipEntry|string} entry ZipEntry object or String with the full path of the entry
+         * @returns {integer}
+         */
+        childCount: function(entry) {
+          const item = getEntry(entry);
+          if (item) {
+            return _zip.getChildCount(item);
+          }
+        },
+        /**
          * Asynchronous readFile
-         * @param entry ZipEntry object or String with the full path of the entry
-         * @param callback
+         * @param {ZipEntry|string} entry ZipEntry object or String with the full path of the entry
+         * @param {callback} callback
          *
          * @return Buffer or Null in case of error
          */
@@ -21812,8 +22080,8 @@ var require_adm_zip = __commonJS({
         },
         /**
          * Extracts the given entry from the archive and returns the content as plain text in the given encoding
-         * @param entry ZipEntry object or String with the full path of the entry
-         * @param encoding Optional. If no encoding is specified utf8 is used
+         * @param {ZipEntry|string} entry - ZipEntry object or String with the full path of the entry
+         * @param {string} encoding - Optional. If no encoding is specified utf8 is used
          *
          * @return String
          */
@@ -21829,9 +22097,9 @@ var require_adm_zip = __commonJS({
         },
         /**
          * Asynchronous readAsText
-         * @param entry ZipEntry object or String with the full path of the entry
-         * @param callback
-         * @param encoding Optional. If no encoding is specified utf8 is used
+         * @param {ZipEntry|string} entry ZipEntry object or String with the full path of the entry
+         * @param {callback} callback
+         * @param {string} [encoding] - Optional. If no encoding is specified utf8 is used
          *
          * @return String
          */
@@ -21856,9 +22124,23 @@ var require_adm_zip = __commonJS({
         /**
          * Remove the entry from the file or the entry and all it's nested directories and files if the given entry is a directory
          *
-         * @param entry
+         * @param {ZipEntry|string} entry
+         * @param {boolean} withsubfolders
+         * @returns {void}
          */
-        deleteFile: function(entry) {
+        deleteFile: function(entry, withsubfolders = true) {
+          var item = getEntry(entry);
+          if (item) {
+            _zip.deleteFile(item.entryName, withsubfolders);
+          }
+        },
+        /**
+         * Remove the entry from the file or directory without affecting any nested entries
+         *
+         * @param {ZipEntry|string} entry
+         * @returns {void}
+         */
+        deleteEntry: function(entry) {
           var item = getEntry(entry);
           if (item) {
             _zip.deleteEntry(item.entryName);
@@ -21867,7 +22149,7 @@ var require_adm_zip = __commonJS({
         /**
          * Adds a comment to the zip. The zip must be rewritten after adding the comment.
          *
-         * @param comment
+         * @param {string} comment
          */
         addZipComment: function(comment) {
           _zip.comment = comment;
@@ -21884,8 +22166,8 @@ var require_adm_zip = __commonJS({
          * Adds a comment to a specified zipEntry. The zip must be rewritten after adding the comment
          * The comment cannot exceed 65535 characters in length
          *
-         * @param entry
-         * @param comment
+         * @param {ZipEntry} entry
+         * @param {string} comment
          */
         addZipEntryComment: function(entry, comment) {
           var item = getEntry(entry);
@@ -21896,7 +22178,7 @@ var require_adm_zip = __commonJS({
         /**
          * Returns the comment of the specified entry
          *
-         * @param entry
+         * @param {ZipEntry} entry
          * @return String
          */
         getZipEntryComment: function(entry) {
@@ -21909,8 +22191,8 @@ var require_adm_zip = __commonJS({
         /**
          * Updates the content of an existing entry inside the archive. The zip must be rewritten after updating the content
          *
-         * @param entry
-         * @param content
+         * @param {ZipEntry} entry
+         * @param {Buffer} content
          */
         updateFile: function(entry, content) {
           var item = getEntry(entry);
@@ -21921,90 +22203,107 @@ var require_adm_zip = __commonJS({
         /**
          * Adds a file from the disk to the archive
          *
-         * @param localPath File to add to zip
-         * @param zipPath Optional path inside the zip
-         * @param zipName Optional name for the file
+         * @param {string} localPath File to add to zip
+         * @param {string} [zipPath] Optional path inside the zip
+         * @param {string} [zipName] Optional name for the file
+         * @param {string} [comment] Optional file comment
          */
         addLocalFile: function(localPath, zipPath, zipName, comment) {
           if (filetools.fs.existsSync(localPath)) {
             zipPath = zipPath ? fixPath(zipPath) : "";
-            var p = localPath.split("\\").join("/").split("/").pop();
+            const p = pth.win32.basename(pth.win32.normalize(localPath));
             zipPath += zipName ? zipName : p;
             const _attr = filetools.fs.statSync(localPath);
-            this.addFile(zipPath, filetools.fs.readFileSync(localPath), comment, _attr);
+            const data = _attr.isFile() ? filetools.fs.readFileSync(localPath) : Buffer.alloc(0);
+            if (_attr.isDirectory()) zipPath += filetools.sep;
+            this.addFile(zipPath, data, comment, _attr);
           } else {
-            throw new Error(Utils.Errors.FILE_NOT_FOUND.replace("%s", localPath));
+            throw Utils.Errors.FILE_NOT_FOUND(localPath);
           }
+        },
+        /**
+         * Callback for showing if everything was done.
+         *
+         * @callback doneCallback
+         * @param {Error} err - Error object
+         * @param {boolean} done - was request fully completed
+         */
+        /**
+         * Adds a file from the disk to the archive
+         *
+         * @param {(object|string)} options - options object, if it is string it us used as localPath.
+         * @param {string} options.localPath - Local path to the file.
+         * @param {string} [options.comment] - Optional file comment.
+         * @param {string} [options.zipPath] - Optional path inside the zip
+         * @param {string} [options.zipName] - Optional name for the file
+         * @param {doneCallback} callback - The callback that handles the response.
+         */
+        addLocalFileAsync: function(options2, callback) {
+          options2 = typeof options2 === "object" ? options2 : { localPath: options2 };
+          const localPath = pth.resolve(options2.localPath);
+          const { comment } = options2;
+          let { zipPath, zipName } = options2;
+          const self2 = this;
+          filetools.fs.stat(localPath, function(err, stats) {
+            if (err) return callback(err, false);
+            zipPath = zipPath ? fixPath(zipPath) : "";
+            const p = pth.win32.basename(pth.win32.normalize(localPath));
+            zipPath += zipName ? zipName : p;
+            if (stats.isFile()) {
+              filetools.fs.readFile(localPath, function(err2, data) {
+                if (err2) return callback(err2, false);
+                self2.addFile(zipPath, data, comment, stats);
+                return setImmediate(callback, void 0, true);
+              });
+            } else if (stats.isDirectory()) {
+              zipPath += filetools.sep;
+              self2.addFile(zipPath, Buffer.alloc(0), comment, stats);
+              return setImmediate(callback, void 0, true);
+            }
+          });
         },
         /**
          * Adds a local directory and all its nested files and directories to the archive
          *
-         * @param localPath
-         * @param zipPath optional path inside zip
-         * @param filter optional RegExp or Function if files match will
-         *               be included.
-         * @param {number | object} attr - number as unix file permissions, object as filesystem Stats object
+         * @param {string} localPath - local path to the folder
+         * @param {string} [zipPath] - optional path inside zip
+         * @param {(RegExp|function)} [filter] - optional RegExp or Function if files match will be included.
          */
-        addLocalFolder: function(localPath, zipPath, filter, attr) {
-          if (filter instanceof RegExp) {
-            filter = /* @__PURE__ */ function(rx) {
-              return function(filename) {
-                return rx.test(filename);
-              };
-            }(filter);
-          } else if ("function" !== typeof filter) {
-            filter = function() {
-              return true;
-            };
-          }
+        addLocalFolder: function(localPath, zipPath, filter) {
+          filter = filenameFilter(filter);
           zipPath = zipPath ? fixPath(zipPath) : "";
           localPath = pth.normalize(localPath);
           if (filetools.fs.existsSync(localPath)) {
             const items = filetools.findFiles(localPath);
             const self2 = this;
             if (items.length) {
-              items.forEach(function(filepath) {
-                var p = pth.relative(localPath, filepath).split("\\").join("/");
+              for (const filepath of items) {
+                const p = pth.join(zipPath, relativePath(localPath, filepath));
                 if (filter(p)) {
-                  var stats = filetools.fs.statSync(filepath);
-                  if (stats.isFile()) {
-                    self2.addFile(zipPath + p, filetools.fs.readFileSync(filepath), "", attr ? attr : stats);
-                  } else {
-                    self2.addFile(zipPath + p + "/", Buffer.alloc(0), "", attr ? attr : stats);
-                  }
+                  self2.addLocalFile(filepath, pth.dirname(p));
                 }
-              });
+              }
             }
           } else {
-            throw new Error(Utils.Errors.FILE_NOT_FOUND.replace("%s", localPath));
+            throw Utils.Errors.FILE_NOT_FOUND(localPath);
           }
         },
         /**
-         * Asynchronous addLocalFile
-         * @param localPath
-         * @param callback
-         * @param zipPath optional path inside zip
-         * @param filter optional RegExp or Function if files match will
+         * Asynchronous addLocalFolder
+         * @param {string} localPath
+         * @param {callback} callback
+         * @param {string} [zipPath] optional path inside zip
+         * @param {RegExp|function} [filter] optional RegExp or Function if files match will
          *               be included.
          */
         addLocalFolderAsync: function(localPath, callback, zipPath, filter) {
-          if (filter instanceof RegExp) {
-            filter = /* @__PURE__ */ function(rx) {
-              return function(filename) {
-                return rx.test(filename);
-              };
-            }(filter);
-          } else if ("function" !== typeof filter) {
-            filter = function() {
-              return true;
-            };
-          }
+          filter = filenameFilter(filter);
           zipPath = zipPath ? fixPath(zipPath) : "";
           localPath = pth.normalize(localPath);
           var self2 = this;
           filetools.fs.open(localPath, "r", function(err) {
             if (err && err.code === "ENOENT") {
-              callback(void 0, Utils.Errors.FILE_NOT_FOUND.replace("%s", localPath));
+              callback(void 0, Utils.Errors.FILE_NOT_FOUND(localPath));
             } else if (err) {
               callback(void 0, err);
             } else {
@@ -22014,7 +22313,7 @@ var require_adm_zip = __commonJS({
                 i += 1;
                 if (i < items.length) {
                   var filepath = items[i];
-                  var p = pth.relative(localPath, filepath).split("\\").join("/");
+                  var p = relativePath(localPath, filepath).split("\\").join("/");
                   p = p.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x20-\x7E]/g, "");
                   if (filter(p)) {
                     filetools.fs.stat(filepath, function(er0, stats) {
@@ -22047,24 +22346,83 @@ var require_adm_zip = __commonJS({
           });
         },
         /**
+         * Adds a local directory and all its nested files and directories to the archive
+         *
+         * @param {object | string} options - options object, if it is string it us used as localPath.
+         * @param {string} options.localPath - Local path to the folder.
+         * @param {string} [options.zipPath] - optional path inside zip.
+         * @param {RegExp|function} [options.filter] - optional RegExp or Function if files match will be included.
+         * @param {function|string} [options.namefix] - optional function to help fix filename
+         * @param {doneCallback} callback - The callback that handles the response.
+         *
+         */
+        addLocalFolderAsync2: function(options2, callback) {
+          const self2 = this;
+          options2 = typeof options2 === "object" ? options2 : { localPath: options2 };
+          const localPath = pth.resolve(fixPath(options2.localPath));
+          let { zipPath, filter, namefix } = options2;
+          if (filter instanceof RegExp) {
+            filter = /* @__PURE__ */ function(rx) {
+              return function(filename) {
+                return rx.test(filename);
+              };
+            }(filter);
+          } else if ("function" !== typeof filter) {
+            filter = function() {
+              return true;
+            };
+          }
+          zipPath = zipPath ? fixPath(zipPath) : "";
+          if (namefix === "latin1") {
+            namefix = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x20-\x7E]/g, "");
+          }
+          if (typeof namefix !== "function") namefix = (str) => str;
+          const relPathFix = (entry) => pth.join(zipPath, namefix(relativePath(localPath, entry)));
+          const fileNameFix = (entry) => pth.win32.basename(pth.win32.normalize(namefix(entry)));
+          filetools.fs.open(localPath, "r", function(err) {
+            if (err && err.code === "ENOENT") {
+              callback(void 0, Utils.Errors.FILE_NOT_FOUND(localPath));
+            } else if (err) {
+              callback(void 0, err);
+            } else {
+              filetools.findFilesAsync(localPath, function(err2, fileEntries) {
+                if (err2) return callback(err2);
+                fileEntries = fileEntries.filter((dir) => filter(relPathFix(dir)));
+                if (!fileEntries.length) callback(void 0, false);
+                setImmediate(
+                  fileEntries.reverse().reduce(function(next, entry) {
+                    return function(err3, done) {
+                      if (err3 || done === false) return setImmediate(next, err3, false);
+                      self2.addLocalFileAsync(
+                        {
+                          localPath: entry,
+                          zipPath: pth.dirname(relPathFix(entry)),
+                          zipName: fileNameFix(entry)
+                        },
+                        next
+                      );
+                    };
+                  }, callback)
+                );
+              });
+            }
+          });
+        },
+        /**
+         * Adds a local directory and all its nested files and directories to the archive
          *
          * @param {string} localPath - path where files will be extracted
          * @param {object} props - optional properties
-         * @param {string} props.zipPath - optional path inside zip
-         * @param {regexp, function} props.filter - RegExp or Function if files match will be included.
+         * @param {string} [props.zipPath] - optional path inside zip
+         * @param {RegExp|function} [props.filter] - optional RegExp or Function if files match will be included.
+         * @param {function|string} [props.namefix] - optional function to help fix filename
          */
         addLocalFolderPromise: function(localPath, props) {
           return new Promise((resolve, reject) => {
-            const { filter, zipPath } = Object.assign({}, props);
-            this.addLocalFolderAsync(
-              localPath,
-              (done, err) => {
-                if (err) reject(err);
-                if (done) resolve(this);
-              },
-              zipPath,
-              filter
-            );
+            this.addLocalFolderAsync2(Object.assign({ localPath }, props), (err, done) => {
+              if (err) reject(err);
+              if (done) resolve(this);
+            });
           });
         },
         /**
@@ -22074,14 +22432,15 @@ var require_adm_zip = __commonJS({
          *
          * @param {string} entryName
          * @param {Buffer | string} content - file content as buffer or utf8 coded string
-         * @param {string} comment - file comment
-         * @param {number | object} attr - number as unix file permissions, object as filesystem Stats object
+         * @param {string} [comment] - file comment
+         * @param {number | object} [attr] - number as unix file permissions, object as filesystem Stats object
          */
         addFile: function(entryName, content, comment, attr) {
+          entryName = zipnamefix(entryName);
           let entry = getEntry(entryName);
           const update = entry != null;
           if (!update) {
-            entry = new ZipEntry();
+            entry = new ZipEntry(opts);
             entry.entryName = entryName;
           }
           entry.comment = comment || "";
@@ -22102,19 +22461,22 @@ var require_adm_zip = __commonJS({
           entry.attr = fileattr;
           entry.setData(content);
           if (!update) _zip.setEntry(entry);
+          return entry;
         },
         /**
          * Returns an array of ZipEntry objects representing the files and folders inside the archive
          *
-         * @return Array
+         * @param {string} [password]
+         * @returns Array
          */
-        getEntries: function() {
+        getEntries: function(password) {
+          _zip.password = password;
           return _zip ? _zip.entries : [];
         },
         /**
          * Returns a ZipEntry object representing the file or folder specified by ``name``.
          *
-         * @param name
+         * @param {string} name
          * @return ZipEntry
          */
         getEntry: function(name) {
@@ -22130,48 +22492,45 @@ var require_adm_zip = __commonJS({
          * Extracts the given entry to the given targetPath
          * If the entry is a directory inside the archive, the entire directory and it's subdirectories will be extracted
          *
-         * @param entry ZipEntry object or String with the full path of the entry
-         * @param targetPath Target folder where to write the file
-         * @param maintainEntryPath If maintainEntryPath is true and the entry is inside a folder, the entry folder
-         *                          will be created in targetPath as well. Default is TRUE
-         * @param overwrite If the file already exists at the target path, the file will be overwriten if this is true.
-         *                  Default is FALSE
-         * @param keepOriginalPermission The file will be set as the permission from the entry if this is true.
-         *                  Default is FALSE
-         * @param outFileName String If set will override the filename of the extracted file (Only works if the entry is a file)
+         * @param {string|ZipEntry} entry - ZipEntry object or String with the full path of the entry
+         * @param {string} targetPath - Target folder where to write the file
+         * @param {boolean} [maintainEntryPath=true] - If maintainEntryPath is true and the entry is inside a folder, the entry folder will be created in targetPath as well. Default is TRUE
+         * @param {boolean} [overwrite=false] - If the file already exists at the target path, the file will be overwriten if this is true.
+         * @param {boolean} [keepOriginalPermission=false] - The file will be set as the permission from the entry if this is true.
+         * @param {string} [outFileName] - String If set will override the filename of the extracted file (Only works if the entry is a file)
          *
          * @return Boolean
          */
         extractEntryTo: function(entry, targetPath, maintainEntryPath, overwrite, keepOriginalPermission, outFileName) {
-          overwrite = get_Bool(overwrite, false);
-          keepOriginalPermission = get_Bool(keepOriginalPermission, false);
-          maintainEntryPath = get_Bool(maintainEntryPath, true);
-          outFileName = get_Str(outFileName, get_Str(keepOriginalPermission, void 0));
+          overwrite = get_Bool(false, overwrite);
+          keepOriginalPermission = get_Bool(false, keepOriginalPermission);
+          maintainEntryPath = get_Bool(true, maintainEntryPath);
+          outFileName = get_Str(keepOriginalPermission, outFileName);
           var item = getEntry(entry);
           if (!item) {
-            throw new Error(Utils.Errors.NO_ENTRY);
+            throw Utils.Errors.NO_ENTRY();
           }
           var entryName = canonical(item.entryName);
-          var target = sanitize(targetPath, outFileName && !item.isDirectory ? outFileName : maintainEntryPath ? entryName : pth.basename(entryName));
+          var target = sanitize(targetPath, outFileName && !item.isDirectory ? canonical(outFileName) : maintainEntryPath ? entryName : pth.basename(entryName));
           if (item.isDirectory) {
             var children = _zip.getEntryChildren(item);
             children.forEach(function(child) {
               if (child.isDirectory) return;
               var content2 = child.getData();
               if (!content2) {
-                throw new Error(Utils.Errors.CANT_EXTRACT_FILE);
+                throw Utils.Errors.CANT_EXTRACT_FILE();
               }
-              var name = canonical(child.entryName);
-              var childName = sanitize(targetPath, maintainEntryPath ? name : pth.basename(name));
+              var name = canonical(maintainEntryPath ? child.entryName : child.entryName.substring(item.entryName.length));
+              var childName = sanitize(targetPath, name);
               const fileAttr2 = keepOriginalPermission ? child.header.fileAttr : void 0;
               filetools.writeFileTo(childName, content2, overwrite, fileAttr2);
             });
             return true;
           }
-          var content = item.getData();
-          if (!content) throw new Error(Utils.Errors.CANT_EXTRACT_FILE);
+          var content = item.getData(_zip.password);
+          if (!content) throw Utils.Errors.CANT_EXTRACT_FILE();
           if (filetools.fs.existsSync(target) && !overwrite) {
-            throw new Error(Utils.Errors.CANT_OVERRIDE);
+            throw Utils.Errors.CANT_OVERRIDE();
           }
           const fileAttr = keepOriginalPermission ? entry.header.fileAttr : void 0;
           filetools.writeFileTo(target, content, overwrite, fileAttr);
@@ -22179,18 +22538,18 @@ var require_adm_zip = __commonJS({
         },
         /**
          * Test the archive
-         *
+         * @param {string} [pass]
          */
         test: function(pass) {
           if (!_zip) {
             return false;
           }
-          for (var entry in _zip.entries) {
+          for (var entry of _zip.entries) {
             try {
               if (entry.isDirectory) {
                 continue;
               }
-              var content = _zip.entries[entry].getData(pass);
+              var content = entry.getData(pass);
               if (!content) {
                 return false;
               }
@@ -22203,125 +22562,139 @@ var require_adm_zip = __commonJS({
         /**
          * Extracts the entire archive to the given location
          *
-         * @param targetPath Target location
-         * @param overwrite If the file already exists at the target path, the file will be overwriten if this is true.
+         * @param {string} targetPath Target location
+         * @param {boolean} [overwrite=false] If the file already exists at the target path, the file will be overwriten if this is true.
          *                  Default is FALSE
-         * @param keepOriginalPermission The file will be set as the permission from the entry if this is true.
+         * @param {boolean} [keepOriginalPermission=false] The file will be set as the permission from the entry if this is true.
          *                  Default is FALSE
+         * @param {string|Buffer} [pass] password
          */
         extractAllTo: function(targetPath, overwrite, keepOriginalPermission, pass) {
-          overwrite = get_Bool(overwrite, false);
+          keepOriginalPermission = get_Bool(false, keepOriginalPermission);
           pass = get_Str(keepOriginalPermission, pass);
-          keepOriginalPermission = get_Bool(keepOriginalPermission, false);
-          if (!_zip) {
-            throw new Error(Utils.Errors.NO_ZIP);
-          }
+          overwrite = get_Bool(false, overwrite);
+          if (!_zip) throw Utils.Errors.NO_ZIP();
+          const dirEntries = [];
           _zip.entries.forEach(function(entry) {
-            var entryName = sanitize(targetPath, canonical(entry.entryName.toString()));
+            var entryName = sanitize(targetPath, canonical(entry.entryName));
             if (entry.isDirectory) {
               filetools.makeDir(entryName);
+              if (keepOriginalPermission) dirEntries.push({ path: entryName, attr: entry.header.fileAttr });
               return;
             }
             var content = entry.getData(pass);
             if (!content) {
-              throw new Error(Utils.Errors.CANT_EXTRACT_FILE);
+              throw Utils.Errors.CANT_EXTRACT_FILE();
             }
             const fileAttr = keepOriginalPermission ? entry.header.fileAttr : void 0;
             filetools.writeFileTo(entryName, content, overwrite, fileAttr);
             try {
               filetools.fs.utimesSync(entryName, entry.header.time, entry.header.time);
             } catch (err) {
-              throw new Error(Utils.Errors.CANT_EXTRACT_FILE);
             }
           });
+          applyDirAttributes(dirEntries);
         },
         /**
          * Asynchronous extractAllTo
          *
-         * @param targetPath Target location
-         * @param overwrite If the file already exists at the target path, the file will be overwriten if this is true.
+         * @param {string} targetPath Target location
+         * @param {boolean} [overwrite=false] If the file already exists at the target path, the file will be overwriten if this is true.
          *                  Default is FALSE
-         * @param keepOriginalPermission The file will be set as the permission from the entry if this is true.
+         * @param {boolean} [keepOriginalPermission=false] The file will be set as the permission from the entry if this is true.
          *                  Default is FALSE
-         * @param callback The callback will be executed when all entries are extracted successfully or any error is thrown.
+         * @param {function} callback The callback will be executed when all entries are extracted successfully or any error is thrown.
          */
         extractAllToAsync: function(targetPath, overwrite, keepOriginalPermission, callback) {
-          overwrite = get_Bool(overwrite, false);
-          if (typeof keepOriginalPermission === "function" && !callback) callback = keepOriginalPermission;
-          keepOriginalPermission = get_Bool(keepOriginalPermission, false);
+          callback = get_Fun(overwrite, keepOriginalPermission, callback);
+          keepOriginalPermission = get_Bool(false, keepOriginalPermission);
+          overwrite = get_Bool(false, overwrite);
           if (!callback) {
-            callback = function(err) {
-              throw new Error(err);
-            };
+            return new Promise((resolve, reject) => {
+              this.extractAllToAsync(targetPath, overwrite, keepOriginalPermission, function(err) {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(this);
+                }
+              });
+            });
           }
           if (!_zip) {
-            callback(new Error(Utils.Errors.NO_ZIP));
+            callback(Utils.Errors.NO_ZIP());
             return;
           }
           targetPath = pth.resolve(targetPath);
-          const getPath = (entry) => sanitize(targetPath, pth.normalize(canonical(entry.entryName.toString())));
+          const getPath = (entry) => sanitize(targetPath, pth.normalize(canonical(entry.entryName)));
           const getError = (msg, file) => new Error(msg + ': "' + file + '"');
           const dirEntries = [];
-          const fileEntries = /* @__PURE__ */ new Set();
+          const fileEntries = [];
           _zip.entries.forEach((e) => {
             if (e.isDirectory) {
               dirEntries.push(e);
             } else {
-              fileEntries.add(e);
+              fileEntries.push(e);
             }
           });
+          const deferredDirAttr = [];
           for (const entry of dirEntries) {
             const dirPath = getPath(entry);
             const dirAttr = keepOriginalPermission ? entry.header.fileAttr : void 0;
             try {
               filetools.makeDir(dirPath);
-              if (dirAttr) filetools.fs.chmodSync(dirPath, dirAttr);
-              filetools.fs.utimesSync(dirPath, entry.header.time, entry.header.time);
             } catch (er) {
               callback(getError("Unable to create folder", dirPath));
+              continue;
+            }
+            if (dirAttr) deferredDirAttr.push({ path: dirPath, attr: dirAttr });
+            try {
+              filetools.fs.utimesSync(dirPath, entry.header.time, entry.header.time);
+            } catch (er) {
             }
           }
-          const done = () => {
-            if (fileEntries.size === 0) {
-              callback();
-            }
-          };
-          for (const entry of fileEntries.values()) {
-            const entryName = pth.normalize(canonical(entry.entryName.toString()));
-            const filePath = sanitize(targetPath, entryName);
-            entry.getDataAsync(function(content, err_1) {
-              if (err_1) {
-                callback(new Error(err_1));
-                return;
+          const done = (err) => {
+            if (!err) {
+              try {
+                applyDirAttributes(deferredDirAttr);
+              } catch (er) {
+                return callback(getError("Unable to set folder permissions", er.path || ""));
               }
-              if (!content) {
-                callback(new Error(Utils.Errors.CANT_EXTRACT_FILE));
+            }
+            callback(err);
+          };
+          fileEntries.reverse().reduce(function(next, entry) {
+            return function(err) {
+              if (err) {
+                next(err);
               } else {
-                const fileAttr = keepOriginalPermission ? entry.header.fileAttr : void 0;
-                filetools.writeFileToAsync(filePath, content, overwrite, fileAttr, function(succ) {
-                  if (!succ) {
-                    callback(getError("Unable to write file", filePath));
-                    return;
+                const entryName = pth.normalize(canonical(entry.entryName));
+                const filePath = sanitize(targetPath, entryName);
+                entry.getDataAsync(function(content, err_1) {
+                  if (err_1) {
+                    next(err_1);
+                  } else if (!content) {
+                    next(Utils.Errors.CANT_EXTRACT_FILE());
+                  } else {
+                    const fileAttr = keepOriginalPermission ? entry.header.fileAttr : void 0;
+                    filetools.writeFileToAsync(filePath, content, overwrite, fileAttr, function(succ) {
+                      if (!succ) {
+                        return next(getError("Unable to write file", filePath));
+                      }
+                      filetools.fs.utimes(filePath, entry.header.time, entry.header.time, function() {
+                        next();
+                      });
+                    });
                   }
-                  filetools.fs.utimes(filePath, entry.header.time, entry.header.time, function(err_2) {
-                    if (err_2) {
-                      callback(getError("Unable to set times", filePath));
-                      return;
-                    }
-                    fileEntries.delete(entry);
-                    done();
-                  });
                 });
               }
-            });
-          }
-          done();
+            };
+          }, done)();
         },
         /**
          * Writes the newly created zip file to disk at the specified location or if a zip was opened and no ``targetFileName`` is provided, it will overwrite the opened zip
          *
-         * @param targetFileName
-         * @param callback
+         * @param {string} targetFileName
+         * @param {function} callback
          */
         writeZip: function(targetFileName, callback) {
           if (arguments.length === 1) {
@@ -22340,6 +22713,15 @@ var require_adm_zip = __commonJS({
             if (typeof callback === "function") callback(!ok ? new Error("failed") : null, "");
           }
         },
+        /**
+                 *
+                 * @param {string} targetFileName
+                 * @param {object} [props]
+                 * @param {boolean} [props.overwrite=true] If the file already exists at the target path, the file will be overwriten if this is true.
+                 * @param {boolean} [props.perm] The file will be set as the permission from the entry if this is true.
+        
+                 * @returns {Promise<void>}
+                 */
         writeZipPromise: function(targetFileName, props) {
           const { overwrite, perm } = Object.assign({ overwrite: true }, props);
           return new Promise((resolve, reject) => {
@@ -22351,6 +22733,9 @@ var require_adm_zip = __commonJS({
             }, reject);
           });
         },
+        /**
+         * @returns {Promise<Buffer>} A promise to the Buffer.
+         */
         toBufferPromise: function() {
           return new Promise((resolve, reject) => {
             _zip.toAsyncBuffer(resolve, reject);
@@ -22359,10 +22744,13 @@ var require_adm_zip = __commonJS({
         /**
          * Returns the content of the entire zip file as a Buffer object
          *
-         * @return Buffer
+         * @prop {function} [onSuccess]
+         * @prop {function} [onFail]
+         * @prop {function} [onItemStart]
+         * @prop {function} [onItemEnd]
+         * @returns {Buffer}
          */
         toBuffer: function(onSuccess, onFail, onItemStart, onItemEnd) {
-          this.valueOf = 2;
           if (typeof onSuccess === "function") {
             _zip.toAsyncBuffer(onSuccess, onFail, onItemStart, onItemEnd);
             return null;
@@ -41768,9 +42156,11 @@ var require_feedType = __commonJS({
       FeedType2["AwsElasticContainerRegistry"] = "AwsElasticContainerRegistry";
       FeedType2["BuiltIn"] = "BuiltIn";
       FeedType2["Docker"] = "Docker";
+      FeedType2["GcsStorage"] = "GcsStorage";
       FeedType2["GitHub"] = "GitHub";
       FeedType2["Helm"] = "Helm";
       FeedType2["Maven"] = "Maven";
+      FeedType2["Npm"] = "Npm";
       FeedType2["Nuget"] = "NuGet";
       FeedType2["OctopusProject"] = "OctopusProject";
     })(FeedType = exports2.FeedType || (exports2.FeedType = {}));
@@ -41863,6 +42253,14 @@ var require_feedRepository = __commonJS({
   }
 });
 
+// node_modules/@octopusdeploy/api-client/dist/features/feeds/gcsStorageFeed.js
+var require_gcsStorageFeed = __commonJS({
+  "node_modules/@octopusdeploy/api-client/dist/features/feeds/gcsStorageFeed.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+  }
+});
+
 // node_modules/@octopusdeploy/api-client/dist/features/feeds/gitHubFeed.js
 var require_gitHubFeed = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/feeds/gitHubFeed.js"(exports2) {
@@ -41938,6 +42336,7 @@ var require_feeds = __commonJS({
     __exportStar(require_feed(), exports2);
     __exportStar(require_feedRepository(), exports2);
     __exportStar(require_feedType(), exports2);
+    __exportStar(require_gcsStorageFeed(), exports2);
     __exportStar(require_gitHubFeed(), exports2);
     __exportStar(require_helmFeed(), exports2);
     __exportStar(require_mavenFeed(), exports2);
@@ -47505,6 +47904,147 @@ var require_semver2 = __commonJS({
   }
 });
 
+// node_modules/@octopusdeploy/api-client/dist/versionCheck.js
+var require_versionCheck = __commonJS({
+  "node_modules/@octopusdeploy/api-client/dist/versionCheck.js"(exports2) {
+    "use strict";
+    var __awaiter2 = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    var __generator = exports2 && exports2.__generator || function(thisArg, body) {
+      var _ = { label: 0, sent: function() {
+        if (t[0] & 1) throw t[1];
+        return t[1];
+      }, trys: [], ops: [] }, f, y, t, g;
+      return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+        return this;
+      }), g;
+      function verb(n) {
+        return function(v) {
+          return step([n, v]);
+        };
+      }
+      function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+          if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+          if (y = 0, t) op = [op[0] & 2, t.value];
+          switch (op[0]) {
+            case 0:
+            case 1:
+              t = op;
+              break;
+            case 4:
+              _.label++;
+              return { value: op[1], done: false };
+            case 5:
+              _.label++;
+              y = op[1];
+              op = [0];
+              continue;
+            case 7:
+              op = _.ops.pop();
+              _.trys.pop();
+              continue;
+            default:
+              if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                _ = 0;
+                continue;
+              }
+              if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                _.label = op[1];
+                break;
+              }
+              if (op[0] === 6 && _.label < t[1]) {
+                _.label = t[1];
+                t = op;
+                break;
+              }
+              if (t && _.label < t[2]) {
+                _.label = t[2];
+                _.ops.push(op);
+                break;
+              }
+              if (t[2]) _.ops.pop();
+              _.trys.pop();
+              continue;
+          }
+          op = body.call(thisArg, _);
+        } catch (e) {
+          op = [6, e];
+          y = 0;
+        } finally {
+          f = t = 0;
+        }
+        if (op[0] & 5) throw op[1];
+        return { value: op[0] ? op[1] : void 0, done: true };
+      }
+    };
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.ensureServerVersionAtLeast = exports2.isServerVersionAtLeast = exports2.isLocalOctopusVersion = void 0;
+    var semver_1 = require_semver2();
+    function isLocalOctopusVersion(version) {
+      return /^0\.0\.0(?:[-+].*)?$/.test(version);
+    }
+    exports2.isLocalOctopusVersion = isLocalOctopusVersion;
+    function isServerVersionAtLeast(serverVersion, minimumVersion) {
+      if (isLocalOctopusVersion(serverVersion))
+        return true;
+      if (!(0, semver_1.valid)(serverVersion))
+        return false;
+      return !(0, semver_1.lt)(serverVersion, minimumVersion);
+    }
+    exports2.isServerVersionAtLeast = isServerVersionAtLeast;
+    function ensureServerVersionAtLeast(client, minimumVersion, featureDescription) {
+      var _a;
+      return __awaiter2(this, void 0, void 0, function() {
+        var serverInformation, message;
+        return __generator(this, function(_b) {
+          switch (_b.label) {
+            case 0:
+              return [4, client.getServerInformation()];
+            case 1:
+              serverInformation = _b.sent();
+              if (isServerVersionAtLeast(serverInformation.version, minimumVersion))
+                return [
+                  2
+                  /*return*/
+                ];
+              message = "The Octopus instance doesn't support ".concat(featureDescription, ", it will need to be upgraded to at least ").concat(minimumVersion, " in order to access this API.");
+              (_a = client.error) === null || _a === void 0 ? void 0 : _a.call(client, message);
+              throw new Error(message);
+          }
+        });
+      });
+    }
+    exports2.ensureServerVersionAtLeast = ensureServerVersionAtLeast;
+  }
+});
+
 // node_modules/@octopusdeploy/api-client/dist/features/projects/releases/deployments/deploymentRepository.js
 var require_deploymentRepository = __commonJS({
   "node_modules/@octopusdeploy/api-client/dist/features/projects/releases/deployments/deploymentRepository.js"(exports2) {
@@ -47619,7 +48159,7 @@ var require_deploymentRepository = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DeploymentRepository = void 0;
     var __1 = require_dist2();
-    var semver_1 = require_semver2();
+    var versionCheck_1 = require_versionCheck();
     var DeploymentRepository = (
       /** @class */
       function() {
@@ -47635,23 +48175,18 @@ var require_deploymentRepository = __commonJS({
           return this.client.request("".concat(this.baseApiPathTemplate, "{?skip,take,ids,projects,environments,tenants,channels,taskState}"), __assign({ spaceName: this.spaceName }, args));
         };
         DeploymentRepository2.prototype.create = function(command) {
-          var _a, _b;
           return __awaiter2(this, void 0, void 0, function() {
-            var serverInformation, response, mappedTasks;
-            return __generator(this, function(_c) {
-              switch (_c.label) {
+            var response, mappedTasks;
+            return __generator(this, function(_a) {
+              switch (_a.label) {
                 case 0:
-                  return [4, this.client.getServerInformation()];
+                  return [4, (0, versionCheck_1.ensureServerVersionAtLeast)(this.client, "2022.3.5512", "deploying releases using the Executions API")];
                 case 1:
-                  serverInformation = _c.sent();
-                  if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
-                    (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support deploying releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                    throw new Error("The Octopus instance doesn't support deploying releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                  }
+                  _a.sent();
                   this.client.debug("Deploying a release...");
                   return [4, this.client.doCreate("".concat(this.baseApiPathTemplate, "/create/untenanted/v1"), __assign({ spaceIdOrName: command.spaceName }, command))];
                 case 2:
-                  response = _c.sent();
+                  response = _a.sent();
                   if (response.DeploymentServerTasks.length == 0) {
                     throw new Error("No server task details returned");
                   }
@@ -47672,23 +48207,18 @@ var require_deploymentRepository = __commonJS({
           });
         };
         DeploymentRepository2.prototype.createTenanted = function(command) {
-          var _a, _b;
           return __awaiter2(this, void 0, void 0, function() {
-            var serverInformation, response, mappedTasks;
-            return __generator(this, function(_c) {
-              switch (_c.label) {
+            var response, mappedTasks;
+            return __generator(this, function(_a) {
+              switch (_a.label) {
                 case 0:
-                  return [4, this.client.getServerInformation()];
+                  return [4, (0, versionCheck_1.ensureServerVersionAtLeast)(this.client, "2022.3.5512", "deploying tenanted releases using the Executions API")];
                 case 1:
-                  serverInformation = _c.sent();
-                  if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
-                    (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support deploying tenanted releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                    throw new Error("The Octopus instance doesn't support deploying tenanted releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                  }
+                  _a.sent();
                   this.client.debug("Deploying a tenanted release...");
                   return [4, this.client.doCreate("".concat(this.baseApiPathTemplate, "/create/tenanted/v1"), __assign({ spaceIdOrName: command.spaceName }, command))];
                 case 2:
-                  response = _c.sent();
+                  response = _a.sent();
                   if (response.DeploymentServerTasks.length == 0) {
                     throw new Error("No server task details returned");
                   }
@@ -47898,7 +48428,7 @@ var require_releaseRepository = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.ReleaseRepository = void 0;
     var __1 = require_dist2();
-    var semver_1 = require_semver2();
+    var versionCheck_1 = require_versionCheck();
     var ReleaseRepository = (
       /** @class */
       function() {
@@ -47907,23 +48437,18 @@ var require_releaseRepository = __commonJS({
           this.spaceName = spaceName;
         }
         ReleaseRepository2.prototype.create = function(command) {
-          var _a, _b;
           return __awaiter2(this, void 0, void 0, function() {
-            var serverInformation, response;
-            return __generator(this, function(_c) {
-              switch (_c.label) {
+            var response;
+            return __generator(this, function(_a) {
+              switch (_a.label) {
                 case 0:
-                  return [4, this.client.getServerInformation()];
+                  return [4, (0, versionCheck_1.ensureServerVersionAtLeast)(this.client, "2022.3.5512", "creating releases using the Executions API")];
                 case 1:
-                  serverInformation = _c.sent();
-                  if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
-                    (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support creating releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                    throw new Error("The Octopus instance doesn't support creating releases using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                  }
+                  _a.sent();
                   this.client.debug("Creating a release...");
                   return [4, this.client.doCreate("".concat(__1.spaceScopedRoutePrefix, "/releases/create/v1"), __assign({ spaceIdOrName: command.spaceName }, command))];
                 case 2:
-                  response = _c.sent();
+                  response = _a.sent();
                   this.client.debug("Release created successfully.");
                   return [2, response];
               }
@@ -48118,7 +48643,7 @@ var require_runbookRunRepository = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.RunbookRunRepository = void 0;
     var spaceScopedRoutePrefix_1 = require_spaceScopedRoutePrefix();
-    var semver_1 = require_semver2();
+    var versionCheck_1 = require_versionCheck();
     var RunbookRunRepository = (
       /** @class */
       function() {
@@ -48134,23 +48659,18 @@ var require_runbookRunRepository = __commonJS({
           return this.client.request("".concat(this.baseApiPathTemplate, "{?skip,take,ids,projects,environments,tenants,runbooks,taskState,partialName}"), __assign({ spaceName: this.spaceName }, args));
         };
         RunbookRunRepository2.prototype.create = function(command) {
-          var _a, _b;
           return __awaiter2(this, void 0, void 0, function() {
-            var serverInformation, response, mappedTasks;
-            return __generator(this, function(_c) {
-              switch (_c.label) {
+            var response, mappedTasks;
+            return __generator(this, function(_a) {
+              switch (_a.label) {
                 case 0:
-                  return [4, this.client.getServerInformation()];
+                  return [4, (0, versionCheck_1.ensureServerVersionAtLeast)(this.client, "2022.3.5512", "running runbooks using the Executions API")];
                 case 1:
-                  serverInformation = _c.sent();
-                  if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
-                    (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support running runbooks using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                    throw new Error("The Octopus instance doesn't support running runbooks using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                  }
+                  _a.sent();
                   this.client.debug("Running a runbook...");
                   return [4, this.client.doCreate("".concat(spaceScopedRoutePrefix_1.spaceScopedRoutePrefix, "/runbook-runs/create/v1"), __assign({ spaceIdOrName: command.spaceName }, command))];
                 case 2:
-                  response = _c.sent();
+                  response = _a.sent();
                   if (response.RunbookRunServerTasks.length == 0) {
                     throw new Error("No server task details returned");
                   }
@@ -48171,23 +48691,18 @@ var require_runbookRunRepository = __commonJS({
           });
         };
         RunbookRunRepository2.prototype.createGit = function(command, gitRef) {
-          var _a, _b;
           return __awaiter2(this, void 0, void 0, function() {
-            var serverInformation, response, mappedTasks;
-            return __generator(this, function(_c) {
-              switch (_c.label) {
+            var response, mappedTasks;
+            return __generator(this, function(_a) {
+              switch (_a.label) {
                 case 0:
-                  return [4, this.client.getServerInformation()];
+                  return [4, (0, versionCheck_1.ensureServerVersionAtLeast)(this.client, "2022.3.5512", "running runbooks using the Executions API")];
                 case 1:
-                  serverInformation = _c.sent();
-                  if ((0, semver_1.lt)(serverInformation.version, "2022.3.5512")) {
-                    (_b = (_a = this.client).error) === null || _b === void 0 ? void 0 : _b.call(_a, "The Octopus instance doesn't support running runbooks using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                    throw new Error("The Octopus instance doesn't support running runbooks using the Executions API, it will need to be upgraded to at least 2022.3.5512 in order to access this API.");
-                  }
+                  _a.sent();
                   this.client.debug("Running a runbook...");
                   return [4, this.client.doCreate("".concat(spaceScopedRoutePrefix_1.spaceScopedRoutePrefix, "/runbook-runs/git/create/v1"), __assign({ spaceIdOrName: command.spaceName, gitRef }, command))];
                 case 2:
-                  response = _c.sent();
+                  response = _a.sent();
                   if (response.RunbookRunServerTasks.length == 0) {
                     throw new Error("No server task details returned");
                   }
@@ -52910,6 +53425,25 @@ var require_axios = __commonJS({
       iterator,
       toStringTag
     } = Symbol;
+    var hasOwnProperty = (({
+      hasOwnProperty: hasOwnProperty2
+    }) => (obj, prop) => hasOwnProperty2.call(obj, prop))(Object.prototype);
+    var hasOwnInPrototypeChain = (thing, prop) => {
+      let obj = thing;
+      const seen = [];
+      while (obj != null && obj !== Object.prototype) {
+        if (seen.indexOf(obj) !== -1) {
+          return false;
+        }
+        seen.push(obj);
+        if (hasOwnProperty(obj, prop)) {
+          return true;
+        }
+        obj = getPrototypeOf(obj);
+      }
+      return false;
+    };
+    var getSafeProp = (obj, prop) => obj != null && hasOwnInPrototypeChain(obj, prop) ? obj[prop] : void 0;
     var kindOf = /* @__PURE__ */ ((cache) => (thing) => {
       const str = toString.call(thing);
       return cache[str] || (cache[str] = str.slice(8, -1).toLowerCase());
@@ -52942,11 +53476,14 @@ var require_axios = __commonJS({
     var isObject = (thing) => thing !== null && typeof thing === "object";
     var isBoolean = (thing) => thing === true || thing === false;
     var isPlainObject = (val) => {
-      if (kindOf(val) !== "object") {
+      if (!isObject(val)) {
         return false;
       }
       const prototype2 = getPrototypeOf(val);
-      return (prototype2 === null || prototype2 === Object.prototype || Object.getPrototypeOf(prototype2) === null) && !(toStringTag in val) && !(iterator in val);
+      return (prototype2 === null || prototype2 === Object.prototype || getPrototypeOf(prototype2) === null) && // Treat any genuine (non-Object.prototype-polluted) Symbol.toStringTag or
+      // Symbol.iterator as evidence the value is a tagged/iterable type rather
+      // than a plain object, while ignoring keys injected onto Object.prototype.
+      !hasOwnInPrototypeChain(val, toStringTag) && !hasOwnInPrototypeChain(val, iterator);
     };
     var isEmptyObject = (val) => {
       if (!isObject(val) || isBuffer(val)) {
@@ -53199,9 +53736,6 @@ var require_axios = __commonJS({
         return p1.toUpperCase() + p2;
       });
     };
-    var hasOwnProperty = (({
-      hasOwnProperty: hasOwnProperty2
-    }) => (obj, prop) => hasOwnProperty2.call(obj, prop))(Object.prototype);
     var {
       propertyIsEnumerable
     } = Object.prototype;
@@ -53302,6 +53836,7 @@ var require_axios = __commonJS({
     })(typeof setImmediate === "function", isFunction$1(_global.postMessage));
     var asap = typeof queueMicrotask !== "undefined" ? queueMicrotask.bind(_global) : typeof process !== "undefined" && process.nextTick || _setImmediate;
     var isIterable = (thing) => thing != null && isFunction$1(thing[iterator]);
+    var isSafeIterable = (thing) => thing != null && hasOwnInPrototypeChain(thing, iterator) && isIterable(thing);
     var utils$1 = {
       isArray,
       isArrayBuffer,
@@ -53347,6 +53882,8 @@ var require_axios = __commonJS({
       hasOwnProperty,
       hasOwnProp: hasOwnProperty,
       // an alias to avoid ESLint no-prototype-builtins detection
+      hasOwnInPrototypeChain,
+      getSafeProp,
       reduceDescriptors,
       freezeMethods,
       toObjectSet,
@@ -53362,7 +53899,8 @@ var require_axios = __commonJS({
       isThenable,
       setImmediate: _setImmediate,
       asap,
-      isIterable
+      isIterable,
+      isSafeIterable
     };
     var ignoreDuplicateOf = utils$1.toObjectSet(["age", "authorization", "content-length", "content-type", "etag", "expires", "from", "host", "if-modified-since", "if-unmodified-since", "last-modified", "location", "max-forwards", "proxy-authorization", "referer", "retry-after", "user-agent"]);
     var parseHeaders = (rawHeaders) => {
@@ -53500,13 +54038,19 @@ var require_axios = __commonJS({
           setHeaders(header, valueOrRewrite);
         } else if (utils$1.isString(header) && (header = header.trim()) && !isValidHeaderName(header)) {
           setHeaders(parseHeaders(header), valueOrRewrite);
-        } else if (utils$1.isObject(header) && utils$1.isIterable(header)) {
-          let obj = {}, dest, key;
+        } else if (utils$1.isObject(header) && utils$1.isSafeIterable(header)) {
+          let obj = /* @__PURE__ */ Object.create(null), dest, key;
           for (const entry of header) {
             if (!utils$1.isArray(entry)) {
               throw new TypeError("Object iterator must return a key-value pair");
             }
-            obj[key = entry[0]] = (dest = obj[key]) ? utils$1.isArray(dest) ? [...dest, entry[1]] : [dest, entry[1]] : entry[1];
+            key = entry[0];
+            if (utils$1.hasOwnProp(obj, key)) {
+              dest = obj[key];
+              obj[key] = utils$1.isArray(dest) ? [...dest, entry[1]] : [dest, entry[1]];
+            } else {
+              obj[key] = entry[1];
+            }
           }
           setHeaders(obj, valueOrRewrite);
         } else {
@@ -53711,7 +54255,13 @@ var require_axios = __commonJS({
     var AxiosError = class _AxiosError extends Error {
       static from(error2, code, config, request, response, customProps) {
         const axiosError = new _AxiosError(error2.message, code || error2.code, config, request, response);
-        axiosError.cause = error2;
+        Object.defineProperty(axiosError, "cause", {
+          __proto__: null,
+          value: error2,
+          writable: true,
+          enumerable: false,
+          configurable: true
+        });
         axiosError.name = error2.name;
         if (error2.status != null && axiosError.status == null) {
           axiosError.status = error2.status;
@@ -53788,6 +54338,7 @@ var require_axios = __commonJS({
     AxiosError.ERR_NOT_SUPPORT = "ERR_NOT_SUPPORT";
     AxiosError.ERR_INVALID_URL = "ERR_INVALID_URL";
     AxiosError.ERR_FORM_DATA_DEPTH_EXCEEDED = "ERR_FORM_DATA_DEPTH_EXCEEDED";
+    var DEFAULT_FORM_DATA_MAX_DEPTH = 100;
     function isVisitable(thing) {
       return utils$1.isPlainObject(thing) || utils$1.isArray(thing);
     }
@@ -53824,8 +54375,9 @@ var require_axios = __commonJS({
       const dots = options.dots;
       const indexes = options.indexes;
       const _Blob = options.Blob || typeof Blob !== "undefined" && Blob;
-      const maxDepth = options.maxDepth === void 0 ? 100 : options.maxDepth;
+      const maxDepth = options.maxDepth === void 0 ? DEFAULT_FORM_DATA_MAX_DEPTH : options.maxDepth;
       const useBlob = _Blob && utils$1.isSpecCompliantForm(formData);
+      const stack = [];
       if (!utils$1.isFunction(visitor)) {
         throw new TypeError("visitor must be a function");
       }
@@ -53841,9 +54393,37 @@ var require_axios = __commonJS({
           throw new AxiosError("Blob is not supported. Use a Buffer instead.");
         }
         if (utils$1.isArrayBuffer(value) || utils$1.isTypedArray(value)) {
-          return useBlob && typeof Blob === "function" ? new Blob([value]) : Buffer.from(value);
+          if (useBlob && typeof _Blob === "function") {
+            return new _Blob([value]);
+          }
+          if (typeof Buffer !== "undefined") {
+            return Buffer.from(value);
+          }
+          throw new AxiosError("Blob is not supported. Use a Buffer instead.", AxiosError.ERR_NOT_SUPPORT);
         }
         return value;
+      }
+      function throwIfMaxDepthExceeded(depth) {
+        if (depth > maxDepth) {
+          throw new AxiosError("Object is too deeply nested (" + depth + " levels). Max depth: " + maxDepth, AxiosError.ERR_FORM_DATA_DEPTH_EXCEEDED);
+        }
+      }
+      function stringifyWithDepthLimit(value, depth) {
+        if (maxDepth === Infinity) {
+          return JSON.stringify(value);
+        }
+        const ancestors = [];
+        return JSON.stringify(value, function limitDepth(_key, currentValue) {
+          if (!utils$1.isObject(currentValue)) {
+            return currentValue;
+          }
+          while (ancestors.length && ancestors[ancestors.length - 1] !== this) {
+            ancestors.pop();
+          }
+          ancestors.push(currentValue);
+          throwIfMaxDepthExceeded(depth + ancestors.length - 1);
+          return currentValue;
+        });
       }
       function defaultVisitor(value, key, path2) {
         let arr = value;
@@ -53854,7 +54434,7 @@ var require_axios = __commonJS({
         if (value && !path2 && typeof value === "object") {
           if (utils$1.endsWith(key, "{}")) {
             key = metaTokens ? key : key.slice(0, -2);
-            value = JSON.stringify(value);
+            value = stringifyWithDepthLimit(value, 1);
           } else if (utils$1.isArray(value) && isFlatArray(value) || (utils$1.isFileList(value) || utils$1.endsWith(key, "[]")) && (arr = utils$1.toArray(value))) {
             key = removeBrackets(key);
             arr.forEach(function each(el, index) {
@@ -53873,7 +54453,6 @@ var require_axios = __commonJS({
         formData.append(renderKey(path2, key, dots), convertValue(value));
         return false;
       }
-      const stack = [];
       const exposedHelpers = Object.assign(predicates, {
         defaultVisitor,
         convertValue,
@@ -53881,9 +54460,7 @@ var require_axios = __commonJS({
       });
       function build(value, path2, depth = 0) {
         if (utils$1.isUndefined(value)) return;
-        if (depth > maxDepth) {
-          throw new AxiosError("Object is too deeply nested (" + depth + " levels). Max depth: " + maxDepth, AxiosError.ERR_FORM_DATA_DEPTH_EXCEEDED);
-        }
+        throwIfMaxDepthExceeded(depth);
         if (stack.indexOf(value) !== -1) {
           throw new Error("Circular reference detected in " + path2.join("."));
         }
@@ -53924,9 +54501,7 @@ var require_axios = __commonJS({
       this._pairs.push([name, value]);
     };
     prototype.toString = function toString2(encoder) {
-      const _encode = encoder ? function(value) {
-        return encoder.call(this, value, encode$1);
-      } : encode$1;
+      const _encode = encoder ? (value) => encoder.call(this, value, encode$1) : encode$1;
       return this._pairs.map(function each(pair) {
         return _encode(pair[0]) + "=" + _encode(pair[1]);
       }, "").join("&");
@@ -53938,11 +54513,12 @@ var require_axios = __commonJS({
       if (!params) {
         return url2;
       }
-      const _encode = options && options.encode || encode;
+      url2 = url2 || "";
       const _options = utils$1.isFunction(options) ? {
         serialize: options
       } : options;
-      const serializeFn = _options && _options.serialize;
+      const _encode = utils$1.getSafeProp(_options, "encode") || encode;
+      const serializeFn = utils$1.getSafeProp(_options, "serialize");
       let serializedParams;
       if (serializeFn) {
         serializedParams = serializeFn(params, _options);
@@ -54025,7 +54601,8 @@ var require_axios = __commonJS({
       forcedJSONParsing: true,
       clarifyTimeoutError: false,
       legacyInterceptorReqResOrdering: true,
-      advertiseZstdAcceptEncoding: false
+      advertiseZstdAcceptEncoding: false,
+      validateStatusUndefinedResolves: true
     };
     var URLSearchParams2 = url.URLSearchParams;
     var ALPHA = "abcdefghijklmnopqrstuvwxyz";
@@ -54090,10 +54667,21 @@ var require_axios = __commonJS({
         ...options
       });
     }
+    var MAX_DEPTH = DEFAULT_FORM_DATA_MAX_DEPTH;
+    function throwIfDepthExceeded(index) {
+      if (index > MAX_DEPTH) {
+        throw new AxiosError("FormData field is too deeply nested (" + index + " levels). Max depth: " + MAX_DEPTH, AxiosError.ERR_FORM_DATA_DEPTH_EXCEEDED);
+      }
+    }
     function parsePropPath(name) {
-      return utils$1.matchAll(/\w+|\[(\w*)]/g, name).map((match) => {
-        return match[0] === "[]" ? "" : match[1] || match[0];
-      });
+      const path2 = [];
+      const pattern = /\w+|\[(\w*)]/g;
+      let match;
+      while ((match = pattern.exec(name)) !== null) {
+        throwIfDepthExceeded(path2.length);
+        path2.push(match[0] === "[]" ? "" : match[1] || match[0]);
+      }
+      return path2;
     }
     function arrayToObject(arr) {
       const obj = {};
@@ -54109,6 +54697,7 @@ var require_axios = __commonJS({
     }
     function formDataToJSON(formData) {
       function buildPath(path2, value, target, index) {
+        throwIfDepthExceeded(index);
         let name = path2[index++];
         if (name === "__proto__") return true;
         const isNumericKey = Number.isFinite(+name);
@@ -54295,9 +54884,28 @@ var require_axios = __commonJS({
     function combineURLs(baseURL, relativeURL) {
       return relativeURL ? baseURL.replace(/\/?\/$/, "") + "/" + relativeURL.replace(/^\/+/, "") : baseURL;
     }
-    function buildFullPath(baseURL, requestedURL, allowAbsoluteUrls) {
+    var malformedHttpProtocol = /^https?:(?!\/\/)/i;
+    var httpProtocolControlCharacters = /[\t\n\r]/g;
+    function stripLeadingC0ControlOrSpace(url2) {
+      let i = 0;
+      while (i < url2.length && url2.charCodeAt(i) <= 32) {
+        i++;
+      }
+      return url2.slice(i);
+    }
+    function normalizeURLForProtocolCheck(url2) {
+      return stripLeadingC0ControlOrSpace(url2).replace(httpProtocolControlCharacters, "");
+    }
+    function assertValidHttpProtocolURL(url2, config) {
+      if (typeof url2 === "string" && malformedHttpProtocol.test(normalizeURLForProtocolCheck(url2))) {
+        throw new AxiosError('Invalid URL: missing "//" after protocol', AxiosError.ERR_INVALID_URL, config);
+      }
+    }
+    function buildFullPath(baseURL, requestedURL, allowAbsoluteUrls, config) {
+      assertValidHttpProtocolURL(requestedURL, config);
       let isRelativeUrl = !isAbsoluteURL(requestedURL);
       if (baseURL && (isRelativeUrl || allowAbsoluteUrls === false)) {
+        assertValidHttpProtocolURL(baseURL, config);
         return combineURLs(baseURL, requestedURL);
       }
       return requestedURL;
@@ -54367,7 +54975,7 @@ var require_axios = __commonJS({
     function getEnv(key) {
       return process.env[key.toLowerCase()] || process.env[key.toUpperCase()] || "";
     }
-    var VERSION = "1.17.0";
+    var VERSION = "1.18.1";
     function parseProtocol(url2) {
       const match = /^([-+\w]{1,25}):(?:\/\/)?/.exec(url2);
       return match && match[1] || "";
@@ -54389,13 +54997,13 @@ var require_axios = __commonJS({
         const params = match[2];
         const encoding = match[3] ? "base64" : "utf8";
         const body = match[4];
-        let mime;
+        let mime = "";
         if (type) {
           mime = params ? type + params : type;
         } else if (params) {
           mime = "text/plain" + params;
         }
-        const buffer = Buffer.from(decodeURIComponent(body), encoding);
+        const buffer = encoding === "base64" ? Buffer.from(body, "base64") : Buffer.from(decodeURIComponent(body), encoding);
         if (asBlob) {
           if (!_Blob) {
             throw new AxiosError("Blob is not supported", AxiosError.ERR_NOT_SUPPORT);
@@ -54719,12 +55327,28 @@ var require_axios = __commonJS({
         }, cb);
       } : fn;
     };
-    var LOOPBACK_HOSTNAMES = /* @__PURE__ */ new Set(["localhost"]);
+    var LOOPBACK_HOSTNAMES = /* @__PURE__ */ new Set(["localhost", "0.0.0.0"]);
     var isIPv4Loopback = (host) => {
       const parts = host.split(".");
       if (parts.length !== 4) return false;
       if (parts[0] !== "127") return false;
       return parts.every((p) => /^\d+$/.test(p) && Number(p) >= 0 && Number(p) <= 255);
+    };
+    var isIPv6ZeroGroup = (group) => /^0{1,4}$/.test(group);
+    var isIPv6Unspecified = (host) => {
+      if (host === "::") return true;
+      const compressionIndex = host.indexOf("::");
+      if (compressionIndex !== -1) {
+        if (compressionIndex !== host.lastIndexOf("::")) return false;
+        const left = host.slice(0, compressionIndex);
+        const right = host.slice(compressionIndex + 2);
+        const leftGroups = left ? left.split(":") : [];
+        const rightGroups = right ? right.split(":") : [];
+        const explicitGroups = leftGroups.length + rightGroups.length;
+        return explicitGroups < 8 && leftGroups.every(isIPv6ZeroGroup) && rightGroups.every(isIPv6ZeroGroup);
+      }
+      const groups = host.split(":");
+      return groups.length === 8 && groups.every(isIPv6ZeroGroup);
     };
     var isIPv6Loopback = (host) => {
       if (host === "::1") return true;
@@ -54748,6 +55372,7 @@ var require_axios = __commonJS({
       if (!host) return false;
       if (LOOPBACK_HOSTNAMES.has(host)) return true;
       if (isIPv4Loopback(host)) return true;
+      if (isIPv6Unspecified(host)) return true;
       return isIPv6Loopback(host);
     };
     var DEFAULT_PORTS = {
@@ -54940,6 +55565,8 @@ var require_axios = __commonJS({
       }), throttled[1]];
     };
     var asyncDecorator = (fn) => (...args) => utils$1.asap(() => fn(...args));
+    var isHexDigit = (charCode) => charCode >= 48 && charCode <= 57 || charCode >= 65 && charCode <= 70 || charCode >= 97 && charCode <= 102;
+    var isPercentEncodedByte = (str, i, len) => i + 2 < len && isHexDigit(str.charCodeAt(i + 1)) && isHexDigit(str.charCodeAt(i + 2));
     function estimateDataURLDecodedBytes(url2) {
       if (!url2 || typeof url2 !== "string") return 0;
       if (!url2.startsWith("data:")) return 0;
@@ -54955,7 +55582,7 @@ var require_axios = __commonJS({
           if (body.charCodeAt(i) === 37 && i + 2 < len) {
             const a = body.charCodeAt(i + 1);
             const b = body.charCodeAt(i + 2);
-            const isHex = (a >= 48 && a <= 57 || a >= 65 && a <= 70 || a >= 97 && a <= 102) && (b >= 48 && b <= 57 || b >= 65 && b <= 70 || b >= 97 && b <= 102);
+            const isHex = isHexDigit(a) && isHexDigit(b);
             if (isHex) {
               effectiveLen -= 2;
               i += 2;
@@ -54987,13 +55614,13 @@ var require_axios = __commonJS({
         const bytes2 = groups * 3 - (pad || 0);
         return bytes2 > 0 ? bytes2 : 0;
       }
-      if (typeof Buffer !== "undefined" && typeof Buffer.byteLength === "function") {
-        return Buffer.byteLength(body, "utf8");
-      }
       let bytes = 0;
       for (let i = 0, len = body.length; i < len; i++) {
         const c = body.charCodeAt(i);
-        if (c < 128) {
+        if (c === 37 && isPercentEncodedByte(body, i, len)) {
+          bytes += 1;
+          i += 2;
+        } else if (c < 128) {
           bytes += 1;
         } else if (c < 2048) {
           bytes += 2;
@@ -55049,6 +55676,33 @@ var require_axios = __commonJS({
     var kAxiosInstalledTunnel = Symbol("axios.http.installedTunnel");
     var tunnelingAgentCache = /* @__PURE__ */ new Map();
     var tunnelingAgentCacheUser = /* @__PURE__ */ new WeakMap();
+    var NODE_NATIVE_ENV_PROXY_SUPPORT = {
+      22: 21,
+      24: 5
+    };
+    function isNodeNativeEnvProxySupported(nodeVersion = process.versions && process.versions.node) {
+      if (!nodeVersion) {
+        return false;
+      }
+      const [major, minor] = nodeVersion.split(".").map((part) => Number(part));
+      if (!Number.isInteger(major) || !Number.isInteger(minor)) {
+        return false;
+      }
+      if (major > 24) {
+        return true;
+      }
+      return NODE_NATIVE_ENV_PROXY_SUPPORT[major] != null && minor >= NODE_NATIVE_ENV_PROXY_SUPPORT[major];
+    }
+    function isNodeEnvProxyEnabled(agent, nodeVersion = process.versions && process.versions.node) {
+      if (!isNodeNativeEnvProxySupported(nodeVersion)) {
+        return false;
+      }
+      const agentOptions = agent && agent.options;
+      return Boolean(agentOptions && utils$1.hasOwnProp(agentOptions, "proxyEnv") && agentOptions.proxyEnv != null);
+    }
+    function getProxyEnvAgent(options, configHttpAgent, configHttpsAgent) {
+      return isHttps.test(options.protocol) ? configHttpsAgent || https.globalAgent : configHttpAgent || http.globalAgent;
+    }
     function getTunnelingAgent(agentOptions, userHttpsAgent) {
       const key = agentOptions.protocol + "//" + agentOptions.hostname + ":" + (agentOptions.port || "") + "#" + (agentOptions.auth || "");
       const cache = userHttpsAgent ? tunnelingAgentCacheUser.get(userHttpsAgent) || tunnelingAgentCacheUser.set(userHttpsAgent, /* @__PURE__ */ new Map()).get(userHttpsAgent) : tunnelingAgentCache;
@@ -55100,13 +55754,37 @@ var require_axios = __commonJS({
       if (options.beforeRedirects.auth) {
         options.beforeRedirects.auth(options);
       }
+      if (options.beforeRedirects.sensitiveHeaders) {
+        options.beforeRedirects.sensitiveHeaders(options, requestDetails);
+      }
       if (options.beforeRedirects.config) {
         options.beforeRedirects.config(options, responseDetails, requestDetails);
       }
     }
-    function setProxy(options, configProxy, location2, isRedirect, configHttpsAgent) {
+    function stripMatchingHeaders(headers, sensitiveSet) {
+      if (!headers) {
+        return;
+      }
+      Object.keys(headers).forEach((header) => {
+        if (sensitiveSet.has(header.toLowerCase())) {
+          delete headers[header];
+        }
+      });
+    }
+    function isSameOriginRedirect(redirectOptions, requestDetails) {
+      if (!requestDetails) {
+        return false;
+      }
+      try {
+        return new URL(requestDetails.url).origin === new URL(redirectOptions.href).origin;
+      } catch (e) {
+        return false;
+      }
+    }
+    function setProxy(options, configProxy, location2, isRedirect, configHttpsAgent, configHttpAgent) {
       let proxy = configProxy;
-      if (!proxy && proxy !== false) {
+      const proxyEnvAgent = getProxyEnvAgent(options, configHttpAgent, configHttpsAgent);
+      if (!proxy && proxy !== false && !isNodeEnvProxyEnabled(proxyEnvAgent)) {
         const proxyUrl = getProxyForUrl(location2);
         if (proxyUrl) {
           if (!shouldBypassProxy(location2)) {
@@ -55197,7 +55875,7 @@ var require_axios = __commonJS({
         }
       }
       options.beforeRedirects.proxy = function beforeRedirect(redirectOptions) {
-        setProxy(redirectOptions, configProxy, redirectOptions.href, true, configHttpsAgent);
+        setProxy(redirectOptions, configProxy, redirectOptions.href, true, configHttpsAgent, configHttpAgent);
       };
     }
     var isHttpAdapterSupported = typeof process !== "undefined" && utils$1.kindOf(process) === "process";
@@ -55274,7 +55952,7 @@ var require_axios = __commonJS({
     };
     var httpAdapter = isHttpAdapterSupported && function httpAdapter2(config) {
       return wrapAsync(async function dispatchHttpRequest(resolve, reject, onDone) {
-        const own2 = (key) => utils$1.hasOwnProp(config, key) ? config[key] : void 0;
+        const own2 = (key) => utils$1.getSafeProp(config, key);
         const transitional = own2("transitional") || transitionalDefaults;
         let data = own2("data");
         let lookup = own2("lookup");
@@ -55282,9 +55960,17 @@ var require_axios = __commonJS({
         let httpVersion = own2("httpVersion");
         if (httpVersion === void 0) httpVersion = 1;
         let http2Options = own2("http2Options");
+        const httpAgent = own2("httpAgent");
+        const httpsAgent = own2("httpsAgent");
+        const configProxy = own2("proxy");
         const responseType = own2("responseType");
         const responseEncoding = own2("responseEncoding");
-        const method = config.method.toUpperCase();
+        const socketPath = own2("socketPath");
+        const method = own2("method").toUpperCase();
+        const maxRedirects = own2("maxRedirects");
+        const maxBodyLength = own2("maxBodyLength");
+        const maxContentLength = own2("maxContentLength");
+        const decompress = own2("decompress");
         let isDone;
         let rejected = false;
         let req;
@@ -55323,9 +56009,11 @@ var require_axios = __commonJS({
           }
         }
         function createTimeoutError() {
-          let timeoutErrorMessage = config.timeout ? "timeout of " + config.timeout + "ms exceeded" : "timeout exceeded";
-          if (config.timeoutErrorMessage) {
-            timeoutErrorMessage = config.timeoutErrorMessage;
+          const configTimeout = own2("timeout");
+          let timeoutErrorMessage = configTimeout ? "timeout of " + configTimeout + "ms exceeded" : "timeout exceeded";
+          const configTimeoutErrorMessage = own2("timeoutErrorMessage");
+          if (configTimeoutErrorMessage) {
+            timeoutErrorMessage = configTimeoutErrorMessage;
           }
           return new AxiosError(timeoutErrorMessage, transitional.clarifyTimeoutError ? AxiosError.ETIMEDOUT : AxiosError.ECONNABORTED, config, req);
         }
@@ -55366,15 +56054,16 @@ var require_axios = __commonJS({
             onFinished();
           }
         });
-        const fullPath = buildFullPath(config.baseURL, config.url, config.allowAbsoluteUrls);
-        const parsed = new URL(fullPath, platform2.hasBrowserEnv ? platform2.origin : void 0);
+        const fullPath = buildFullPath(own2("baseURL"), own2("url"), own2("allowAbsoluteUrls"), config);
+        const urlBase = socketPath ? "http://localhost" : platform2.hasBrowserEnv ? platform2.origin : void 0;
+        const parsed = new URL(fullPath, urlBase);
         const protocol = parsed.protocol || supportedProtocols[0];
         if (protocol === "data:") {
-          if (config.maxContentLength > -1) {
-            const dataUrl = String(config.url || fullPath || "");
+          if (maxContentLength > -1) {
+            const dataUrl = String(own2("url") || fullPath || "");
             const estimated = estimateDataURLDecodedBytes(dataUrl);
-            if (estimated > config.maxContentLength) {
-              return reject(new AxiosError("maxContentLength size of " + config.maxContentLength + " exceeded", AxiosError.ERR_BAD_RESPONSE, config));
+            if (estimated > maxContentLength) {
+              return reject(new AxiosError("maxContentLength size of " + maxContentLength + " exceeded", AxiosError.ERR_BAD_RESPONSE, config));
             }
           }
           let convertedData;
@@ -55387,7 +56076,7 @@ var require_axios = __commonJS({
             });
           }
           try {
-            convertedData = fromDataURI(config.url, responseType === "blob", {
+            convertedData = fromDataURI(own2("url"), responseType === "blob", {
               Blob: config.env && config.env.Blob
             });
           } catch (err) {
@@ -55452,7 +56141,7 @@ var require_axios = __commonJS({
             return reject(new AxiosError("Data after transformation must be a string, an ArrayBuffer, a Buffer, or a Stream", AxiosError.ERR_BAD_REQUEST, config));
           }
           headers.setContentLength(data.length, false);
-          if (config.maxBodyLength > -1 && data.length > config.maxBodyLength) {
+          if (maxBodyLength > -1 && data.length > maxBodyLength) {
             return reject(new AxiosError("Request body larger than maxBodyLength limit", AxiosError.ERR_BAD_REQUEST, config));
           }
         }
@@ -55477,8 +56166,8 @@ var require_axios = __commonJS({
         let auth = void 0;
         const configAuth = own2("auth");
         if (configAuth) {
-          const username = configAuth.username || "";
-          const password = configAuth.password || "";
+          const username = utils$1.getSafeProp(configAuth, "username") || "";
+          const password = utils$1.getSafeProp(configAuth, "password") || "";
           auth = username + ":" + password;
         }
         if (!auth && (parsed.username || parsed.password)) {
@@ -55489,13 +56178,12 @@ var require_axios = __commonJS({
         auth && headers.delete("authorization");
         let path$1;
         try {
-          path$1 = buildURL(parsed.pathname + parsed.search, config.params, config.paramsSerializer).replace(/^\?/, "");
+          path$1 = buildURL(parsed.pathname + parsed.search, own2("params"), own2("paramsSerializer")).replace(/^\?/, "");
         } catch (err) {
-          const customErr = new Error(err.message);
-          customErr.config = config;
-          customErr.url = config.url;
-          customErr.exists = true;
-          return reject(customErr);
+          return reject(AxiosError.from(err, AxiosError.ERR_BAD_REQUEST, config, null, null, {
+            url: own2("url"),
+            exists: true
+          }));
         }
         headers.set("Accept-Encoding", utils$1.hasOwnProp(transitional, "advertiseZstdAcceptEncoding") && transitional.advertiseZstdAcceptEncoding === true ? ACCEPT_ENCODING_WITH_ZSTD : ACCEPT_ENCODING, false);
         const options = Object.assign(/* @__PURE__ */ Object.create(null), {
@@ -55503,8 +56191,8 @@ var require_axios = __commonJS({
           method,
           headers: toByteStringHeaderObject(headers),
           agents: {
-            http: config.httpAgent,
-            https: config.httpsAgent
+            http: httpAgent,
+            https: httpsAgent
           },
           auth,
           protocol,
@@ -55514,7 +56202,6 @@ var require_axios = __commonJS({
           http2Options
         });
         !utils$1.isUndefined(lookup) && (options.lookup = lookup);
-        const socketPath = own2("socketPath");
         if (socketPath) {
           if (typeof socketPath !== "string") {
             return reject(new AxiosError("socketPath must be a string", AxiosError.ERR_BAD_OPTION_VALUE, config));
@@ -55532,13 +56219,14 @@ var require_axios = __commonJS({
         } else {
           options.hostname = parsed.hostname.startsWith("[") ? parsed.hostname.slice(1, -1) : parsed.hostname;
           options.port = parsed.port;
-          setProxy(options, config.proxy, protocol + "//" + parsed.hostname + (parsed.port ? ":" + parsed.port : "") + options.path, false, config.httpsAgent);
+          setProxy(options, configProxy, protocol + "//" + parsed.hostname + (parsed.port ? ":" + parsed.port : "") + options.path, false, httpsAgent, httpAgent);
         }
         let transport;
         let isNativeTransport = false;
+        let transportEnforcesMaxBodyLength = false;
         const isHttpsRequest = isHttps.test(options.protocol);
         if (options.agent == null) {
-          options.agent = isHttpsRequest ? config.httpsAgent : config.httpAgent;
+          options.agent = isHttpsRequest ? httpsAgent : httpAgent;
         }
         if (isHttp2) {
           transport = http2Transport;
@@ -55546,12 +56234,14 @@ var require_axios = __commonJS({
           const configTransport = own2("transport");
           if (configTransport) {
             transport = configTransport;
-          } else if (config.maxRedirects === 0) {
+          } else if (maxRedirects === 0) {
             transport = isHttpsRequest ? https : http;
             isNativeTransport = true;
           } else {
-            if (config.maxRedirects) {
-              options.maxRedirects = config.maxRedirects;
+            transportEnforcesMaxBodyLength = true;
+            options.sensitiveHeaders = [];
+            if (maxRedirects) {
+              options.maxRedirects = maxRedirects;
             }
             const configBeforeRedirect = own2("beforeRedirect");
             if (configBeforeRedirect) {
@@ -55569,11 +56259,32 @@ var require_axios = __commonJS({
                 }
               };
             }
+            const sensitiveHeaders = own2("sensitiveHeaders");
+            if (sensitiveHeaders != null) {
+              if (!utils$1.isArray(sensitiveHeaders)) {
+                return reject(new AxiosError("sensitiveHeaders must be an array of strings", AxiosError.ERR_BAD_OPTION_VALUE, config));
+              }
+              const sensitiveSet = /* @__PURE__ */ new Set();
+              for (const header of sensitiveHeaders) {
+                if (!utils$1.isString(header)) {
+                  return reject(new AxiosError("sensitiveHeaders must be an array of strings", AxiosError.ERR_BAD_OPTION_VALUE, config));
+                }
+                sensitiveSet.add(header.toLowerCase());
+              }
+              if (sensitiveSet.size) {
+                options.sensitiveHeaders = Array.from(sensitiveSet);
+                options.beforeRedirects.sensitiveHeaders = function beforeRedirectSensitiveHeaders(redirectOptions, requestDetails) {
+                  if (!isSameOriginRedirect(redirectOptions, requestDetails)) {
+                    stripMatchingHeaders(redirectOptions.headers, sensitiveSet);
+                  }
+                };
+              }
+            }
             transport = isHttpsRequest ? httpsFollow : httpFollow;
           }
         }
-        if (config.maxBodyLength > -1) {
-          options.maxBodyLength = config.maxBodyLength;
+        if (maxBodyLength > -1) {
+          options.maxBodyLength = maxBodyLength;
         } else {
           options.maxBodyLength = Infinity;
         }
@@ -55592,7 +56303,7 @@ var require_axios = __commonJS({
           }
           let responseStream = res;
           const lastRequest = res.req || req;
-          if (config.decompress !== false && res.headers["content-encoding"]) {
+          if (decompress !== false && res.headers["content-encoding"]) {
             if (method === "HEAD" || res.statusCode === 204) {
               delete res.headers["content-encoding"];
             }
@@ -55633,8 +56344,8 @@ var require_axios = __commonJS({
             request: lastRequest
           };
           if (responseType === "stream") {
-            if (config.maxContentLength > -1) {
-              const limit = config.maxContentLength;
+            if (maxContentLength > -1) {
+              const limit = maxContentLength;
               const source = responseStream;
               async function* enforceMaxContentLength() {
                 let totalResponseBytes = 0;
@@ -55658,10 +56369,10 @@ var require_axios = __commonJS({
             responseStream.on("data", function handleStreamData(chunk) {
               responseBuffer.push(chunk);
               totalResponseBytes += chunk.length;
-              if (config.maxContentLength > -1 && totalResponseBytes > config.maxContentLength) {
+              if (maxContentLength > -1 && totalResponseBytes > maxContentLength) {
                 rejected = true;
                 responseStream.destroy();
-                abort(new AxiosError("maxContentLength size of " + config.maxContentLength + " exceeded", AxiosError.ERR_BAD_RESPONSE, config, lastRequest));
+                abort(new AxiosError("maxContentLength size of " + maxContentLength + " exceeded", AxiosError.ERR_BAD_RESPONSE, config, lastRequest));
               }
             });
             responseStream.on("aborted", function handlerStreamAborted() {
@@ -55711,7 +56422,9 @@ var require_axios = __commonJS({
         });
         const boundSockets = /* @__PURE__ */ new Set();
         req.on("socket", function handleRequestSocket(socket) {
-          socket.setKeepAlive(true, 1e3 * 60);
+          if (typeof socket.setKeepAlive === "function") {
+            socket.setKeepAlive(true, 1e3 * 60);
+          }
           if (!socket[kAxiosSocketListener]) {
             socket.on("error", function handleSocketError(err) {
               const current = socket[kAxiosCurrentReq];
@@ -55733,8 +56446,8 @@ var require_axios = __commonJS({
           }
           boundSockets.clear();
         });
-        if (config.timeout) {
-          const timeout = parseInt(config.timeout, 10);
+        if (own2("timeout")) {
+          const timeout = parseInt(own2("timeout"), 10);
           if (Number.isNaN(timeout)) {
             abort(new AxiosError("error trying to parse `config.timeout` to int", AxiosError.ERR_BAD_OPTION_VALUE, config, req));
             return;
@@ -55766,8 +56479,8 @@ var require_axios = __commonJS({
             }
           });
           let uploadStream = data;
-          if (config.maxBodyLength > -1 && config.maxRedirects === 0) {
-            const limit = config.maxBodyLength;
+          if (maxBodyLength > -1 && !transportEnforcesMaxBodyLength) {
+            const limit = maxBodyLength;
             let bytesSent = 0;
             uploadStream = stream.pipeline([data, new stream.Transform({
               transform(chunk, _enc, cb) {
@@ -55823,7 +56536,11 @@ var require_axios = __commonJS({
             const cookie = cookies2[i].replace(/^\s+/, "");
             const eq = cookie.indexOf("=");
             if (eq !== -1 && cookie.slice(0, eq) === name) {
-              return decodeURIComponent(cookie.slice(eq + 1));
+              try {
+                return decodeURIComponent(cookie.slice(eq + 1));
+              } catch (e) {
+                return cookie.slice(eq + 1);
+              }
             }
           }
           return null;
@@ -55848,6 +56565,7 @@ var require_axios = __commonJS({
       ...thing
     } : thing;
     function mergeConfig(config1, config2) {
+      config1 = config1 || {};
       config2 = config2 || {};
       const config = /* @__PURE__ */ Object.create(null);
       Object.defineProperty(config, "hasOwnProperty", {
@@ -55889,6 +56607,23 @@ var require_axios = __commonJS({
         } else if (!utils$1.isUndefined(a)) {
           return getMergedValue(void 0, a);
         }
+      }
+      function getMergedTransitionalOption(prop) {
+        const transitional2 = utils$1.hasOwnProp(config2, "transitional") ? config2.transitional : void 0;
+        if (!utils$1.isUndefined(transitional2)) {
+          if (utils$1.isPlainObject(transitional2)) {
+            if (utils$1.hasOwnProp(transitional2, prop)) {
+              return transitional2[prop];
+            }
+          } else {
+            return void 0;
+          }
+        }
+        const transitional1 = utils$1.hasOwnProp(config1, "transitional") ? config1.transitional : void 0;
+        if (utils$1.isPlainObject(transitional1) && utils$1.hasOwnProp(transitional1, prop)) {
+          return transitional1[prop];
+        }
+        return void 0;
       }
       function mergeDirectKeys(a, b, prop) {
         if (utils$1.hasOwnProp(config2, prop)) {
@@ -55940,6 +56675,13 @@ var require_axios = __commonJS({
         const configValue = merge2(a, b, prop);
         utils$1.isUndefined(configValue) && merge2 !== mergeDirectKeys || (config[prop] = configValue);
       });
+      if (utils$1.hasOwnProp(config2, "validateStatus") && utils$1.isUndefined(config2.validateStatus) && getMergedTransitionalOption("validateStatusUndefinedResolves") === false) {
+        if (utils$1.hasOwnProp(config1, "validateStatus")) {
+          config.validateStatus = getMergedValue(void 0, config1.validateStatus);
+        } else {
+          delete config.validateStatus;
+        }
+      }
       return config;
     }
     var FORM_DATA_CONTENT_HEADERS = ["content-type", "content-length"];
@@ -55948,7 +56690,7 @@ var require_axios = __commonJS({
         headers.set(formHeaders);
         return;
       }
-      Object.entries(formHeaders).forEach(([key, val]) => {
+      Object.entries(formHeaders || {}).forEach(([key, val]) => {
         if (FORM_DATA_CONTENT_HEADERS.includes(key.toLowerCase())) {
           headers.set(key, val);
         }
@@ -55968,9 +56710,15 @@ var require_axios = __commonJS({
       const allowAbsoluteUrls = own2("allowAbsoluteUrls");
       const url2 = own2("url");
       newConfig.headers = headers = AxiosHeaders.from(headers);
-      newConfig.url = buildURL(buildFullPath(baseURL, url2, allowAbsoluteUrls), own2("params"), own2("paramsSerializer"));
+      newConfig.url = buildURL(buildFullPath(baseURL, url2, allowAbsoluteUrls, newConfig), own2("params"), own2("paramsSerializer"));
       if (auth) {
-        headers.set("Authorization", "Basic " + btoa((auth.username || "") + ":" + (auth.password ? encodeUTF8$1(auth.password) : "")));
+        const username = utils$1.getSafeProp(auth, "username") || "";
+        const password = utils$1.getSafeProp(auth, "password") || "";
+        try {
+          headers.set("Authorization", "Basic " + btoa(username + ":" + (password ? encodeUTF8$1(password) : "")));
+        } catch (e) {
+          throw AxiosError.from(e, AxiosError.ERR_BAD_OPTION_VALUE, config);
+        }
       }
       if (utils$1.isFormData(data)) {
         if (platform2.hasStandardBrowserEnv || platform2.hasStandardBrowserWebWorkerEnv || utils$1.isReactNative(data)) {
@@ -56117,6 +56865,7 @@ var require_axios = __commonJS({
         const protocol = parseProtocol(_config.url);
         if (protocol && !platform2.protocols.includes(protocol)) {
           reject(new AxiosError("Unsupported protocol " + protocol + ":", AxiosError.ERR_BAD_REQUEST, config));
+          done();
           return;
         }
         request.send(requestData || null);
@@ -56152,7 +56901,9 @@ var require_axios = __commonJS({
         });
         signals = null;
       };
-      signals.forEach((signal2) => signal2.addEventListener("abort", onabort));
+      signals.forEach((signal2) => signal2.addEventListener("abort", onabort, {
+        once: true
+      }));
       const {
         signal
       } = controller;
@@ -56382,12 +57133,14 @@ var require_axios = __commonJS({
           composedSignal.unsubscribe();
         });
         let requestContentLength;
+        let pendingBodyError = null;
+        const maxBodyLengthError = () => new AxiosError("Request body larger than maxBodyLength limit", AxiosError.ERR_BAD_REQUEST, config, request);
         try {
           let auth = void 0;
           const configAuth = own2("auth");
           if (configAuth) {
-            const username = configAuth.username || "";
-            const password = configAuth.password || "";
+            const username = utils$1.getSafeProp(configAuth, "username") || "";
+            const password = utils$1.getSafeProp(configAuth, "password") || "";
             auth = {
               username,
               password
@@ -56420,25 +57173,42 @@ var require_axios = __commonJS({
             }
           }
           if (hasMaxBodyLength && method !== "get" && method !== "head") {
-            const outboundLength = await resolveBodyLength(headers, data);
-            if (typeof outboundLength === "number" && isFinite(outboundLength) && outboundLength > maxBodyLength) {
-              throw new AxiosError("Request body larger than maxBodyLength limit", AxiosError.ERR_BAD_REQUEST, config, request);
+            const outboundLength = await getBodyLength(data);
+            if (typeof outboundLength === "number" && isFinite(outboundLength)) {
+              requestContentLength = outboundLength;
+              if (outboundLength > maxBodyLength) {
+                throw maxBodyLengthError();
+              }
             }
           }
-          if (onUploadProgress && supportsRequestStream && method !== "get" && method !== "head" && (requestContentLength = await resolveBodyLength(headers, data)) !== 0) {
-            let _request = new Request(url2, {
-              method: "POST",
-              body: data,
-              duplex: "half"
-            });
-            let contentTypeHeader;
-            if (utils$1.isFormData(data) && (contentTypeHeader = _request.headers.get("content-type"))) {
-              headers.setContentType(contentTypeHeader);
+          const mustEnforceStreamBody = hasMaxBodyLength && (utils$1.isReadableStream(data) || utils$1.isStream(data));
+          const trackRequestStream = (stream2, onProgress, flush) => trackStream(stream2, DEFAULT_CHUNK_SIZE, (loadedBytes) => {
+            if (hasMaxBodyLength && loadedBytes > maxBodyLength) {
+              throw pendingBodyError = maxBodyLengthError();
             }
-            if (_request.body) {
-              const [onProgress, flush] = progressEventDecorator(requestContentLength, progressEventReducer(asyncDecorator(onUploadProgress)));
-              data = trackStream(_request.body, DEFAULT_CHUNK_SIZE, onProgress, flush);
+            onProgress && onProgress(loadedBytes);
+          }, flush);
+          if (supportsRequestStream && method !== "get" && method !== "head" && (onUploadProgress || mustEnforceStreamBody)) {
+            requestContentLength = requestContentLength == null ? await resolveBodyLength(headers, data) : requestContentLength;
+            if (requestContentLength !== 0 || mustEnforceStreamBody) {
+              let _request = new Request(url2, {
+                method: "POST",
+                body: data,
+                duplex: "half"
+              });
+              let contentTypeHeader;
+              if (utils$1.isFormData(data) && (contentTypeHeader = _request.headers.get("content-type"))) {
+                headers.setContentType(contentTypeHeader);
+              }
+              if (_request.body) {
+                const [onProgress, flush] = onUploadProgress && progressEventDecorator(requestContentLength, progressEventReducer(asyncDecorator(onUploadProgress))) || [];
+                data = trackRequestStream(_request.body, onProgress, flush);
+              }
             }
+          } else if (mustEnforceStreamBody && !isRequestSupported && isReadableStreamSupported && method !== "get" && method !== "head") {
+            data = trackRequestStream(data);
+          } else if (mustEnforceStreamBody && isRequestSupported && !supportsRequestStream && method !== "get" && method !== "head") {
+            throw new AxiosError("Stream request bodies are not supported by the current fetch implementation", AxiosError.ERR_NOT_SUPPORT, config, request);
           }
           if (!utils$1.isString(withCredentials)) {
             withCredentials = withCredentials ? "include" : "omit";
@@ -56462,8 +57232,9 @@ var require_axios = __commonJS({
           };
           request = isRequestSupported && new Request(url2, resolvedOptions);
           let response = await (isRequestSupported ? _fetch(request, fetchOptions) : _fetch(url2, resolvedOptions));
+          const responseHeaders = AxiosHeaders.from(response.headers);
           if (hasMaxContentLength) {
-            const declaredLength = utils$1.toFiniteNumber(response.headers.get("content-length"));
+            const declaredLength = utils$1.toFiniteNumber(responseHeaders.getContentLength());
             if (declaredLength != null && declaredLength > maxContentLength) {
               throw new AxiosError("maxContentLength size of " + maxContentLength + " exceeded", AxiosError.ERR_BAD_RESPONSE, config, request);
             }
@@ -56474,7 +57245,7 @@ var require_axios = __commonJS({
             ["status", "statusText", "headers"].forEach((prop) => {
               options[prop] = response[prop];
             });
-            const responseContentLength = utils$1.toFiniteNumber(response.headers.get("content-length"));
+            const responseContentLength = utils$1.toFiniteNumber(responseHeaders.getContentLength());
             const [onProgress, flush] = onDownloadProgress && progressEventDecorator(responseContentLength, progressEventReducer(asyncDecorator(onDownloadProgress), true)) || [];
             let bytesRead = 0;
             const onChunkProgress = (loadedBytes) => {
@@ -56525,13 +57296,35 @@ var require_axios = __commonJS({
             const canceledError = composedSignal.reason;
             canceledError.config = config;
             request && (canceledError.request = request);
-            err !== canceledError && (canceledError.cause = err);
+            if (err !== canceledError) {
+              Object.defineProperty(canceledError, "cause", {
+                __proto__: null,
+                value: err,
+                writable: true,
+                enumerable: false,
+                configurable: true
+              });
+            }
             throw canceledError;
           }
+          if (pendingBodyError) {
+            request && !pendingBodyError.request && (pendingBodyError.request = request);
+            throw pendingBodyError;
+          }
+          if (err instanceof AxiosError) {
+            request && !err.request && (err.request = request);
+            throw err;
+          }
           if (err && err.name === "TypeError" && /Load failed|fetch/i.test(err.message)) {
-            throw Object.assign(new AxiosError("Network Error", AxiosError.ERR_NETWORK, config, request, err && err.response), {
-              cause: err.cause || err
+            const networkError = new AxiosError("Network Error", AxiosError.ERR_NETWORK, config, request, err && err.response);
+            Object.defineProperty(networkError, "cause", {
+              __proto__: null,
+              value: err.cause || err,
+              writable: true,
+              enumerable: false,
+              configurable: true
             });
+            throw networkError;
           }
           throw AxiosError.from(err, err && err.code, config, request, err && err.response);
         }
@@ -56606,7 +57399,7 @@ var require_axios = __commonJS({
       if (!adapter) {
         const reasons = Object.entries(rejectedReasons).map(([id, state]) => `adapter ${id} ` + (state === false ? "is not supported by the environment" : "is not available in the build"));
         let s = length ? reasons.length > 1 ? "since :\n" + reasons.map(renderReason).join("\n") : " " + renderReason(reasons[0]) : "as no adapter specified";
-        throw new AxiosError(`There is no suitable adapter to dispatch the request ` + s, "ERR_NOT_SUPPORT");
+        throw new AxiosError(`There is no suitable adapter to dispatch the request ` + s, AxiosError.ERR_NOT_SUPPORT);
       }
       return adapter;
     }
@@ -56693,7 +57486,7 @@ var require_axios = __commonJS({
       };
     };
     function assertOptions(options, schema, allowUnknown) {
-      if (typeof options !== "object") {
+      if (typeof options !== "object" || options === null) {
         throw new AxiosError("options must be an object", AxiosError.ERR_BAD_OPTION_VALUE);
       }
       const keys = Object.keys(options);
@@ -56785,7 +57578,8 @@ var require_axios = __commonJS({
             forcedJSONParsing: validators.transitional(validators.boolean),
             clarifyTimeoutError: validators.transitional(validators.boolean),
             legacyInterceptorReqResOrdering: validators.transitional(validators.boolean),
-            advertiseZstdAcceptEncoding: validators.transitional(validators.boolean)
+            advertiseZstdAcceptEncoding: validators.transitional(validators.boolean),
+            validateStatusUndefinedResolves: validators.transitional(validators.boolean)
           }, false);
         }
         if (paramsSerializer != null) {
@@ -56875,7 +57669,7 @@ var require_axios = __commonJS({
       }
       getUri(config) {
         config = mergeConfig(this.defaults, config);
-        const fullPath = buildFullPath(config.baseURL, config.url, config.allowAbsoluteUrls);
+        const fullPath = buildFullPath(config.baseURL, config.url, config.allowAbsoluteUrls, config);
         return buildURL(fullPath, config.params, config.paramsSerializer);
       }
     };
@@ -56884,7 +57678,7 @@ var require_axios = __commonJS({
         return this.request(mergeConfig(config || {}, {
           method,
           url: url2,
-          data: (config || {}).data
+          data: config && utils$1.hasOwnProp(config, "data") ? config.data : void 0
         }));
       };
     });
@@ -58330,6 +59124,7 @@ var require_dist2 = __commonJS({
     __exportStar(require_spaceScopedRoutePrefix(), exports2);
     __exportStar(require_subscriptionRecord(), exports2);
     __exportStar(require_utils3(), exports2);
+    __exportStar(require_versionCheck(), exports2);
   }
 });
 
@@ -59017,5 +59812,5 @@ urijs/src/URITemplate.js:
    *)
 
 axios/dist/node/axios.cjs:
-  (*! Axios v1.17.0 Copyright (c) 2026 Matt Zabriskie and contributors *)
+  (*! Axios v1.18.1 Copyright (c) 2026 Matt Zabriskie and contributors *)
 */
