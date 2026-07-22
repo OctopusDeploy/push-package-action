@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.0.3](https://github.com/OctopusDeploy/push-package-action/compare/v4.0.2...v4.0.3) (2026-07-22)
+
+
+### Bug Fixes
+
+* **deps:** bump @octopusdeploy/api-client to 3.11.5 ([#597](https://github.com/OctopusDeploy/push-package-action/issues/597)) ([e3a1fab](https://github.com/OctopusDeploy/push-package-action/commit/e3a1faba98f027b78e2071aae47e279898d0b483))
+* **deps:** bump @octopusdeploy/api-client to 3.11.6 ([#603](https://github.com/OctopusDeploy/push-package-action/issues/603)) ([222cd63](https://github.com/OctopusDeploy/push-package-action/commit/222cd633f4587ca92691c0cdcc3e04180bdbdde8))
+* **deps:** update js-yaml to resolve DoS advisory ([#602](https://github.com/OctopusDeploy/push-package-action/issues/602)) ([78be0c7](https://github.com/OctopusDeploy/push-package-action/commit/78be0c7db68ecaca7d42252db702973dff2cf853))
+
 ## [4.0.2](https://github.com/OctopusDeploy/push-package-action/compare/v4.0.1...v4.0.2) (2026-06-08)
 
 
