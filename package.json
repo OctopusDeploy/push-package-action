@@ -26,8 +26,8 @@
     "eslint-plugin-prettier": "4.2.5",
     "jest": "29.7.0",
     "jest-circus": "29.7.0",
-    "jest-junit": "15.0.0",
-    "js-yaml": "5.2.1",
+    "jest-junit": "17.0.0",
+    "js-yaml": "5.2.2",
     "prettier": "2.8.8",
     "tmp": "0.2.7",
     "ts-jest": "29.4.9",
@@ -99,5 +99,8 @@
     "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js --ci --reporters=default --reporters=jest-junit --testPathPattern=__tests__/unit",
     "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --ci --reporters=default --reporters=jest-junit --testPathPattern=__tests__/integration"
   },
-  "version": "4.0.3"
+  "version": "4.0.3",
+  "overrides": {
+    "brace-expansion": "^5.0.8"
+  }
 }
