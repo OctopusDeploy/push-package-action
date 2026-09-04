@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.0.4](https://github.com/OctopusDeploy/push-package-action/compare/v4.0.3...v4.0.4) (2026-09-04)
+
+
+### Bug Fixes
+
+* **deps:** bump brace-expansion override to resolve DoS bypass ([#608](https://github.com/OctopusDeploy/push-package-action/issues/608)) ([5c828f4](https://github.com/OctopusDeploy/push-package-action/commit/5c828f4382101197694481d3d8daa708485f1a82))
+* **deps:** resolve outstanding npm audit advisories ([#604](https://github.com/OctopusDeploy/push-package-action/issues/604)) ([295a4ee](https://github.com/OctopusDeploy/push-package-action/commit/295a4ee42b32037ba6b86433007adec666b1dd82))
+
 ## [4.0.3](https://github.com/OctopusDeploy/push-package-action/compare/v4.0.2...v4.0.3) (2026-07-22)
 
 
