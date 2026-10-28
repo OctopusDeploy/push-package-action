@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.8](https://github.com/OctopusDeploy/push-package-action/compare/v4.0.7...v4.0.8) (2026-10-28)
+
+
+### Bug Fixes
+
+* **deps:** bump undici from 6.29.0 to 6.29.1 ([ac6de62](https://github.com/OctopusDeploy/push-package-action/commit/ac6de62cd60baa8bcaef3612a41d8ae14e22bf33))
+
 ## [4.0.7](https://github.com/OctopusDeploy/push-package-action/compare/v4.0.6...v4.0.7) (2026-10-20)
 
 
